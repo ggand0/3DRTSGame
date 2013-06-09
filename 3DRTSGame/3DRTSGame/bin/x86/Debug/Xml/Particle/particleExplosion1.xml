@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="_3DRTSGame.ParticleEffect.Movement">
+    <!--<Item Type="_3DRTSGame.Emitters.ExplosionParticleEmitter">
+        <Speed>500</Speed>
+    </Item>-->
+    <Item Type="_3DRTSGame.ExplosionParticleEmitter">
+      <Name>flash</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Mercury\LensFlare</TexturePath>
+      <ParticleNum use = "argument" type = "int">10</ParticleNum>
+      <Scale use = "argument" type = "Vector2">100</Scale>
+      <Lifespane use = "argument" type = "float">0.2</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">3</Speed>
+    </Item>
+    <Item Type="_3DRTSGame.ExplosionParticleEmitter">
+      <Name>mist/smoke</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Particle\smoke</TexturePath>
+      <ParticleNum use = "argument" type = "int">100</ParticleNum>
+      <Scale use = "argument" type = "Vector2">200</Scale>
+      <Lifespane use = "argument" type = "float">3</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">10</Speed>
+    </Item><!---->
+    <Item Type="_3DRTSGame.ExplosionParticleEmitter">
+      <Name>explosion</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Particle\explosion</TexturePath>
+      <ParticleNum use = "argument" type = "int">200</ParticleNum>
+      <Scale use = "argument" type = "Vector2">100</Scale>
+      <Lifespane use = "argument" type = "float">3</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">5</Speed>
+    </Item>
+    <Item Type = "_3DRTSGame.ExplosionParticleEmitter">
+      <Name>flying spark</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Mercury\Beam2</TexturePath>
+      <ParticleNum use = "argument" type = "int">80</ParticleNum>
+      <Scale use = "argument" type = "Vector2">70</Scale>
+      <Lifespane use = "argument" type = "float">3</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">20</Speed>
+        <BillboardMode use = "argument" type = "BillboardMode">Line</BillboardMode>
+    </Item>
+    <Item Type = "_3DRTSGame.ExplosionParticleEmitter">
+      <Name>spark</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Mercury\FlowerBurst</TexturePath>
+      <ParticleNum use = "argument" type = "int">60</ParticleNum>
+      <Scale use = "argument" type = "Vector2">50</Scale>
+      <Lifespane use = "argument" type = "float">3</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">10</Speed>
+    </Item>
+    <Item Type = "_3DRTSGame.ShockWaveParticleEmitter">
+      <Name>ring shaped shock wave</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Particle\GlowRing</TexturePath>
+      <ParticleNum use = "argument" type = "int">1</ParticleNum>
+      <Scale use = "argument" type = "Vector2">300</Scale>
+      <Lifespane use = "argument" type = "float">3</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">10</Speed>
+    </Item>
+    <Name>Big Explosion</Name>
+    <Author>pentiumx</Author>
+    <Description>description of basic explosion particles</Description>
+  </Asset>
+</XnaContent>

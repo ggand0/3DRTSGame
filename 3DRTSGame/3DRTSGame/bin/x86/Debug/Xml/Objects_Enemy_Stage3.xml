@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--コメント未記入のパラメータはまだ調整中のもの-->
+<objects>
+    <obj Name = "FlyingEnemy3">
+        <defSpeed type = "field">-2.0</defSpeed><!-- -2.5 移動速度(負の値)-->
+        <jumpSpeed type = "field">-16</jumpSpeed><!-- -16 ジャンプ速度(負の値)-->
+        <defMovePattern>1</defMovePattern><!-- 1 移動パターン(0~1)-->
+    </obj>
+    <obj Name = "FlyingOutEnemy3">
+        <defFlyingOutDistance type = "field">300</defFlyingOutDistance><!-- 300 反応して飛び出る範囲-->
+        <defFlyingOutSpeed type = "field">-12</defFlyingOutSpeed><!-- -12 飛び出す速度（負の値）-->  
+    </obj>
+    <obj Name = "StationalEnemy3">
+        <defSpeed type = "field">2</defSpeed><!-- 2移動速度-->
+        <jumpInterval type = "field">180</jumpInterval>
+    </obj>
+    <obj Name = "SkatingEnemy2">
+        <defSpeed type = "field">-2.5</defSpeed><!-- -2.5 移動速度(負の値)-->
+        <stopDistance type = "field">125</stopDistance>
+    </obj>
+</objects>

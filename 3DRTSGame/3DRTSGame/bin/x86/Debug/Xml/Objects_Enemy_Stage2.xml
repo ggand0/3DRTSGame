@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--コメント未記入のパラメータはまだ調整中のもの-->
+<objects>
+    <obj Name = "FlyingEnemy2">
+        <defSpeed type ="field">2</defSpeed><!-- 2 移動速度-->
+        <shootDistance type = "field">100</shootDistance><!-- 100 撃ってくる距離-->
+    </obj>
+    <obj Name = "FlyingOutEnemy2">
+        <defFlyingOutDistance type = "field">100</defFlyingOutDistance><!-- 300 反応して飛び出る範囲-->
+        <defFlyingOutSpeed type = "field">16</defFlyingOutSpeed><!-- 16 飛び出す速度（正の値）-->  
+    </obj>
+    <obj Name = "RushingOutEnemy">
+        <defFlyingOutDistance type = "field">200</defFlyingOutDistance><!-- 200 反応して飛び出る範囲-->
+        <defFlyingOutSpeed type = "field">-18</defFlyingOutSpeed><!-- -18 飛び出す速度（負の値）-->  
+    </obj>
+    <obj Name = "SkatingEnemy">
+        <spFriction type = "field">0.25</spFriction><!-- 0.25 摩擦係数(この敵のみに設定される値)-->
+        <defStopDistance type = "field">50</defStopDistance> <!-- 50Playerの直前で止まる距離（その後は滑るだけ）-->
+    </obj>
+</objects>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--キーコンフィグ：0-8の値を入力-->
+<objects>
+    <obj Name = "KeyConfig">
+        <sword_lite type = "key">3</sword_lite>
+        <sword_strong type = "key">0</sword_strong>
+        <jump type = "key">2</jump>
+        <nothing0 type = "key">1</nothing0>
+        <dash type = "key">6</dash>
+        <TAS type = "key">7</TAS>
+        <nothing1 type = "key">4</nothing1>
+        <nothing2 type = "key">5</nothing2>
+        <PAUSE type = "key">8</PAUSE>
+        <SELECT type = "key">9</SELECT>
+    </obj>
+</objects>

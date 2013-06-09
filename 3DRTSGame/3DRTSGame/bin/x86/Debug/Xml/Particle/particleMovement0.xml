@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="HLSLTest.ParticleEffect.Movement">
+    <!--<Item Type="HLSLTest.Emitters.ExplosionParticleEmitter">
+        <Speed>500</Speed>
+    </Item>-->
+    <Item Type="ExplosionParticleEmitter">
+      <Name>flare</Name>
+      <TexturePath type = "argument">Textures\\Mercury\\LensFlare</TexturePath>
+      <ParticleNum type = "argument">10</ParticleNum>
+      <Scale type = "argument">80</Scale>
+      <Lifespane type = "argument">0.2</Lifespane>
+      <FadeInTime type = "argument">0</FadeInTime>
+      <MovementType type = "argument">0</MovementType>
+      <Speed type = "argument">0.1</Speed>
+    </Item>
+    <Item Type="ExplosionParticleEmitter">
+      <Name>explosion</Name>
+      <TexturePath type = "argument">Textures\\Particle\\explosion</TexturePath>
+      <ParticleNum type = "argument">50</ParticleNum>
+      <Scale type = "argument">20</Scale>
+      <Lifespane type = "argument">3</Lifespane>
+      <FadeInTime type = "argument">0</FadeInTime>
+      <MovementType type = "argument">0</MovementType>
+      <Speed type = "argument">2</Speed>
+    </Item>
+    <Item Type="ExplosionParticleEmitter">
+      <Name type = "argument">explosion</Name>
+      <TexturePath type = "argument">Textures\\Mercury\\FlowerBurst</TexturePath>
+      <ParticleNum type = "argument">20</ParticleNum>
+      <Scale type = "argument">10</Scale>
+      <Lifespane type = "argument">3</Lifespane>
+      <FadeInTime type = "argument">0</FadeInTime>
+      <MovementType type = "argument">0</MovementType>
+      <Speed type = "argument">2</Speed>
+    </Item>
+    <Name>Basic Explosion</Name>
+    <Author>pentiumx</Author>
+    <Description>description of basic explosion particles</Description>
+  </Asset>
+</XnaContent>

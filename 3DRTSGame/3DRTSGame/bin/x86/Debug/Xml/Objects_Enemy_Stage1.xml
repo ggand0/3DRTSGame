@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--コメント未記入のパラメータはまだ調整中のもの-->
+<objects>
+    <obj Name = "JumpingEnemy">
+        <defSpeed type = "field">-2.5</defSpeed><!-- -2.5 移動速度（X方向）-->
+        <jumpSpeed type = "field">-10</jumpSpeed><!-- -10 ジャンプ速度（負の値）-->
+        <defMovePattern type = "field">0</defMovePattern><!-- 0 移動パターン(0~2まで実装の予定)-->
+    </obj>
+    <obj Name = "FlyingEnemy">
+        <defSpeed type = "field">-2.5</defSpeed><!-- 2 移動速度（X方向）-->
+        <attackType type = "field">0</attackType><!-- 0 攻撃パターン(0~2まで実装の予定)-->
+        <shootDistance type = "field">100</shootDistance><!-- 100 Playerが近づいてきたときに射撃する範囲-->                                             
+    </obj>
+    <obj Name = "FlyingOutEnemy">
+        <defSpeed type = "field">2</defSpeed><!-- 2 飛び出た後の移動速度（X方向）-->
+        <defFlyingOutDistance type = "field">300</defFlyingOutDistance><!-- 300 反応して飛び出る範囲-->
+        <defFlyingOutSpeed type = "field">-12</defFlyingOutSpeed><!-- -12 飛び出す速度（負の値）-->                                             
+    </obj>
+</objects>

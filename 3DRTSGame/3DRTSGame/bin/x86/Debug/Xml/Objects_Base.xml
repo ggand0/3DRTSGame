@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--コメント未記入のパラメータはまだ調整中のもの-->
+<objects>
+    <obj Name = "Object">
+        <defHitPoint type = "field">3</defHitPoint><!-- 3 敵のデフォルトのHP-->
+        <timeCoefObject type = "property">0.3</timeCoefObject><!-- 0.3 TASのスロウのパラメータ：恐らくPlayerと敵の動きの比率-->
+        <defGravity type = "field">0.60</defGravity><!-- 0.60 デフォルトの重力-->
+        <accel type = "field">0.40</accel><!-- 0.40 移動時のアクセル-->
+        <maxSpeed type = "field">32</maxSpeed><!-- 32 最高速度：32以上にすると多分マップチップすり抜ける-->
+        <defFriction type = "field">0.40</defFriction><!-- 0.40 摩擦-->
+    </obj>
+    <obj Name = "Enemy">
+        <motionDelayTime type = "field">60</motionDelayTime><!-- 60 敵が攻撃を受けたあと止まっている時間[frame]-->
+    </obj>
+    <obj Name = "Player">
+        <screenPosition type = "field">200,0</screenPosition><!--200,0　固定スクロール(ボス戦とか)時のPlayerのスクリーン座標（画面内の位置）-->
+        <MAXTAS type = "field">1800</MAXTAS><!--1800　TASの最大値-->
+        <initialTAS type = "field">900</initialTAS><!--900　TASの初期値-->
+        <firstJumpSpeed type = "field">-13.0</firstJumpSpeed><!--　-13.0　ジャンプ１回目の速度(負の値)-->
+        <secondJumpSpeed type = "field">-10.0</secondJumpSpeed><!--　-10.0　空中ジャンプの速度(負の値)-->
+    </obj>
+</objects>

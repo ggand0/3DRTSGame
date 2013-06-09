@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent>
+  <Asset Type="_3DRTSGame.ParticleEffect.Movement">
+    <!--<Item Type="_3DRTSGame.Emitters.ExplosionParticleEmitter">
+        <Speed>500</Speed>
+    </Item>-->
+    <Item Type="_3DRTSGame.ExplosionParticleEmitter">
+      <Name>flare</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Mercury\LensFlare</TexturePath>
+      <ParticleNum use = "argument" type = "int">10</ParticleNum>
+      <Scale use = "argument" type = "Vector2">80</Scale>
+      <Lifespane use = "argument" type = "float">0.2</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">0.1</Speed>
+    </Item>
+    <Item Type="_3DRTSGame.ExplosionParticleEmitter">
+      <Name>explosion</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Particle\explosion</TexturePath>
+      <ParticleNum use = "argument" type = "int">200</ParticleNum>
+      <Scale use = "argument" type = "Vector2">20</Scale>
+      <Lifespane use = "argument" type = "float">3</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">0.5</Speed>
+    </Item>
+    <Item Type = "_3DRTSGame.ExplosionParticleEmitter">
+      <Name>explosion</Name>
+      <TexturePath use = "argument" type = "Texture2D">Textures\Mercury\FlowerBurst</TexturePath>
+      <ParticleNum use = "argument" type = "int">20</ParticleNum>
+      <Scale use = "argument" type = "Vector2">10</Scale>
+      <Lifespane use = "argument" type = "float">3</Lifespane>
+      <FadeInTime use = "argument" type = "float">0</FadeInTime>
+      <Movementuse use = "argument" type = "int">0</Movementuse>
+      <Speed use = "argument" type = "float">2</Speed>
+    </Item>
+    <Name>Basic Explosion</Name>
+    <Author>pentiumx</Author>
+    <Description>description of basic explosion particles</Description>
+  </Asset>
+</XnaContent>
