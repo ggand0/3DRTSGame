@@ -65,7 +65,7 @@ namespace _3DRTSGame
 			effect.CurrentTechnique.Passes[0].Apply();
 			graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 			graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
-			4 * BillboardNum, 0, BillboardNum * 2);
+				4 * BillboardNum, 0, BillboardNum * 2);
 		}
 		protected void DrawTransparentPixels()
 		{
@@ -114,6 +114,13 @@ namespace _3DRTSGame
 			IndexElementSize.ThirtyTwoBits,
 			BillboardNum * 6, BufferUsage.WriteOnly);
 			indexBuffers.SetData<int>(indices);
+		}
+		public void SetPosition(Vector3 position)
+		{
+			for (int i = 0; i < particles.Length; i++) {
+				particles[i].Position = position;
+			}
+			vertexBuffers.SetData<VertexPositionTexture>(particles);
 		}
 
 		protected virtual void setEffectParameters(Matrix View, Matrix Projection, Vector3 Up, Vector3 Right)

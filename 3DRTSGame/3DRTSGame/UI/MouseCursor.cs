@@ -39,9 +39,9 @@ namespace _3DRTSGame
 			}
 
 			Vector2 pos = MouseInput.GetMousePosition();
-			spriteBatch.Begin();
+			//spriteBatch.Begin();
 			spriteBatch.Draw(texture, State == CursorState.Normal ? MouseInput.GetMousePosition() : MouseInput.GetCachedPosition(), Color.White);
-			spriteBatch.End();
+			//spriteBatch.End();
 		}
 
 		public MouseCursor()

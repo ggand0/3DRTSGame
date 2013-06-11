@@ -10,7 +10,15 @@ namespace _3DRTSGame
 {
 	public class UIManager : Drawable
 	{
-		public List<UIObject> interfaces = new List<UIObject>();
+		public static SpriteBatch spriteBatch;
+		private List<UIObject> interfaces = new List<UIObject>();
+		private static UnitPanel mainPanel = new UnitPanel();
+
+
+		public static Type GetUnitType()
+		{
+			return mainPanel.GetUnitType();
+		}
 
 		public override void Update(GameTime gameTime)
 		{
@@ -24,17 +32,22 @@ namespace _3DRTSGame
 		{
 			base.Draw(gameTime);
 
+			spriteBatch.Begin();
 			foreach (UIObject ui in interfaces) {
 				ui.Draw(gameTime);
 			}
+			mainPanel.Draw(gameTime);
+			spriteBatch.End();
 		}
 		private void Initialize()
 		{
 			interfaces.Add(new MouseCursor());
+			//interfaces.Add(new UnitPanel());
 		}
 
 		public UIManager()
 		{
+			
 			Initialize();
 		}
 	}

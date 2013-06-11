@@ -32,8 +32,8 @@ namespace _3DRTSGame
 		public int LevelNum { get; private set; }
 		public bool MoveNextLevel { get; set; }
 
-		public float Width { get; private set; }
-		public float Height { get; private set; }
+		public static float Width { get; private set; }
+		public static float Height { get; private set; }
 
 		public Game1()
 		{
@@ -87,6 +87,7 @@ namespace _3DRTSGame
 			Debug.spriteBatch = this.spriteBatch;
 			Object.spriteBatch = spriteBatch;
 			UIObject.spriteBatch = spriteBatch;
+			UIManager.spriteBatch = spriteBatch;
 
 			Level.graphicsDevice = GraphicsDevice;
 			Level.content = Content;

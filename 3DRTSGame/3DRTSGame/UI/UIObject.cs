@@ -12,7 +12,11 @@ namespace _3DRTSGame
 	{
 		public static SpriteBatch spriteBatch;
 		public static ContentManager content;
+		public static Game1 game;
+
 		protected Texture2D texture;
+		protected Vector2 UIPosition;
+		protected float scale;
 
 		protected virtual void HandleInput()
 		{

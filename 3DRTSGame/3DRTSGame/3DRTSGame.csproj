@@ -98,6 +98,7 @@
     <Compile Include="Camera\RTSCamera.cs" />
     <Compile Include="Core\EnemyManager.cs" />
     <Compile Include="Core\IDamageable.cs" />
+    <Compile Include="Core\ProductionManager.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Effect\EffectManager.cs" />
     <Compile Include="Effect\EnergyRingEffect.cs" />
@@ -179,10 +180,11 @@
     <Compile Include="Terrain\SphericalTerrain2.cs" />
     <Compile Include="Terrain\Terrain.cs" />
     <Compile Include="Terrain\Water.cs" />
+    <Compile Include="UI\UnitPanel.cs" />
     <Compile Include="UI\MouseCursor.cs" />
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="UI\UIObject.cs" />
-    <Compile Include="UI\UnitSelectionButton.cs" />
+    <Compile Include="UI\UnitCard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

@@ -69,6 +69,7 @@ Content\Fonts\Pump_Demi_Bold.xnb
 Content\Fonts\Pump_Demi_Bold2.xnb
 Content\Fonts\titleFont.xnb
 Content\Models\AGM-65-Maverick-Air-to-Ground-Tactical-Missile.xnb
+Content\Models\AGM65Missile.xnb
 Content\Models\cube.xnb
 Content\Models\Dawn.xnb
 Content\Models\DeepSpace.xnb
@@ -95,6 +96,8 @@ Content\Models\WaterMeshRotated.xnb
 Content\Models\Asteroid.xnb
 Content\Models\Ground.xnb
 Content\Models\pea_proj.xnb
+Content\Models\sphere.xnb
+Content\Models\sphere2.xnb
 Content\Textures\Billboard\tree.xnb
 Content\Textures\Laser.xnb
 Content\Textures\Laser2.xnb
@@ -214,6 +217,8 @@ Content\Textures\UI\LifeBar2.xnb
 Content\Textures\UI\LifeBar2Back.xnb
 Content\Textures\UI\LifeBarRed.xnb
 Content\Textures\whiteBoard.xnb
+Content\SoundEffects\explosion0.xnb
+Content\SoundEffects\missile0.xnb
 Content\SoundEffects\laser0.xnb
 Content\SoundEffects\laser1.xnb
 Content\SoundEffects\License\LAAT0.xnb
@@ -242,8 +247,6 @@ Content\Models\tex_02_0.xnb
 Content\Models\teapottex1_0.xnb
 Content\Models\asteroid1_0.xnb
 Content\Models\pea_proj_0.xnb
-Content\SoundEffects\explosion0.xnb
-Content\SoundEffects\missile0.xnb
-Content\Models\AGM65Missile.xnb
-Content\Models\sphere2.xnb
-Content\Models\sphere.xnb
+Content\Textures\UI\ui_deepsapce.xnb
+Content\Textures\UI\ui_tdrs.xnb
+Content\Textures\UI\GlowRing2.xnb

@@ -259,7 +259,7 @@
     <Compile Include="Models\fighter0.fbx">
       <Name>fighter0</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>AlignedModelProcessor</Processor>
     </Compile>
     <Compile Include="Models\Ground.x">
       <Name>Ground</Name>
@@ -304,7 +304,7 @@
     <Compile Include="Models\spacestation4.fbx">
       <Name>spacestation4</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>AlignedModelProcessor</Processor>
     </Compile>
     <Compile Include="Models\sphere.x">
       <Name>sphere</Name>
@@ -1215,6 +1215,31 @@
   <ItemGroup>
     <Folder Include="Models\bak\" />
     <Folder Include="Textures\bak\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BlenderToXNAProcessor\BlenderToXNAProcessor.csproj">
+      <Project>{FF0A4651-2DF9-4697-AB3A-7CADD7D22F20}</Project>
+      <Name>BlenderToXNAProcessor</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\UI\ui_deepsapce.png">
+      <Name>ui_deepsapce</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\UI\ui_tdrs.png">
+      <Name>ui_tdrs</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\UI\GlowRing2.png">
+      <Name>GlowRing2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 

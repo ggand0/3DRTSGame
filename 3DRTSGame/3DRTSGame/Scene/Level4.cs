@@ -55,6 +55,8 @@ namespace _3DRTSGame
         private Matrix RotationMatrix = Matrix.Identity;
 		private EnemyManager enemyManager;
 		private UIManager uiManager = new UIManager();
+		private ProductionManager productionManager;
+
 
         /// <summary>
         /// Utility専用クラスにまとめるべき
@@ -77,6 +79,7 @@ namespace _3DRTSGame
 		{
 			base.Initialize();
 			enemyManager = new EnemyManager(this);
+			productionManager = new ProductionManager(this);
 			new DebugOverlay(graphicsDevice, content);
 
 			// Entities
@@ -101,7 +104,7 @@ namespace _3DRTSGame
             grid.GridSize = 64;;//32;
 			// Set the grid to draw on the x/z plane around the origin
 			grid.WorldMatrix = Matrix.Identity;
-		}	
+		}
 		public override void Load()
 		{
 			base.Load();
@@ -245,7 +248,8 @@ namespace _3DRTSGame
 
 			MouseState ms = Mouse.GetState();
 			ButtonState bs = ms.LeftButton;
-			if (MouseInput.IsOnButtonDownL()) {
+			//if (MouseInput.IsOnButtonDownL()) {
+			if (false) {
 				Vector2 mousePos = MouseInput.GetMousePosition();
 
 				// rayとplaneのintersection pointを計算する
@@ -467,6 +471,7 @@ namespace _3DRTSGame
 				Models.Add(a);
 			}*/
 			enemyManager.Update(gameTime);
+			productionManager.Update(gameTime);
 
 			base.Update(gameTime);
 
@@ -584,6 +589,7 @@ namespace _3DRTSGame
 
 
 			// Draw UIs
+			productionManager.Draw(gameTime);
 			uiManager.Draw(gameTime);
 		}
 

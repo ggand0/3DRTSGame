@@ -49,7 +49,7 @@ namespace _3DRTSGame
 			higherScene.Draw(gameTime);
 
 			spriteBatch.Begin();
-			spriteBatch.Draw(mask, new Rectangle(0, 0, (int)game.Width, (int)game.Height), new Color(0, 0, 0, 100));
+			spriteBatch.Draw(mask, new Rectangle(0, 0, (int)Game1.Width, (int)Game1.Height), new Color(0, 0, 0, 100));
 			spriteBatch.End();
 			base.Draw(gameTime);
 		}

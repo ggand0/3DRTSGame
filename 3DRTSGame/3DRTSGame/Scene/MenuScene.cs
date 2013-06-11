@@ -26,9 +26,9 @@ namespace _3DRTSGame
 
 		public override void Load()
 		{
-			TEXT_POSITION = new Vector2(game.Width / 2,
-				(game.Height / 2 - game.menuFont.MeasureString("A").Y * (buttonNum * 2 / 4)));// * (buttonNum * 1 / 4)
-			TITLE_POSITION = new Vector2(game.Width / 2, game.menuFont.MeasureString("A").Y / 2);
+			TEXT_POSITION = new Vector2(Game1.Width / 2,
+				(Game1.Height / 2 - game.menuFont.MeasureString("A").Y * (buttonNum * 2 / 4)));// * (buttonNum * 1 / 4)
+			TITLE_POSITION = new Vector2(Game1.Width / 2, game.menuFont.MeasureString("A").Y / 2);
 			//backGround = content.Load<Texture2D>("General\\Menu\\MenuBG");
 			mask = content.Load<Texture2D>("Textures\\whiteBoard");
 			//mask = content.Load<Texture2D>("General\\Menu\\MaskTexture");
