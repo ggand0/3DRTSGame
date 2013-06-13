@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace _3DRTSGame
 {
@@ -13,10 +14,11 @@ namespace _3DRTSGame
 	{
 		#region Fields
 		// statics
+
 		private static readonly float VERTICAL_ANGLE_MIN = 0.01f;
 		private static readonly float VERTICAL_ANGLE_MAX = MathHelper.Pi - 0.01f;
 		private static readonly float ZOOM_MIN = 100;
-		private static readonly float ZOOM_MAX = 00.0f;
+		private static readonly float ZOOM_MAX = 10000.0f;
 		//private static readonly float ZOOM_RATE = 10; // スムーズにズームさせたい時に使用する予定
 
 		private short zoomMode = 0;
@@ -29,7 +31,7 @@ namespace _3DRTSGame
 		//public Vector3 Position { get; set; }
 		public Vector3 Velocity { get; set; }
 		// Chased object properties
-		public Vector3 ChasePosition { get; set; }
+		//public Vector3 Target { get; set; }//ChasePosition
 		public Vector3 ChaseDirection { get; set; }
 		//public Vector3 Up { get; private set; }
 		//public Vector3 Right { get; private set; }
@@ -41,8 +43,8 @@ namespace _3DRTSGame
 		/// <summary>
 		/// 少し上からプレイヤーを見下ろす視点にしたい時など、視点の調整に使用。
 		/// </summary>
-		public Vector3 LookAtOffset { get; set; }
-		public Vector3 LookAt { get; set; }
+		//public Vector3 LookAtOffset { get; set; }
+		//public Vector3 LookAt { get; set; }
 		public Vector3 CameraPosition { get; set; }
 		public Matrix rotation = Matrix.Identity;
 
@@ -357,9 +359,9 @@ namespace _3DRTSGame
 			// Rotate horizontally
 			CameraPosition = Vector3.Transform(CameraPosition, Matrix.CreateRotationY(_horizontalAngle));
 			//Position = ChasePosition + CameraPosition;
-			DesiredPosition = ChasePosition + CameraPosition;
+			DesiredPosition = Target + CameraPosition;
 
-			LookAt = ChasePosition +
+			LookAt = Target +
 				Vector3.TransformNormal(LookAtOffset, transform);
 		}
 		private void UpdateViewProjection()
@@ -369,31 +371,101 @@ namespace _3DRTSGame
 			Projection = Matrix.CreatePerspectiveFieldOfView(FieldOfView,
 				AspectRatio, NearPlaneDistance, FarPlaneDistance);
 		}
+
+		Vector2 mouseOrgPos, curPos, prevPos;
+		float leftrightRot, updownRot, prevScroll, curScroll;
+		Vector3 Direction;
 		private void HandleInput()
 		{
+			if (MouseInput.IsOnButtonDownR()) {
+				mouseOrgPos = MouseInput.GetMousePosition();
+				leftrightRot = updownRot = 0;
+			}
+			if (MouseInput.BUTTONR()) {
+				float rotationSpeed = 0.1f;//5
+				Vector2 mousePos = MouseInput.GetMousePosition();
+
+
+				// rayとplaneのintersection pointを計算する
+				Vector3 nearsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 0f);
+				Vector3 farsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 1f);
+
+				Matrix world = Matrix.CreateTranslation(0, 0, 0);
+				Vector3 nearPoint = Level.graphicsDevice.Viewport.Unproject(nearsource, Projection, View, world);
+				Vector3 farPoint = Level.graphicsDevice.Viewport.Unproject(farsource, Projection, View, world);
+				// Create a ray from the near clip plane to the far clip plane.
+				Vector3 direction = farPoint - nearPoint;
+				direction.Normalize();
+
+				curPos = MouseInput.GetMousePosition();
+				float xDifference = curPos.X - mouseOrgPos.X;
+				float yDifference = curPos.Y - mouseOrgPos.Y;
+				//leftrightRot -= rotationSpeed * xDifference;// * amount
+				//updownRot -= rotationSpeed * yDifference;
+				_horizontalAngle -= MathHelper.ToRadians(rotationSpeed * xDifference);
+				_verticalAngle -= MathHelper.ToRadians(rotationSpeed * yDifference);
+				Mouse.SetPosition((int)mouseOrgPos.X, (int)mouseOrgPos.Y);
+				MouseInput.SetCachedPosition(mouseOrgPos);
+
+				//HorizontalAngle = MathHelper.ToRadians(leftrightRot);
+				//VerticalAngle = MathHelper.ToRadians(updownRot);
+
+			}
+
+
+
 			if (JoyStick.vectorOther.Length() > 0.2) {
 				_verticalAngle += MathHelper.ToRadians(JoyStick.vectorOther.Y);
 				_horizontalAngle += MathHelper.ToRadians(JoyStick.vectorOther.X);
 			}
 
-			if (JoyStick.IsOnKeyDown(7)) {
+			/*if (JoyStick.IsOnKeyDown(7)) {
 				zoomMode++;
 				if (zoomMode == zoomState.Length) zoomMode = 0;
 			}
-			_zoom = zoomState[zoomMode];
-
-
-			float speed = 10;
-			if (JoyStick.stickDirection == _3DRTSGame.Direction.LEFT) {
-				Target += new Vector3(-speed, 0, 0);
-			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.RIGHT) {
-				Target += new Vector3(speed, 0, 0);
+			_zoom = zoomState[zoomMode];*/
+			if (JoyStick.KEY(7)) {
+				_zoom += 20;
 			}
-			if (JoyStick.stickDirection == _3DRTSGame.Direction.UP) {
-				Target += new Vector3(0, 0, speed);
-			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.DOWN) {
-				Target += new Vector3(0, 0, -speed);
+			if (JoyStick.KEY(5)) {
+				_zoom -= 20;
 			}
+			curScroll = Mouse.GetState().ScrollWheelValue;
+			_zoom -= (curScroll - prevScroll);
+			prevScroll = curScroll;
+
+			//
+			/*float stickSensitivity = 0.2f;
+			//  スティックが倒されていればDirectionを再計算する
+			if (JoyStick.Vector.Length() > stickSensitivity) {
+				double analogAngle = Math.Atan2(JoyStick.Vector.Y, JoyStick.Vector.X);
+				float speed = JoyStick.Vector.Length() * 30;
+				analogAngle += MathHelper.ToRadians(-90);
+                
+				Vector3 tmpVelocity = Vector3.Zero;
+				Direction = Target - Position;
+				Direction = new Vector3(tmpDirection.X, 0, tmpDirection.Z);
+				RotationMatrix = Matrix.CreateRotationY((float)analogAngle);
+				// 面白い動き : //RotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(JoyStick.Vector.Y)) * Matrix.CreateRotationX(MathHelper.ToRadians(-JoyStick.Vector.X));
+				tmpDirection = Vector3.TransformNormal(tmpDirection, RotationMatrix);
+				tmpDirection = Vector3.Normalize(tmpDirection);// プロパティなので代入しないと反映されないことに注意
+				tmpVelocity = new Vector3(tmpDirection.X * speed, tmpVelocity.Y, tmpDirection.Z * speed);
+
+				tmpCameraPos += tmpVelocity;
+			}*/
+
+			/*float speed = 10;
+			if (JoyStick.stickDirection == _3DRTSGame.Direction.LEFT || KeyInput.KEY(Keys.A)) {
+				target += new Vector3(-speed, 0, 0);
+			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.RIGHT || KeyInput.KEY(Keys.D)) {
+				target += new Vector3(speed, 0, 0);
+			}
+			if (JoyStick.stickDirection == _3DRTSGame.Direction.UP || KeyInput.KEY(Keys.W)) {
+				target += new Vector3(0, 0, speed);
+			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.DOWN || KeyInput.KEY(Keys.S)) {
+				target += new Vector3(0, 0, -speed);
+			}*/
+
 		}
 		/// <summary>
 		/// カメラを目的の位置に配置し、移動を停止します。これは、
@@ -410,56 +482,12 @@ namespace _3DRTSGame
 
 			// 目的の位置に設定する
 			//Position = ChasePosition + AdjustOffset/**/ + CameraPosition;// AdjustOffsetを加えてPlayerの少し上を追わせるようにする
-			Position = ChasePosition + CameraPosition;
+			Position = Target + CameraPosition;
 			//Position = DesiredPosition + AdjustOffset;
 
 			UpdateViewProjection();
 		}
-		/// <summary>
-		/// Targetの設定を含む初期化を行う。
-		/// </summary>
-		public void Initialize(Game1 game, Object target)
-		{
-			// カメラのオフセットを設定します
-			DesiredPositionOffset = new Vector3(0.0f, 2000.0f, 3500.0f);
-			//LookAtOffset = new Vector3(0.0f, 150.0f, 0.0f);// 少し上を見るように調整されてあるようだ
-			LookAtOffset = new Vector3(0.0f, 25.0f, 0.0f);
 
-			// カメラの視点を設定します
-			NearPlaneDistance = 10.0f;
-			FarPlaneDistance = 100000.0f;
-			// カメラのアスペクト比を設定します
-			// これは、グラフィック デバイスを初期化する base.Initalize() の
-			// 呼び出しの後で行う必要があります。
-			AspectRatio = (float)game.GraphicsDevice.Viewport.Width /
-				game.GraphicsDevice.Viewport.Height;
-
-			// カメラで初期リセットを実行し、静止位置で開始するようにます。これを行わないと、カメラは原点で開始し
-			// 追尾対象オブジェクトを追ってワールド中を移動します。ここで実行する理由は、Reset でアスペクト比が必要になるためです。
-			UpdateChaseTarget(target);
-			Reset();
-		}
-		public void Initialize(Game1 game, Vector3 target)
-		{
-			// カメラのオフセットを設定します
-			DesiredPositionOffset = new Vector3(0.0f, 2000.0f, 3500.0f);
-			//LookAtOffset = new Vector3(0.0f, 150.0f, 0.0f);// 少し上を見るように調整されてあるようだ
-			LookAtOffset = new Vector3(0.0f, 25.0f, 0.0f);
-
-			// カメラの視点を設定します
-			NearPlaneDistance = 10.0f;
-			FarPlaneDistance = 100000.0f;
-			// カメラのアスペクト比を設定します
-			// これは、グラフィック デバイスを初期化する base.Initalize() の
-			// 呼び出しの後で行う必要があります。
-			AspectRatio = (float)game.GraphicsDevice.Viewport.Width /
-				game.GraphicsDevice.Viewport.Height;
-
-			// カメラで初期リセットを実行し、静止位置で開始するようにます。これを行わないと、カメラは原点で開始し
-			// 追尾対象オブジェクトを追ってワールド中を移動します。ここで実行する理由は、Reset でアスペクト比が必要になるためです。
-			UpdateChaseTarget(target);
-			Reset();
-		}
 
 
 		/// <summary>
@@ -473,19 +501,20 @@ namespace _3DRTSGame
 			Up = target.Up;*/
 
 			// ActionGameと違って今は対象の方向と一致していない
-			ChasePosition = target.Position;
+			Target = target.Position;
 			ChaseDirection = target.Position - Position;
 			//Up = target.RotationMatrix.Up;
 		}
 		public void UpdateChaseTarget(Vector3 target)
 		{
 			// ActionGameと違って今は対象の方向と一致していない
-			ChasePosition = target;
+			Target = target;
 			ChaseDirection = target - Position;
 			//Up = target.RotationMatrix.Up;
 		}
 
 
+		Vector3 target;
 		/// <summary>
 		/// カメラの現在位置から、追跡されるオブジェクトの背後の目的のオフセットに向かって
 		/// カメラをアニメーション表示します。カメラのアニメーションは、
@@ -498,6 +527,8 @@ namespace _3DRTSGame
 			if (gameTime == null) {
 				throw new ArgumentNullException("gameTime is null.");
 			}
+
+			UpdateChaseTarget(target);
 			HandleInput();
 			UpdateWorldPositions();
 
@@ -519,10 +550,60 @@ namespace _3DRTSGame
 		}
 		#endregion
 
+		/// <summary>
+		/// Targetの設定を含む初期化を行う。
+		/// </summary>
+		public void Initialize(Object target)
+		{
+			// カメラのオフセットを設定します
+			DesiredPositionOffset = new Vector3(0.0f, 2000.0f, 3500.0f);
+			//LookAtOffset = new Vector3(0.0f, 150.0f, 0.0f);// 少し上を見るように調整されてあるようだ
+			LookAtOffset = new Vector3(0.0f, 25.0f, 0.0f);
+
+			// カメラの視点を設定します
+			NearPlaneDistance = 10.0f;
+			FarPlaneDistance = 100000.0f;
+			// カメラのアスペクト比を設定します
+			// これは、グラフィック デバイスを初期化する base.Initalize() の
+			// 呼び出しの後で行う必要があります。
+			AspectRatio = (float)game.GraphicsDevice.Viewport.Width /
+				game.GraphicsDevice.Viewport.Height;
+
+			// カメラで初期リセットを実行し、静止位置で開始するようにます。これを行わないと、カメラは原点で開始し
+			// 追尾対象オブジェクトを追ってワールド中を移動します。ここで実行する理由は、Reset でアスペクト比が必要になるためです。
+			UpdateChaseTarget(target);
+			Reset();
+		}
+		public void Initialize(Vector3 target)
+		{
+			// カメラのオフセットを設定します
+			DesiredPositionOffset = new Vector3(0.0f, 2000.0f, 3500.0f);
+			//LookAtOffset = new Vector3(0.0f, 150.0f, 0.0f);// 少し上を見るように調整されてあるようだ
+			LookAtOffset = new Vector3(0.0f, 25.0f, 0.0f);
+
+			// カメラの視点を設定します
+			NearPlaneDistance = 10.0f;
+			FarPlaneDistance = 100000.0f;
+			// カメラのアスペクト比を設定します
+			// これは、グラフィック デバイスを初期化する base.Initalize() の
+			// 呼び出しの後で行う必要があります。
+			AspectRatio = (float)game.GraphicsDevice.Viewport.Width /
+				game.GraphicsDevice.Viewport.Height;
+
+			// カメラで初期リセットを実行し、静止位置で開始するようにます。これを行わないと、カメラは原点で開始し
+			// 追尾対象オブジェクトを追ってワールド中を移動します。ここで実行する理由は、Reset でアスペクト比が必要になるためです。
+			UpdateChaseTarget(target);
+			Reset();
+		}
+		public RTSCamera(Vector3 Target)
+		{
+			this.Target = Target;
+			Initialize(Target);
+		}
 		public RTSCamera(Vector3 Position, Vector3 Target, Vector3 up)
 		{
 			this.Position = Position;
-			this.ChasePosition = Target;
+			this.Target = Target;
 			this.Up = up;
 
 			LookAt = Target + LookAtOffset;
@@ -530,8 +611,11 @@ namespace _3DRTSGame
 			//View = Matrix.CreateLookAt(this.Position, this.LookAt, this.t);
 			Projection = Matrix.CreatePerspectiveFieldOfView(FieldOfView,
 				AspectRatio, NearPlaneDistance, FarPlaneDistance);
+
+			Initialize(Target);
 		}
 		public RTSCamera()
+			: this(Vector3.Zero)
 		{
 		}
 

@@ -8,13 +8,65 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
+	public struct EnemyInfo
+	{
+		Type EnemyType { get; set; }
+		float SpawnProbability { get; set; }
+
+		public EnemyInfo(Type type, float prob)
+		{
+			this.EnemyType = type;
+			this.SpawnProbability = prob;
+		}
+	}
+	public struct EnemyWave
+	{
+		public EnemyInfo[] EnemyData { get; set; }
+		public int AILevel { get; set; }
+		public int SpawnRate { get; set; }
+		public int SpawnNum { get; set; }
+		public float MaxDistance { get; set; }
+		/// <summary>
+		/// Waveが開始されてから、最後の敵ユニットが投入されるまでの時間
+		/// </summary>
+		public float MaxTimeSec { get; set; }
+
+		public EnemyWave(EnemyInfo[] data, int aiLevel, int rate, int num, float dist, float time)
+		{
+			this.EnemyData = data;
+			this.AILevel = aiLevel;
+			this.SpawnRate = rate;
+			this.SpawnNum = num;
+			this.MaxDistance = dist;
+			this.MaxTimeSec = time;
+		}
+	}
+	public enum WaveState
+	{
+		Interval, 
+		Start,
+		Playing
+	}
+
 	public class EnemyManager
 	{
 		//public static Level4 level;
-		private Level4 level;
+
 		private static readonly int ASTEROID_MAX_SPAWN_NUM = 15;
 		private static readonly int FIGHTER_MAX_SPAWN_NUM = 8;
+
+		private Level4 level;
 		private Random random = new Random();
+		private List<EnemyWave> waves = new List<EnemyWave>();
+
+		/// <summary>
+		/// Spawnし終わったかどうか
+		/// </summary>
+		public bool WaveEnd { get; private set; }
+
+		private WaveState state;
+		private float start;
+
 
 		public static float NextDouble(Random r, double min, double max)
 		{
@@ -58,13 +110,33 @@ namespace _3DRTSGame
 		}
 		public void Update(GameTime gameTime)
 		{
-			SpawnAsteroids();
-			SpawnFighters();
+			// MAX_NUMよりspawnしてるオブジェクトの数が減ったら追加するだけのVersion
+			/*SpawnAsteroids();
+			SpawnFighters();*/
+
+			// Wave準拠Ver
+			float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+			if (state == WaveState.Start) {
+				start = elapsedTime;
+			} else if (state == WaveState.Playing) {
+				float time = elapsedTime - start;
+
+				if (time % waves[0].SpawnRate == 0) {
+					double prob = random.NextDouble();
+
+
+				}
+			}
 		}
 
+		private void Initialize()
+		{
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) } ,0, 3, 3, 3000, 60));
+		}
 		public EnemyManager(Level4 level)
 		{
 			this.level = level;
+			Initialize();
 		}
 	}
 }

@@ -373,6 +373,7 @@ namespace _3DRTSGame
 
 		Vector2 mouseOrgPos, curPos, prevPos;
 		float leftrightRot, updownRot, prevScroll, curScroll;
+		Vector3 Direction;
 		private void HandleInput()
 		{
 			if (MouseInput.IsOnButtonDownR()) {
@@ -432,8 +433,8 @@ namespace _3DRTSGame
 			_zoom -= (curScroll - prevScroll);
 			prevScroll = curScroll;
 
-			/*//
-			float stickSensitivity = 0.2f;
+			//
+			/*float stickSensitivity = 0.2f;
 			//  スティックが倒されていればDirectionを再計算する
 			if (JoyStick.Vector.Length() > stickSensitivity) {
 				double analogAngle = Math.Atan2(JoyStick.Vector.Y, JoyStick.Vector.X);
@@ -441,26 +442,26 @@ namespace _3DRTSGame
 				analogAngle += MathHelper.ToRadians(-90);
                 
 				Vector3 tmpVelocity = Vector3.Zero;
-				Dirention = tmpCameraPos - camera.Position;
-				Dirention = new Vector3(tmpDirention.X, 0, tmpDirention.Z);
+				Direction = Target - Position;
+				Direction = new Vector3(tmpDirection.X, 0, tmpDirection.Z);
 				RotationMatrix = Matrix.CreateRotationY((float)analogAngle);
 				// 面白い動き : //RotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(JoyStick.Vector.Y)) * Matrix.CreateRotationX(MathHelper.ToRadians(-JoyStick.Vector.X));
-				tmpDirention = Vector3.TransformNormal(tmpDirention, RotationMatrix);
-				tmpDirention = Vector3.Normalize(tmpDirention);// プロパティなので代入しないと反映されないことに注意
-				tmpVelocity = new Vector3(tmpDirention.X * speed, tmpVelocity.Y, tmpDirention.Z * speed);
+				tmpDirection = Vector3.TransformNormal(tmpDirection, RotationMatrix);
+				tmpDirection = Vector3.Normalize(tmpDirection);// プロパティなので代入しないと反映されないことに注意
+				tmpVelocity = new Vector3(tmpDirection.X * speed, tmpVelocity.Y, tmpDirection.Z * speed);
 
 				tmpCameraPos += tmpVelocity;
 			}*/
 
 			float speed = 10;
-			if (JoyStick.stickDirection == _3DRTSGame.Direction.LEFT) {
+			if (JoyStick.stickDirection == _3DRTSGame.Direction.LEFT || KeyInput.KEY(Keys.A)) {
 				target += new Vector3(-speed, 0, 0);
-			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.RIGHT) {
+			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.RIGHT || KeyInput.KEY(Keys.D)) {
 				target += new Vector3(speed, 0, 0);
 			}
-			if (JoyStick.stickDirection == _3DRTSGame.Direction.UP) {
+			if (JoyStick.stickDirection == _3DRTSGame.Direction.UP || KeyInput.KEY(Keys.W)) {
 				target += new Vector3(0, 0, speed);
-			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.DOWN) {
+			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.DOWN || KeyInput.KEY(Keys.S)) {
 				target += new Vector3(0, 0, -speed);
 			}/**/
 

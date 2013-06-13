@@ -70,7 +70,8 @@ namespace _3DRTSGame
 			Asteroids = new List<Asteroid>();
 			for (int i = 0; i < asteroidNum; i++) {
 				//random = new Random();
-				Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)), star.Position, 0.05f, "Models\\Asteroid"));
+				Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)),
+					star.Position, 0.05f, "Models\\Asteroid"));
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				//Asteroids[i].SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
 			}
