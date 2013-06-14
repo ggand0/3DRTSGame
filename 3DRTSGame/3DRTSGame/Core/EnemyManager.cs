@@ -10,13 +10,14 @@ namespace _3DRTSGame
 {
 	public struct EnemyInfo
 	{
-		Type EnemyType { get; set; }
-		float SpawnProbability { get; set; }
+		public Type EnemyType { get; set; }
+		public float SpawnProbability { get; set; }
 
 		public EnemyInfo(Type type, float prob)
+			: this()
 		{
-			this.EnemyType = type;
-			this.SpawnProbability = prob;
+			EnemyType = type;
+			SpawnProbability = prob;
 		}
 	}
 	public struct EnemyWave
@@ -32,13 +33,14 @@ namespace _3DRTSGame
 		public float MaxTimeSec { get; set; }
 
 		public EnemyWave(EnemyInfo[] data, int aiLevel, int rate, int num, float dist, float time)
+			: this()
 		{
-			this.EnemyData = data;
-			this.AILevel = aiLevel;
-			this.SpawnRate = rate;
-			this.SpawnNum = num;
-			this.MaxDistance = dist;
-			this.MaxTimeSec = time;
+			EnemyData = data;
+			AILevel = aiLevel;
+			SpawnRate = rate;
+			SpawnNum = num;
+			MaxDistance = dist;
+			MaxTimeSec = time;
 		}
 	}
 	public enum WaveState
@@ -66,6 +68,7 @@ namespace _3DRTSGame
 
 		private WaveState state;
 		private float start;
+		private Dictionary<String, object[]> arguments = new Dictionary<string, object[]>();
 
 
 		public static float NextDouble(Random r, double min, double max)
@@ -108,6 +111,24 @@ namespace _3DRTSGame
 				level.Models.Add(f);
 			}
 		}
+
+		private void SpawnEnemies(Type enemyType)
+		{
+			// 乱数が入らなかったらDictionaryで予めargumentsを計算してスマートにインスタンス生成が出来るのだが、
+			// 乱数入りなので仕方なく関数内で条件分岐させることに。さらにswitch
+			float radius = 3000;
+			if (enemyType == typeof(Asteroid)) {
+				level.Models.Add(
+					new Asteroid(new Vector3(NextDouble(random, -radius, radius)
+					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, "Models\\Asteroid")
+				);
+			} else if (enemyType == typeof(Fighter)) {
+				 level.Models.Add(
+					 new Fighter(new Vector3(NextDouble(random, -radius, radius)	, NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
+					, level.Planets[0].Position, 20f, "Models\\fighter0")
+				);
+			}
+		}
 		public void Update(GameTime gameTime)
 		{
 			// MAX_NUMよりspawnしてるオブジェクトの数が減ったら追加するだけのVersion
@@ -123,7 +144,20 @@ namespace _3DRTSGame
 
 				if (time % waves[0].SpawnRate == 0) {
 					double prob = random.NextDouble();
+					double probs = prob;
 
+					foreach (EnemyInfo i in waves[0].EnemyData) {
+						if (prob < waves[0].EnemyData[0].SpawnProbability) {
+							SpawnEnemies(i.EnemyType);
+							break;
+						}
+						/*if (probs < i.SpawnProbability) {
+							//level.Models.Add((Object)Activator.CreateInstance(i.EnemyType, arguments[i.EnemyType.ToString()]));
+							SpawnEnemies(i.EnemyType);
+						} else {
+							//probs += prob;
+						}*/
+					}
 
 				}
 			}
@@ -132,6 +166,11 @@ namespace _3DRTSGame
 		private void Initialize()
 		{
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) } ,0, 3, 3, 3000, 60));
+
+			arguments.Add("_3DRTSGame.Asteroid", new object[] {
+			});
+			arguments.Add("_3DRTSGame.Fighter", new object[] {
+			});
 		}
 		public EnemyManager(Level4 level)
 		{
