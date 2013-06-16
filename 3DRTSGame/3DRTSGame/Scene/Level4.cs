@@ -205,7 +205,7 @@ namespace _3DRTSGame
 			}
 
 
-			renderer = new PrelightingRenderer(graphicsDevice, content);
+			renderer = new PrelightingRenderer(graphicsDevice, content, false);
 			renderer.Models = Models;
 			renderer.Camera = camera;
 			renderer.Lights = new List<PointLight>() {
@@ -216,7 +216,6 @@ namespace _3DRTSGame
 			};
 			renderer.ShadowLightPosition = new Vector3(300, 500, 300);//LightPosition;
 			renderer.ShadowLightTarget = new Vector3(0, 0, 0);
-			renderer.DoShadowMapping = true;
 			renderer.ShadowMult = 0.3f;//0.01f;//0.3f;
 			LightPosition = renderer.Lights[0].Position;
 
@@ -451,6 +450,7 @@ namespace _3DRTSGame
 			if (Asteroids.Count > 0) {
 				for (int j = 0; j < Asteroids.Count; j++) {
 					if (!Asteroids[j].IsAlive) {
+                        
 						Asteroids.RemoveAt(j);
 					}
 				}

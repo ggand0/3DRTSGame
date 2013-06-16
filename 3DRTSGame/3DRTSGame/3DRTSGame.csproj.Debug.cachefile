@@ -217,6 +217,9 @@ Content\Textures\UI\LifeBar2.xnb
 Content\Textures\UI\LifeBar2Back.xnb
 Content\Textures\UI\LifeBarRed.xnb
 Content\Textures\whiteBoard.xnb
+Content\Textures\UI\ui_deepsapce.xnb
+Content\Textures\UI\ui_tdrs.xnb
+Content\Textures\UI\GlowRing2.xnb
 Content\SoundEffects\explosion0.xnb
 Content\SoundEffects\missile0.xnb
 Content\SoundEffects\laser0.xnb
@@ -247,6 +250,3 @@ Content\Models\tex_02_0.xnb
 Content\Models\teapottex1_0.xnb
 Content\Models\asteroid1_0.xnb
 Content\Models\pea_proj_0.xnb
-Content\Textures\UI\ui_deepsapce.xnb
-Content\Textures\UI\ui_tdrs.xnb
-Content\Textures\UI\GlowRing2.xnb

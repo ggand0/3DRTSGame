@@ -203,7 +203,7 @@ namespace _3DRTSGame
 			renderer.ShadowLightPosition = new Vector3(500, 500, 0);
 			renderer.ShadowLightTarget = new Vector3(0, 0, 0);
 
-			renderer.DoShadowMapping = true;
+			//renderer.DoShadowMapping = true;
 			renderer.ShadowMult = 0.3f;//0.01f;//0.3f;
 			
 

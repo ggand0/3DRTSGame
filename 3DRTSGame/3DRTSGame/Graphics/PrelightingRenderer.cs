@@ -53,7 +53,7 @@ namespace _3DRTSGame
 		// Shadow light view and projection
 		Matrix shadowView, shadowProjection;
 		// Shadow properties
-		public bool DoShadowMapping { get; set; }
+		public bool DoShadowMapping { get; private set; }
 		public float ShadowMult { get; set; }
 
 		// VSM関係
@@ -657,49 +657,54 @@ namespace _3DRTSGame
 		}
 
 		public PrelightingRenderer(GraphicsDevice GraphicsDevice, ContentManager Content)
+            :this(GraphicsDevice, Content, true)
 		{
-			viewWidth = GraphicsDevice.Viewport.Width;
-			viewHeight = GraphicsDevice.Viewport.Height;
-			// Create the three render targets
-			depthTarg = new RenderTarget2D(GraphicsDevice, viewWidth,
-				viewHeight, false, SurfaceFormat.Single, DepthFormat.Depth24);
-			normalTarg = new RenderTarget2D(GraphicsDevice, viewWidth,
-				viewHeight, false, SurfaceFormat.Color, DepthFormat.Depth24);
-				lightTarg = new RenderTarget2D(GraphicsDevice, viewWidth,
-				viewHeight, false, SurfaceFormat.Color, DepthFormat.Depth24);
-
-			// Load effects
-			//depthNormalEffect = Content.Load<Effect>("PPDepthNormal");
-			depthNormalEffect = Content.Load<Effect>("PPDepthNormalV2");
-			//depthNormalEffect.Parameters["FarPlane"].SetValue(shadowFarPlane);
-
-			planetDepthNormalEffect = Content.Load<Effect>("Planets\\PlanetDepthNormal");
-
-			lightingEffect = Content.Load<Effect>("PPLight");
-
-			// Set effect parameters to light mapping effect
-			lightingEffect.Parameters["viewportWidth"].SetValue(viewWidth);
-			lightingEffect.Parameters["viewportHeight"].SetValue(viewHeight);
-
-			// Load point light mesh and set light mapping effect to it
-			lightMesh = Content.Load<Model>("Models\\PPLightMesh");
-			lightMesh.Meshes[0].MeshParts[0].Effect = lightingEffect;
-			this.graphicsDevice = GraphicsDevice;
-
-
-			// shadow関係
-			//shadowDepthTarg = new RenderTarget2D(GraphicsDevice, shadowMapSize, shadowMapSize, false, SurfaceFormat.Single, DepthFormat.Depth24);
-			shadowDepthTarg = new RenderTarget2D(GraphicsDevice, shadowMapSize, shadowMapSize, false, SurfaceFormat.HalfVector2, DepthFormat.Depth24);
-			shadowDepthEffect = Content.Load<Effect>("ShadowDepthEffectV2");
-			shadowDepthEffect.Parameters["FarPlane"].SetValue(shadowFarPlane);
-
-			// VSM
-			spriteBatch = new SpriteBatch(GraphicsDevice);
-			shadowBlurEffect = Content.Load<Effect>("GaussianBlur");
-			shadowBlurTarg = new RenderTarget2D(GraphicsDevice, shadowMapSize,
-			shadowMapSize, false, SurfaceFormat.Color, DepthFormat.Depth24);
-
-			quadRenderer = new QuadRenderer();
 		}
+        public PrelightingRenderer(GraphicsDevice GraphicsDevice, ContentManager Content, bool shadow)
+        {
+            viewWidth = GraphicsDevice.Viewport.Width;
+            viewHeight = GraphicsDevice.Viewport.Height;
+            // Create the three render targets
+            depthTarg = new RenderTarget2D(GraphicsDevice, viewWidth,
+                viewHeight, false, SurfaceFormat.Single, DepthFormat.Depth24);
+            normalTarg = new RenderTarget2D(GraphicsDevice, viewWidth,
+                viewHeight, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            lightTarg = new RenderTarget2D(GraphicsDevice, viewWidth,
+            viewHeight, false, SurfaceFormat.Color, DepthFormat.Depth24);
+
+            // Load effects
+            //depthNormalEffect = Content.Load<Effect>("PPDepthNormal");
+            depthNormalEffect = Content.Load<Effect>("PPDepthNormalV2");
+            //depthNormalEffect.Parameters["FarPlane"].SetValue(shadowFarPlane);
+
+            planetDepthNormalEffect = Content.Load<Effect>("Planets\\PlanetDepthNormal");
+
+            lightingEffect = Content.Load<Effect>("PPLight");
+
+            // Set effect parameters to light mapping effect
+            lightingEffect.Parameters["viewportWidth"].SetValue(viewWidth);
+            lightingEffect.Parameters["viewportHeight"].SetValue(viewHeight);
+
+            // Load point light mesh and set light mapping effect to it
+            lightMesh = Content.Load<Model>("Models\\PPLightMesh");
+            lightMesh.Meshes[0].MeshParts[0].Effect = lightingEffect;
+            this.graphicsDevice = GraphicsDevice;
+            this.DoShadowMapping = shadow;
+
+
+            // shadow関係
+            //shadowDepthTarg = new RenderTarget2D(GraphicsDevice, shadowMapSize, shadowMapSize, false, SurfaceFormat.Single, DepthFormat.Depth24);
+            shadowDepthTarg = new RenderTarget2D(GraphicsDevice, shadowMapSize, shadowMapSize, false, SurfaceFormat.HalfVector2, DepthFormat.Depth24);
+            shadowDepthEffect = Content.Load<Effect>("ShadowDepthEffectV2");
+            shadowDepthEffect.Parameters["FarPlane"].SetValue(shadowFarPlane);
+
+            // VSM
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            shadowBlurEffect = Content.Load<Effect>("GaussianBlur");
+            shadowBlurTarg = new RenderTarget2D(GraphicsDevice, shadowMapSize,
+            shadowMapSize, false, SurfaceFormat.Color, DepthFormat.Depth24);
+
+            quadRenderer = new QuadRenderer();
+        }
 	}
 }

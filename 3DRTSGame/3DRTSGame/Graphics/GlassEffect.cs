@@ -292,7 +292,7 @@ namespace _3DRTSGame
             renderer.ShadowLightTarget = new Vector3(0, 300, 0);//new Vector3(0, 150, 0)
 
 
-            renderer.DoShadowMapping = true;
+            //renderer.DoShadowMapping = true;
             renderer.ShadowMult = 0.3f;//0.01f;//0.3f;
         }
         /*public GlassEffect(ContentManager content, GraphicsDevice graphics,
