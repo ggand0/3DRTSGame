@@ -329,6 +329,29 @@ namespace _3DRTSGame
 				tmpCameraPos += new Vector3(0, 0, -10);
 			}*/
 		}
+		public override void Reset()
+		{
+			/*player = new Player(this);
+		   playerBullets = new List<Bullet>();
+		   enemies = new List<Enemy>();
+		   enemyBullets = new List<Bullet>();
+		   score = 0;
+		   count = 0;
+		   time = 0.0;
+		   BGM.Volume = 1.0f;
+		   BGM.Play();*/
+
+			base.Reset();
+
+		}
+		protected override bool IsClear()
+		{
+			return enemyManager.WaveEnd;
+		}
+		protected override bool IsGameOver()
+		{
+			return !TargetPlanets.Any((x) => x.IsAlive);
+		}
 		protected override void Collide()
 		{
 			base.Collide();
@@ -401,6 +424,13 @@ namespace _3DRTSGame
 						//b.IsActive = false;
 						b.Die();
 						p.Damage();
+
+						if (!p.IsAlive) {
+							ExplosionEffect e = (ExplosionEffect)bigExplosion.Clone();
+							e.Position = b.Position;
+							e.Run();
+							effectManager.Add(e);
+						}
 
 						// 重い！数が多いのでもっと軽いエフェクトを作ろう
 						/*ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
@@ -488,6 +518,9 @@ namespace _3DRTSGame
 
 			foreach (Object o in Models) {
 				if (o.IsAlive) o.Update(gameTime);
+			}
+			if (Models.Count > 100) {
+				string debug = "そろそろModelsのDelete処理を書くこと";
 			}
 			foreach (Bullet b in Bullets) {
 				if (b.IsAlive) b.Update(gameTime);

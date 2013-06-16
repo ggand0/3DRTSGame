@@ -7,11 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace _3DRTSGame
 {
-	public class PauseMenu : MenuScene
+	public class PauseScene : MenuScene
 	{
 		Camera camera;
 
-		public PauseMenu(Level privousScene)
+		public PauseScene(Level privousScene)
 			: base(privousScene)
 		{
 			sceneTitle = "Pause";

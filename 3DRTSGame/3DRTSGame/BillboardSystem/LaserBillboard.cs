@@ -30,8 +30,9 @@ namespace _3DRTSGame
 		public enum BillboardMode { Cylindrical, Spherical };
 		public BillboardMode RenderMode = BillboardMode.Spherical;
 		public int UpdateMode { get; private set; }
+		public Vector3 InitialPosition { get; private set; }
 
-		void GenerateParticles(Vector3[] particlePositions)
+		private void GenerateParticles(Vector3[] particlePositions)
 		{
 			// Create vertex and index arrays
 			particles = new ParticleVertex[nBillboards * 4];
@@ -67,8 +68,7 @@ namespace _3DRTSGame
 				nBillboards * 6, BufferUsage.WriteOnly);
 			indexBuffers.SetData<int>(indices);
 		}
-
-		void SetEffectParameters(Matrix View, Matrix Projection, Vector3 Up,
+		private void SetEffectParameters(Matrix View, Matrix Projection, Vector3 Up,
 			Vector3 Right, Vector3 CameraPosition)
 		{
 			effect.Parameters["ParticleTexture"].SetValue(texture);
@@ -155,7 +155,10 @@ namespace _3DRTSGame
 		}
 		public float GetTraveledDistance(int particleIndex)
 		{
-			return Vector3.Distance(Start, particles[particleIndex].StartPosition);
+			//return Vector3.Distance(Start, particles[particleIndex].StartPosition);
+			Vector3 cur = (Start + End) / 2f;
+			return Vector3.Distance(InitialPosition, cur);
+
 		}
 		/// <summary>
 		/// 線分と球の交叉判定を行う
@@ -283,6 +286,7 @@ namespace _3DRTSGame
 			float debugLength = (end - start).Length();
 			Mid = (start + end) / 2.0f;
 			//generateParticles(particlePositions);
+			InitialPosition = Mid;
 
 
 			GenerateParticles(new Vector3[] { Mid });

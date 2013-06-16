@@ -93,6 +93,7 @@ namespace _3DRTSGame
 			HitPoint--;
 			if (HitPoint <= 0) {
 				IsActive = false;
+				IsAlive = false;
 			}
 		}
 

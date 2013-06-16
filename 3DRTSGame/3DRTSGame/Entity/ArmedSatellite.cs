@@ -128,7 +128,11 @@ namespace _3DRTSGame
 							content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.AlphaBlend, new Vector2(50, 100), 1));/**/ //new Vector2(50, 30)
 						/*level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, Position, tmp, dir1, 1,
 								content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.AlphaBlend, new Vector2(50, 100), 1));*/
-					
+
+
+					// EnemiesをUpdateしてからArmedSatelliteをUpdateすれば当たる？
+
+
 					break;
 				case 5:
 					//if (visibleEnemies.Count > 0) {

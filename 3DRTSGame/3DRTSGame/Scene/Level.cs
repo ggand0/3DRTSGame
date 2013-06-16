@@ -91,8 +91,19 @@ namespace _3DRTSGame
 			if (JoyStick.IsOnKeyDown(9)) {
 				//isEndScene = true;
 				//game.MoveNextLevel = true;
-				PushScene(new PauseMenu(this));
+				PushScene(new PauseScene(this));
 			}
+		}
+		protected virtual bool IsClear()
+		{
+			return false;
+		}
+		protected virtual bool IsGameOver()
+		{
+			return false;
+		}
+		public virtual void Reset()
+		{
 		}
 		public override void Load()
 		{
@@ -101,6 +112,18 @@ namespace _3DRTSGame
 		public override void Update(GameTime gameTime)
 		{
 			HandleInput();
+
+			if (IsClear()) {
+				PushScene(new MaskMenuScene(this,
+					"Game Cleared !",
+					MaskMenuScene.Menu.START_NEW_GAME,
+					MaskMenuScene.Menu.EXIT));
+			} else if (IsGameOver()) {
+				PushScene(new MaskMenuScene(this,
+					"Game Over",
+					MaskMenuScene.Menu.START_NEW_GAME,
+					MaskMenuScene.Menu.EXIT));
+			}
 		}
 		public override void Draw(GameTime gameTime)
 		{

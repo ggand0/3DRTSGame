@@ -169,6 +169,7 @@
     <Compile Include="Scene\Level2.cs" />
     <Compile Include="Scene\Level3.cs" />
     <Compile Include="Scene\Level4.cs" />
+    <Compile Include="Scene\MaskMenuScene.cs" />
     <Compile Include="Scene\MenuScene.cs" />
     <Compile Include="Scene\PauseScene.cs" />
     <Compile Include="Scene\Scene.cs" />

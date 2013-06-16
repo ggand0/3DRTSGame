@@ -45,7 +45,7 @@ namespace _3DRTSGame
 	}
 	public enum WaveState
 	{
-		Interval, 
+		Interval,
 		Start,
 		Playing
 	}
@@ -67,7 +67,9 @@ namespace _3DRTSGame
 		public bool WaveEnd { get; private set; }
 
 		private WaveState state;
-		private float start;
+		//private float start;
+		//private DateTime start;
+		private int count, start;
 		private Dictionary<String, object[]> arguments = new Dictionary<string, object[]>();
 
 
@@ -103,7 +105,7 @@ namespace _3DRTSGame
 		{
 			if (level.Enemies.Count < ASTEROID_MAX_SPAWN_NUM) {// = 15 -5
 				float radius = 3000;
-				Fighter f = new Fighter(new Vector3(NextDouble(random, -radius, radius)	, NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
+				Fighter f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
 					, level.Planets[0].Position, 20f, "Models\\fighter0");
 				f.IsActive = true;
 				f.RenderBoudingSphere = false;
@@ -112,21 +114,26 @@ namespace _3DRTSGame
 			}
 		}
 
+		Asteroid a; Fighter f;
 		private void SpawnEnemies(Type enemyType)
 		{
 			// 乱数が入らなかったらDictionaryで予めargumentsを計算してスマートにインスタンス生成が出来るのだが、
 			// 乱数入りなので仕方なく関数内で条件分岐させることに。さらにswitch
 			float radius = 3000;
 			if (enemyType == typeof(Asteroid)) {
-				level.Models.Add(
-					new Asteroid(new Vector3(NextDouble(random, -radius, radius)
-					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, "Models\\Asteroid")
-				);
+				a = new Asteroid(new Vector3(NextDouble(random, -radius, radius)
+					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, "Models\\Asteroid");
+				a.RenderBoudingSphere = false;
+				level.Models.Add(a);
+				level.Enemies.Add(a);
 			} else if (enemyType == typeof(Fighter)) {
-				 level.Models.Add(
-					 new Fighter(new Vector3(NextDouble(random, -radius, radius)	, NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
-					, level.Planets[0].Position, 20f, "Models\\fighter0")
-				);
+				/*f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
+					, level.Planets[0].Position, 20f, "Models\\fighter0");*/
+				f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
+					, level.TargetPlanets[0].Position, 20f, "Models\\fighter0");
+				f.RenderBoudingSphere = false;
+				level.Models.Add(f);
+				level.Enemies.Add(f);
 			}
 		}
 		public void Update(GameTime gameTime)
@@ -134,43 +141,67 @@ namespace _3DRTSGame
 			// MAX_NUMよりspawnしてるオブジェクトの数が減ったら追加するだけのVersion
 			/*SpawnAsteroids();
 			SpawnFighters();*/
+			count++;
 
 			// Wave準拠Ver
-			float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+			//float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 			if (state == WaveState.Start) {
-				start = elapsedTime;
+				//start = DateTime.Now;
+				start = count;// フレームで管理したいのでカウンタを作成した
+				state = WaveState.Playing;
 			} else if (state == WaveState.Playing) {
-				float time = elapsedTime - start;
+				//float time = (float)(DateTime.Now - start).TotalSeconds;
+				//int time = (int)(DateTime.Now - start).TotalSeconds;
+				int time = (count - start);
 
-				if (time % waves[0].SpawnRate == 0) {
-					double prob = random.NextDouble();
-					double probs = prob;
+				if (time > waves[0].MaxTimeSec * 60) {
+					state = WaveState.Interval;
+					start = count;
+				} else if (time % (waves[0].SpawnRate * 60) == 0) {// 60FPS
+					for (int n = 0; n < waves[0].SpawnNum; n++) {
+						double prob = random.NextDouble();
+						double probs = prob;
+						double sum = 0;
 
-					foreach (EnemyInfo i in waves[0].EnemyData) {
-						if (prob < waves[0].EnemyData[0].SpawnProbability) {
-							SpawnEnemies(i.EnemyType);
-							break;
+						foreach (EnemyInfo i in waves[0].EnemyData) {
+							/*if (prob < waves[0].EnemyData[0].SpawnProbability) {// 要修正
+								SpawnEnemies(i.EnemyType);
+								break;
+							}*/
+							if (prob + sum < i.SpawnProbability) {
+								SpawnEnemies(i.EnemyType);
+								if (i.EnemyType.Name == "Fighter") {
+									string d = "ok";
+								}
+								break;
+							} else {
+								//sum += i.SpawnProbability;
+								//sum += prob;
+								prob -= i.SpawnProbability;
+							}
 						}
-						/*if (probs < i.SpawnProbability) {
-							//level.Models.Add((Object)Activator.CreateInstance(i.EnemyType, arguments[i.EnemyType.ToString()]));
-							SpawnEnemies(i.EnemyType);
-						} else {
-							//probs += prob;
-						}*/
 					}
+				}
 
+			} else if (state == WaveState.Interval) {
+				if (count - start > 10 * 60) {// 10秒で次のwaveへ
+					// wavesのカウントに達していたらクリア
+
+					// 残っているなら次のwaveへ
 				}
 			}
 		}
 
 		private void Initialize()
 		{
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) } ,0, 3, 3, 3000, 60));
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
 
 			arguments.Add("_3DRTSGame.Asteroid", new object[] {
 			});
 			arguments.Add("_3DRTSGame.Fighter", new object[] {
 			});
+
+			state = WaveState.Start;
 		}
 		public EnemyManager(Level4 level)
 		{

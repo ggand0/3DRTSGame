@@ -10,8 +10,8 @@ namespace _3DRTSGame
 	public class MenuScene : Scene
 	{
 		private static readonly int sensitivity = 5;
-		
 		protected static Vector2 TITLE_POSITION;
+
 		protected Vector2 TEXT_POSITION;
 		protected Button[] button;
 		protected string[] menuString;
@@ -19,10 +19,68 @@ namespace _3DRTSGame
 		protected int buttonNum, curButton;
 		protected bool drawBackGround = true;
 
-		public MenuScene(Scene privousScene)
-			: base(privousScene)
+		/*/// <summary>
+		/// 選択可能なメニュー。
+		/// </summary>
+		Menu[] menu;
+		/// <summary>
+		/// このシーンを作成したレベル。
+		/// </summary>
+		Level ownerLevel;
+		/// <summary>
+		/// 選択可能なメニューの一覧。
+		/// </summary>
+		public enum Menu
+		{
+			RESUME,
+			START_NEW_GAME,
+			EXIT,
+			COUNT   //これはメニューの数をカウントするためのモノなので最後においている。
+			//メニューを追加する場合は、COUNTの上にメニューを追加した後、
+			//表示するテキストを↓のMENU_TEXTに、動作をMENU_ACTIONSに定義する。
+		}
+		static string[] MENU_TEXTS = new string[(int)Menu.COUNT]{
+            "Back to game",
+            "Start new game",
+            "Exit"
+        };
+		static Action<MenuScene>[] MENU_ACTIONS
+			= new Action<MenuScene>[(int)Menu.COUNT]{
+            (MenuScene m)=>{},// RESUME
+            (MenuScene m)=>{// START_NEW_GAME
+                m.ownerLevel.Reset();
+            },
+             (MenuScene m)=>{// EXIT
+                 Level.game.Exit();
+             }
+        };*/
+
+
+		public MenuScene(Scene priviousScene)
+			: base(priviousScene)
 		{
 		}
+		/*/// <summary>
+        /// 好きなMenuを選択可能なシーンを作成する。
+        /// </summary>
+        /// <param name="owner">このシーンを作成したLevel</param>
+        /// <param name="menu">使用したいMenu</param>
+		public MenuScene(Scene priviousScene, params Menu[] menu)
+            : base(priviousScene)
+        {
+			if (priviousScene is Level) {
+				this.ownerLevel = (priviousScene as Level);
+			} else {
+				throw new Exception("The owner scene is not a Level instance.");
+			}
+
+            this.menu = menu;
+            TEXT_POSITION = new Vector2(Game1.Width / 2,
+                Game1.Height / 2 - game.menuFont.MeasureString("A").Y * menu.Length);
+
+           
+        }*/
+
 
 		public override void Load()
 		{
