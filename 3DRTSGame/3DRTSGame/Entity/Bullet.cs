@@ -28,7 +28,7 @@ namespace _3DRTSGame
 		public IFF Identification { get; private set; }
 		public float Speed { get; private set; }
 		public Vector3 Direction { get; protected set; }
-		public Vector3 StartPosition { get; private set; }
+		public Vector3 StartPosition { get; protected set; }
 
 		
 		protected float distanceTravelled;

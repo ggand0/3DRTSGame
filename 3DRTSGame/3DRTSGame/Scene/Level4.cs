@@ -389,14 +389,11 @@ namespace _3DRTSGame
 						} else {
 							e = (ExplosionEffect)bigExplosion.Clone();
 						}*/
-						e = (ExplosionEffect)smallExplosion.Clone();
 
+						e = (ExplosionEffect)smallExplosion.Clone();
 						e.Position = o.Position;
-						/*foreach (ExplosionParticleEmitter ep in e.emitters) {
-							ep.Position = e.Position;// もう既にparticlesは初期化されてしまってるので手遅れ！
-						}*/
 						e.Run();
-						effectManager.Add(e);
+						effectManager.Add(e);/**/
 					}
 
 				
@@ -409,11 +406,8 @@ namespace _3DRTSGame
 
 						ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
 						e.Position = o.Position;
-						/*foreach (ExplosionParticleEmitter ep in e.emitters) {
-							ep.Position = e.Position;// もう既にparticlesは初期化されてしまってるので手遅れ！
-						}*/
 						e.Run();
-						effectManager.Add(e);
+						effectManager.Add(e);/**/
 					}
 				}
 
@@ -456,18 +450,22 @@ namespace _3DRTSGame
 				}
 			}
 			if (Bullets.Count > 0) {
-				for (int j = 0; j < Bullets.Count; j++) {
+				//for (int j = 0; j < Bullets.Count; j++) {
+                for (int j = Bullets.Count - 1; j >= 0; j--) {
 					if (!Bullets[j].IsActive) {
+                        /*if (Bullets[j] is LaserBillboardBullet) {
+                            (Bullets[j] as LaserBillboardBullet).Dispose();
+                        }*/
 						Bullets.RemoveAt(j);
 					}
 				}
 			}
-			for (int j = 0; j < Models.Count; j++) {
+			for (int j = Models.Count-1; j >=0; j--) {
 				if (!Models[j].IsAlive) {
 					Models.RemoveAt(j);
 				}
 			}
-			for (int j = 0; j < Enemies.Count; j++) {
+            for (int j = Enemies.Count-1; j >= 0; j--) {
 				if (!Enemies[j].IsAlive) {
 					Enemies.RemoveAt(j);
 				}
@@ -501,47 +499,48 @@ namespace _3DRTSGame
 				Asteroids.Add(a);
 				Models.Add(a);
 			}*/
-			enemyManager.Update(gameTime);
+
+			//enemyManager.Update(gameTime);
 			productionManager.Update(gameTime);
 
 			base.Update(gameTime);
 
 			HandleInput();
 			camera.Update(gameTime);
-			renderer.Update(gameTime);
-			LightPosition = renderer.Lights[0].Position;
+            renderer.Update(gameTime);
+            LightPosition = renderer.Lights[0].Position;
 
-			Sky.Update(gameTime);
-			sun.Update(gameTime);
-			sunCircle.Position = renderer.Lights[0].Position;
-			sunCircle.Update(gameTime);
+            Sky.Update(gameTime);
+            sun.Update(gameTime);
+            sunCircle.Position = renderer.Lights[0].Position;
+            sunCircle.Update(gameTime);
 
-			foreach (Object o in Models) {
-				if (o.IsAlive) o.Update(gameTime);
-			}
-			if (Models.Count > 100) {
-				string debug = "そろそろModelsのDelete処理を書くこと";
-			}
-			foreach (Bullet b in Bullets) {
-				if (b.IsAlive) b.Update(gameTime);
-			}
+            foreach (Object o in Models) {
+                if (o.IsAlive) o.Update(gameTime);
+            }
+            if (Models.Count > 100) {
+                throw new Exception("そろそろModelsのDelete処理を書くこと");
+            }
+            foreach (Bullet b in Bullets) {
+                if (b.IsAlive) b.Update(gameTime);
+            }
 
-			if (planet.IsAlive) planet.Update(gameTime);
+            if (planet.IsAlive) planet.Update(gameTime);
 
 
-			//discoidEffect.Update(gameTime);
+            //discoidEffect.Update(gameTime);
 
-			//shieldEffect.Position = Satellite.Position;
-			//shieldEffect.Update(gameTime);
+            //shieldEffect.Position = Satellite.Position;
+            //shieldEffect.Update(gameTime);
 
-			//explosionTest.Update(gameTime);
-			//bigExplosion.Update(gameTime);
-			lb.Update(gameTime);
+            //explosionTest.Update(gameTime);
+            //bigExplosion.Update(gameTime);
+            lb.Update(gameTime);
 
-			Collide();
+            Collide();
 
-			effectManager.Update(gameTime);
-			uiManager.Update(gameTime);
+            effectManager.Update(gameTime);
+            uiManager.Update(gameTime);
 		}
 		public override void Draw(GameTime gameTime)
 		{
@@ -552,7 +551,7 @@ namespace _3DRTSGame
 			float sunDepth = Vector3.Transform(sun.Position, camera.View).Z;
 			//sunDepth =   Vector3.Transform(Vector3.Transform(Vector3.Transform(sun.Position, sun.World), camera.View), camera.Projection).Z;
 			//float sunFrontDepth = Vector3.Transform(Vector3.Transform(sun.Position + (Vector3.Normalize(sun.Position - camera.CameraPosition) * 200), sun.world), camera.View).Z;
-			camera.FarPlaneDistance = 10000000;
+            camera.FarPlaneDistance = 10000000;// もっと短くてよい
 
 
 			// Draw pre-passes
@@ -618,7 +617,6 @@ namespace _3DRTSGame
 
 			foreach (EnergyShieldEffect ese in transparentEffects) {
 				//ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
-				ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
 			}
 
 

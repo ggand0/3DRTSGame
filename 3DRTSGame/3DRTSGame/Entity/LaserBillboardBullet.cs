@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
-	public class LaserBillboardBullet : Bullet//LaserBillboard
+	public class LaserBillboardBullet : Bullet, IDisposable//LaserBillboard
 	{
         private int count;
 		protected LaserBillboard laserRenderer;
@@ -43,6 +43,10 @@ namespace _3DRTSGame
 			Position = laserRenderer.Mid;
 			IsActive = IsActiveNow();
 		}
+        public void Dispose()
+        {
+            laserRenderer.Dispose();
+        }
 		public override bool IsActiveNow()
 		{
 			if (Mode == 0) {

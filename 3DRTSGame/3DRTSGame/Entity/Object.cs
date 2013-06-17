@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
-	public class Object : Drawable, IRenderable
+	public class Object : Drawable, IRenderable, ICloneable
 	{
 		#region Fields and Properties
 		public static Game1 game;
@@ -105,6 +105,12 @@ namespace _3DRTSGame
 		#endregion
 
 		#region Methods
+        public object Clone()
+        {
+            Object cloned = (Object)MemberwiseClone();
+            // 参照を持っているのはMaterialとBoundingSphereRendererくらいなので当面はこのまま返すことにした
+            return cloned;
+        }
 		protected virtual void Load()
 		{
 			//GenerateTags();

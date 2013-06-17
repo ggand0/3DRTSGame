@@ -73,6 +73,8 @@ namespace _3DRTSGame
 					return minObj;
 			}
 		}
+        Object tmp1;
+        Missile missileOrg;
 		private void Shoot(int bulletType)
 		{
 			switch (bulletType) {
@@ -137,9 +139,13 @@ namespace _3DRTSGame
 				case 5:
 					//if (visibleEnemies.Count > 0) {
 						//Vector3 tmp = SearchTarget(0);
-						Object tmp1 = SearchTargetObj(0);
+                    //Object tmp1 = SearchTargetObj(0);
+                    tmp1 = SearchTargetObj(0);
 						Vector3 dir2 = Vector3.Normalize(tmp1.Position - Position);
-						level.Bullets.Add(new Missile(IFF.Friend, this, tmp1, 5.0f, dir2, Position, 4, "Models\\AGM65Missile"));/**/
+                        // このnewする処理がマジで重い！
+						//level.Bullets.Add(new Missile(IFF.Friend, this, tmp1, 5.0f, dir2, Position, 4, "Models\\AGM65Missile"));/**/
+                        missileOrg.Initialize(tmp1, Position, dir2);
+                        level.Bullets.Add((Missile)missileOrg.Clone());
 					
 					break;
 			}
@@ -200,7 +206,7 @@ namespace _3DRTSGame
 
 			//if (canShoot && JoyStick.IsOnKeyDown(2) || count % shootRate == 0 && IsInRange()) {
 			if (canShoot && IsInRange()) {
-				if (Weapon == SatelliteWeapon.Missile) {
+				/**/if (Weapon == SatelliteWeapon.Missile) {
 					Shoot(5);
 				} else {
 					Shoot(4);
@@ -274,6 +280,10 @@ namespace _3DRTSGame
 			visibleEnemies = new List<Object>();
 			sensorSphere = new BoundingSphere(Position, 1000);
 			RenderBoudingSphere = false;
+
+
+            // 仮に作成しておく
+            missileOrg = new Missile(IFF.Friend, this, null, 5.0f, Vector3.Zero, Position, 4, "Models\\AGM65Missile");
 		}
 		#endregion
 	}

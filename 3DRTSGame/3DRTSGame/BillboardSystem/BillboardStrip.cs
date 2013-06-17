@@ -14,7 +14,7 @@ namespace _3DRTSGame
 	/// 軌跡エフェクト向けにLaserBillboardを複数繋げる試み
 	/// 13/5/26 Quad stripを用いる方針に変更
 	/// </summary>
-	public class BillboardStrip : Drawable
+	public class BillboardStrip : Drawable, ICloneable
 	{
 		public static readonly int MAX_SIZE = 120;
 		public List<Vector3> Positions { get; set; }
@@ -123,6 +123,26 @@ namespace _3DRTSGame
 		}
 		#endregion
 
+        public object Clone()
+        {
+            BillboardStrip cloned = (BillboardStrip)MemberwiseClone();
+
+            if (effect != null) {
+                cloned.effect = (Effect)effect.Clone();
+            }
+            if (vertexBuffers != null) {
+                cloned.vertexBuffers = new VertexBuffer(graphicsDevice,
+					typeof(BillboardStripVertex),
+					nBillboards * 4, BufferUsage.WriteOnly);
+            }
+            if (indexBuffers != null) {
+                cloned.indexBuffers = new IndexBuffer(graphicsDevice,
+                    IndexElementSize.ThirtyTwoBits,
+                    nBillboards * 6, BufferUsage.WriteOnly);
+            }
+
+            return cloned;
+        }
 		public void AddBillboard(GraphicsDevice graphicsDevice, ContentManager content, Texture2D texture, Vector2 billboardSize, Vector3 start, Vector3 end)//List<Vector3> positions)
 		{
 			//Billboards.Add(new LaserBillboard(graphicsDevice, content, texture, billboardSize, start, end));

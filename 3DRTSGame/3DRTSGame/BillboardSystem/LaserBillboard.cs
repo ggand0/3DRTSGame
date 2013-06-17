@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
-	public class LaserBillboard : Drawable
+	public class LaserBillboard : Drawable, IDisposable
 	{
 		// Vertex buffer and index buffer, particle
 		// and index arrays
@@ -32,6 +32,12 @@ namespace _3DRTSGame
 		public int UpdateMode { get; private set; }
 		public Vector3 InitialPosition { get; private set; }
 
+
+        public void Dispose()
+        {
+            //effect.Dispose();
+            //texture.Dispose();
+        }
 		private void GenerateParticles(Vector3[] particlePositions)
 		{
 			// Create vertex and index arrays

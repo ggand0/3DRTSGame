@@ -10,7 +10,7 @@ namespace _3DRTSGame
 	/// <summary>
 	/// 軌跡エフェクトを付けて動かしまくりたい！
 	/// </summary>
-	public class Missile : Bullet
+	public class Missile : Bullet, ICloneable
 	{
 		public Object Target { get; private set; }
 
@@ -98,8 +98,39 @@ namespace _3DRTSGame
 			//return Renderer.IsHitWith(o.transformedBoundingSphere);
 			return boundingSphere.Intersects(o.transformedBoundingSphere);
 		}
+        public void Initialize(Object target, Vector3 position, Vector3 direction)
+        {
+            this.Target = target;
+            this.Position = position;
+            this.Direction = direction;
+        }
+        public object Clone()
+        {
+            Missile cloned = (Missile)MemberwiseClone();
 
+            // 参照を持っているのは、Target, Renderer, positions:
+            if (this.Target != null) {
+                cloned.Target = (Object)this.Target.Clone();
+            }
+            if (this.Renderer != null) {
+                cloned.Renderer = (Object)this.Renderer.Clone();
+            }
+            if (this.positions != null) {
+                // Listを直接Clone出来ないのでこのような操作を行っている
+                cloned.positions = new List<Vector3>();
+                for (int i = 0; i < positions.Count; i++) {
+                    cloned.positions.Add(this.positions[i]);
+                }
+            }
+            if (this.billboardStrip != null) {
+                //cloned.billboardStrip = (BillboardStrip)this.billboardStrip.Clone();
+                // 面倒なのでnewする
+                cloned.billboardStrip = new BillboardStrip(Level.graphicsDevice, content,
+                content.Load<Texture2D>("Textures\\Lines\\smoke"), new Vector2(10, 30), positions, true);
+            }
 
+            return cloned;
+        }
 
 		public override void Draw(Camera camera)
 		{
