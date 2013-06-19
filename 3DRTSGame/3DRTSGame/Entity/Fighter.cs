@@ -20,7 +20,7 @@ namespace _3DRTSGame
 	public class Fighter : Object
 	{
 		public FighterState State { get; private set; }
-		public Vector3 Target { get; private set; }
+		public Vector3 Target { get; set; }
 		public Vector3 StartPosition { get; private set; }
 
 		private Vector3 currentWayPoint;
@@ -37,7 +37,43 @@ namespace _3DRTSGame
         private bool hasBuild, shouldShoot, turned;
 		private SoundEffect shootSound;
 		private List<SoundEffectInstance> currentSounds = new List<SoundEffectInstance>();
-		
+
+        public override object Clone()
+        {
+            Fighter cloned = (Fighter)MemberwiseClone();
+
+            if (changeDirWayPoints != null) {
+                cloned.changeDirWayPoints = new List<Vector3>();
+                foreach (Vector3 v in changeDirWayPoints) {
+                    cloned.changeDirWayPoints.Add(v);
+                }
+            }
+            if (positions != null) {
+                cloned.positions = new List<Vector3>();
+                foreach (Vector3 v in positions) {
+                    cloned.positions.Add(v);
+                }
+            }
+            if (currentSounds != null) {
+                cloned.currentSounds = new List<SoundEffectInstance>();
+                foreach (SoundEffectInstance v in currentSounds) {
+                    cloned.currentSounds.Add(v);
+                }
+            }
+            if (obstacles != null) {
+                cloned.obstacles = new List<BoundingSphere>();
+                foreach (BoundingSphere v in obstacles) {
+                    cloned.obstacles.Add(v);
+                }
+            }
+            if (engineTrailEffect != null) {
+                cloned.engineTrailEffect = (BillboardStrip)engineTrailEffect.Clone();
+            }
+
+
+            //return base.Clone();
+            return cloned;
+        }
 
 		private void Initialize()
 		{

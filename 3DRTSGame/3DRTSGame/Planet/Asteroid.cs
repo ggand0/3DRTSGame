@@ -9,12 +9,22 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
-	public class Asteroid : Object
+	public class Asteroid : Object//, ICloneable
 	{
-		public Vector3 Destination { get; private set; }
+		public Vector3 Destination { get; set; }
 		public float Speed { get; private set; }
 		Effect lightingEffect;
 
+        public override object Clone()
+        {
+            Asteroid cloned = (Asteroid)MemberwiseClone();
+
+            if (lightingEffect != null) {
+                cloned.lightingEffect = lightingEffect.Clone();
+            }
+
+            return cloned;
+        }
 		protected override void UpdateWorldMatrix()
 		{
 			//base.UpdateWorldMatrix();

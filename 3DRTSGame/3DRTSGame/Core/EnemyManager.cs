@@ -72,8 +72,11 @@ namespace _3DRTSGame
 		private int count, start;
 		private Dictionary<String, object[]> arguments = new Dictionary<string, object[]>();
 
+        private Dictionary<string, Object> enemiesOrg = new Dictionary<string, Object>();
 
-		public static float NextDouble(Random r, double min, double max)
+
+        #region Methods
+        public static float NextDouble(Random r, double min, double max)
 		{
 			return (float)(min + r.NextDouble() * (max - min));
 		}
@@ -120,21 +123,43 @@ namespace _3DRTSGame
 			// 乱数が入らなかったらDictionaryで予めargumentsを計算してスマートにインスタンス生成が出来るのだが、
 			// 乱数入りなので仕方なく関数内で条件分岐させることに。さらにswitch
 			float radius = 3000;
-			if (enemyType == typeof(Asteroid)) {
+			/*if (enemyType == typeof(Asteroid)) {
 				a = new Asteroid(new Vector3(NextDouble(random, -radius, radius)
 					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, "Models\\Asteroid");
 				a.RenderBoudingSphere = false;
 				level.Models.Add(a);
 				level.Enemies.Add(a);
 			} else if (enemyType == typeof(Fighter)) {
-				/*f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
-					, level.Planets[0].Position, 20f, "Models\\fighter0");*/
+				//f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
+					//, level.Planets[0].Position, 20f, "Models\\fighter0");
 				f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
 					, level.TargetPlanets[0].Position, 20f, "Models\\fighter0");
 				f.RenderBoudingSphere = false;
 				level.Models.Add(f);
 				level.Enemies.Add(f);
-			}
+			}*/
+            if (enemyType == typeof(Asteroid)) {
+                enemiesOrg["Asteroid"].Position = new Vector3(NextDouble(random, -radius, radius)
+                    , 0, NextDouble(random, -radius, radius));
+                enemiesOrg["Asteroid"].RenderBoudingSphere = false;
+
+                a = (Asteroid)enemiesOrg["Asteroid"].Clone();
+                a.Destination = level.TargetPlanets[0].Position;
+
+                level.Models.Add(a);
+                level.Enemies.Add(a);
+            } else if (enemyType == typeof(Fighter)) {
+                enemiesOrg["Fighter"].Position = new Vector3(NextDouble(random, -radius, radius),
+                    NextDouble(random, -radius, radius), NextDouble(random, -radius, radius));
+                enemiesOrg["Fighter"].RenderBoudingSphere = false;
+                //enemiesOrg["Fighter"].Target = level.TargetPlanets[0];
+
+                f = (Fighter)enemiesOrg["Fighter"].Clone();
+                f.Target = level.TargetPlanets[0].Position;
+
+                level.Models.Add(f);
+                level.Enemies.Add(f);
+            }
 		}
 		public void Update(GameTime gameTime)
 		{
@@ -191,8 +216,9 @@ namespace _3DRTSGame
 				}
 			}
 		}
+        #endregion
 
-		private void Initialize()
+        private void Initialize()
 		{
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
 
@@ -202,6 +228,10 @@ namespace _3DRTSGame
 			});
 
 			state = WaveState.Start;
+
+            // asteroid:4引数コンストラクタ以外を使うとeffectが初期化されずにnullのままになるので注意
+            enemiesOrg.Add("Asteroid", new Asteroid(Vector3.Zero, Vector3.Zero, 0.05f, "Models\\Asteroid"));
+            enemiesOrg.Add("Fighter", new Fighter(Vector3.Zero, Vector3.Zero, 20f, "Models\\fighter0"));
 		}
 		public EnemyManager(Level4 level)
 		{

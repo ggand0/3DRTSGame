@@ -105,7 +105,7 @@ namespace _3DRTSGame
 		#endregion
 
 		#region Methods
-        public object Clone()
+        public virtual object Clone()
         {
             Object cloned = (Object)MemberwiseClone();
             // 参照を持っているのはMaterialとBoundingSphereRendererくらいなので当面はこのまま返すことにした

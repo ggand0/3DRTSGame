@@ -42,7 +42,7 @@ namespace _3DRTSGame
 		public Vector3 Mid { get; private set; }
 		public Color LaserColor { get; private set; }
 		public bool AdjustedWidth { get; private set; }
-
+        BasicEffect basicEffect;
 
 		#region private methods
 		/*private void GenerateParticles(Vector3[] particlePositions)
@@ -139,6 +139,24 @@ namespace _3DRTSGame
                 cloned.indexBuffers = new IndexBuffer(graphicsDevice,
                     IndexElementSize.ThirtyTwoBits,
                     nBillboards * 6, BufferUsage.WriteOnly);
+            }
+            if (particles != null) {
+                cloned.particles = new List<BillboardStripVertex>();
+                foreach (BillboardStripVertex b in particles) {
+                    cloned.particles.Add(b);
+                }
+            }
+            if (indices != null) {
+                cloned.indices = new List<int>();
+                foreach (int i in indices) {
+                    cloned.indices.Add(i);
+                }
+            }
+            if (Positions != null) {
+                cloned.Positions = new List<Vector3>();
+                foreach (Vector3 v in Positions) {
+                    cloned.Positions.Add(v);
+                }
             }
 
             return cloned;
@@ -306,7 +324,7 @@ namespace _3DRTSGame
                 UpdatePositions();
             }
 		}
-        BasicEffect basicEffect;
+        
         private void DrawDebugLine(Matrix view, Matrix projection)
         {
             Matrix projectionMatrix = Matrix.CreateOrthographicOffCenter(0, graphicsDevice.Viewport.Width,

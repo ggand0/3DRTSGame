@@ -500,7 +500,7 @@ namespace _3DRTSGame
 				Models.Add(a);
 			}*/
 
-			//enemyManager.Update(gameTime);
+			enemyManager.Update(gameTime);
 			productionManager.Update(gameTime);
 
 			base.Update(gameTime);

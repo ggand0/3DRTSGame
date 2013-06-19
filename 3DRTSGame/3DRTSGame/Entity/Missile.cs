@@ -110,7 +110,9 @@ namespace _3DRTSGame
 
             // 参照を持っているのは、Target, Renderer, positions:
             if (this.Target != null) {
-                cloned.Target = (Object)this.Target.Clone();
+                // あ、Targetは参照し続けないとダメだな
+                //cloned.Target = (Object)this.Target.Clone();
+                //cloned.Target = (Object)this.Target.Clone();
             }
             if (this.Renderer != null) {
                 cloned.Renderer = (Object)this.Renderer.Clone();
@@ -123,10 +125,10 @@ namespace _3DRTSGame
                 }
             }
             if (this.billboardStrip != null) {
-                //cloned.billboardStrip = (BillboardStrip)this.billboardStrip.Clone();
+                cloned.billboardStrip = (BillboardStrip)this.billboardStrip.Clone();
                 // 面倒なのでnewする
-                cloned.billboardStrip = new BillboardStrip(Level.graphicsDevice, content,
-                content.Load<Texture2D>("Textures\\Lines\\smoke"), new Vector2(10, 30), positions, true);
+                /*cloned.billboardStrip = new BillboardStrip(Level.graphicsDevice, content,
+                content.Load<Texture2D>("Textures\\Lines\\smoke"), new Vector2(10, 30), positions, true);*/
             }
 
             return cloned;
