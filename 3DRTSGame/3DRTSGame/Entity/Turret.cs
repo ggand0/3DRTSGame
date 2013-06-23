@@ -54,7 +54,7 @@ namespace _3DRTSGame
 					return visibleEnemies[r.Next(0, visibleEnemies.Count)].Position;
 				case 1:
 					foreach (Object o in visibleEnemies) {
-						if ((Position - o.Position).Length() < minDis) {
+						if (o.IsActive && (Position - o.Position).Length() < minDis) {
 							minDis = (Position - o.Position).Length();
 							min = o.Position;
 						}
@@ -79,7 +79,7 @@ namespace _3DRTSGame
 					return visibleEnemies[r.Next(0, visibleEnemies.Count)];
 				case 1:
 					foreach (Object o in visibleEnemies) {
-						if ((Position - o.Position).Length() < minDis) {
+						if (o.IsActive && (Position - o.Position).Length() < minDis) {
 							minDis = (Position - o.Position).Length();
 							min = o.Position;
 							minObj = o;
@@ -136,9 +136,12 @@ namespace _3DRTSGame
 					if (visibleEnemies.Count > 0) {
 						//Vector3 tmp = SearchTarget(1);
 						Drawable tmp = SearchTargetObj(1);
-						Vector3 dir1 = Vector3.Normalize(tmp.Position - Position);
-						level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, this, tmp, dir1, 1,
-							content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.AlphaBlend, new Vector2(50, 30), 1));/**/
+
+						if (tmp != null) {// 敵がいれば
+							Vector3 dir1 = Vector3.Normalize(tmp.Position - Position);
+							level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, this, tmp, dir1, 1,
+								content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.AlphaBlend, new Vector2(50, 30), 1));/**/
+						}
 					}
 					break;
 			}

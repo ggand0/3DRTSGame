@@ -171,6 +171,17 @@ namespace _3DRTSGame
 		/// </summary>
 		/// <param name="o"></param>
 		/// <returns></returns>
+		/*public override bool IsHitWith(Object o)
+		{
+			if (o is Fighter) {
+				string d = "";
+			}
+			BoundingSphere bs = o.transformedBoundingSphere;
+			Ray ray = new Ray(Start, Vector3.Normalize(End - Start));
+			return ray.Intersects(bs) != null ? true : false;
+
+			
+		}*/
 		public override bool IsHitWith(Object o)
 		{
 			BoundingSphere bs = o.transformedBoundingSphere;
@@ -193,6 +204,7 @@ namespace _3DRTSGame
 				}
 			}
 		}
+
 
 
 		public Color LaserColor { get; private set; }

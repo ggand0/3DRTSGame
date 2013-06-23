@@ -249,6 +249,31 @@ namespace _3DRTSGame
 				indexBuffers.SetData<int>(indices.ToArray());
 			}
 		}
+		public void RemoveVertices()
+		{
+			if (Positions.Count == 0) {
+				return;
+			}
+			
+			Vector3 z = Vector3.Zero;
+			nBillboards--;
+			particles.RemoveRange(particles.Count - 2, 2);// 後ろの２要素を削除
+			if (Positions.Count > 2) {
+				indices.RemoveRange(indices.Count - 6, 6);
+			}
+
+			if (nBillboards > 0) {
+				vertexBuffers = new VertexBuffer(graphicsDevice,
+					typeof(BillboardStripVertex),
+					nBillboards * 4, BufferUsage.WriteOnly);
+				vertexBuffers.SetData<BillboardStripVertex>(particles.ToArray());
+
+				indexBuffers = new IndexBuffer(graphicsDevice,
+					IndexElementSize.ThirtyTwoBits,
+					nBillboards * 6, BufferUsage.WriteOnly);
+				indexBuffers.SetData<int>(indices.ToArray());
+			}
+		}
 		/// <summary>
 		/// Positionsに合わせて現在のstripの位置等をUpdate
 		/// </summary>

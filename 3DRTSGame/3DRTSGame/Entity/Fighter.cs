@@ -101,13 +101,20 @@ namespace _3DRTSGame
 		}
 		private void UpdateLocus()
 		{
-			//if (IsActive) {
-			positions.Add(Position);
-			engineTrailEffect.Positions = positions;
-			if (positions.Count >= BillboardStrip.MAX_SIZE) {
+			if (IsActive) {
+				positions.Add(Position);
+				engineTrailEffect.Positions = positions;
+				if (positions.Count >= BillboardStrip.MAX_SIZE) {
+					positions.RemoveAt(0);
+				} else if (positions.Count > 0) {
+					engineTrailEffect.AddVertices();
+				}
+			} else {// 死亡時なので減らす
 				positions.RemoveAt(0);
-			} else if (positions.Count > 0) {
-				engineTrailEffect.AddVertices();
+				engineTrailEffect.Positions = positions;
+				if (positions.Count > 0) {
+					engineTrailEffect.RemoveVertices();
+				}
 			}
 		}
 		/// <summary>
@@ -411,7 +418,8 @@ namespace _3DRTSGame
 					UpdateLocus();
 				engineTrailEffect.Update(gameTime);
 			} else {
-				positions.RemoveAt(0);
+				UpdateLocus();
+				engineTrailEffect.Update(gameTime);
 				if (positions.Count == 0) IsAlive = false;
 			}
 		}

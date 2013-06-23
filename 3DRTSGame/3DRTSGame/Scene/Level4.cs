@@ -399,7 +399,7 @@ namespace _3DRTSGame
 				
 
 				//foreach (Object o in Enemies) {
-					if (o is Fighter && (b is Missile) && b.IsActive && b.Identification == IFF.Friend && b.IsHitWith(o)) {
+					if (o is Fighter /*&& (b is Missile)*/ && o.IsActive && b.IsActive && b.Identification == IFF.Friend && b.IsHitWith(o)) {
 						 //b.IsActive = false;
 						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
 						o.Die();

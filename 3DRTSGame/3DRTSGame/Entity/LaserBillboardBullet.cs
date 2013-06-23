@@ -38,8 +38,6 @@ namespace _3DRTSGame
 				laserRenderer.MoveLaser(Direction, Speed);
 			}
 			
-
-			
 			Position = laserRenderer.Mid;
 			IsActive = IsActiveNow();
 		}
