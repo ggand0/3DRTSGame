@@ -11,6 +11,8 @@ namespace _3DRTSGame
 {
 	public class Satellite : Object
 	{
+		private static readonly float DEF_REVOLUTION_SPEED = 0.25f;
+
 		public bool Rotate { get; protected set; }
 		public bool Revolution { get; protected set; }
 		/// <summary>
@@ -44,7 +46,7 @@ namespace _3DRTSGame
 				Roll += rotationSpeed;
 			}
 			if (Revolution) {
-				revolutionSpeed = 1f;
+				revolutionSpeed = DEF_REVOLUTION_SPEED;//1
 				revolutionAngle += MathHelper.ToRadians(revolutionSpeed);
 				Vector3 velocity = new Vector3((float)Math.Cos(revolutionAngle), 0,
 					(float)Math.Sin(revolutionAngle));

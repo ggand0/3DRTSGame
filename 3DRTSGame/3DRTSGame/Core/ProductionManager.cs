@@ -8,9 +8,13 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
+	/// <summary>
+	/// イメージとしてはPlayerがProductionManagerを利用してオブジェクトを買うような構造
+	/// </summary>
 	public class ProductionManager
 	{
 		private Level4 level;
+		private Player player;
 
 		private Type currentSelection;
 		private bool isDragging;
@@ -25,11 +29,13 @@ namespace _3DRTSGame
 		private Object uiModel;
 		private BillboardSystem uiRing;
 
+		private Dictionary<string, int> unitCosts;
+
 		/*private Type GetUnitType()
 		{
 			return null;
 		}*/
-		Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)//Nullable<Vector3>
+		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)//Nullable<Vector3>
 		{
 			float? distance = ray.Intersects(plane);
 			//return distance.HasValue ? ray.Position + ray.Direction * distance.Value : null;
@@ -69,7 +75,7 @@ namespace _3DRTSGame
 				//currentSelection = UIManager.GetUnitType();
 				isDragging = true;
 				
-				//object[] args = new object[] { SatelliteWeapon.Missile, level.waterPlanet.Position + new Vector3(400, 50, 0), waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0" };
+				//object[] args = new object[] { SatelliteWeapon.Missile, level.waterPlanet.Position + new Vector3(400, 50, 0),waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0" };
 				object[] args = new object[] { Vector3.Zero, 10, "Models\\DeepSpace" };
 				uiModel = (Object)Activator.CreateInstance(currentSelection, args);// キャストしたらダメな気がするが...モデル表示するだけだからいいか
 				if (uiRing == null) {
@@ -117,14 +123,19 @@ namespace _3DRTSGame
 		public ProductionManager(Level4 level)
 		{
 			this.level = level;
-			
 		}
 		// 使ってない
 		public ProductionManager(Level4 level, UIManager uiManager)
 		{
 			this.level = level;
+			this.player = level.player;
 			this.UIManager = uiManager;
-			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"), Vector2.One, new Vector3[] { uiModel.Position });
+			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
+				Vector2.One, new Vector3[] { uiModel.Position });
+
+			unitCosts = new Dictionary<string, int>();
+			unitCosts.Add("ArmedSatellite", 100);
+			unitCosts.Add("SpaceStation", 500);
 		}
 	}
 }

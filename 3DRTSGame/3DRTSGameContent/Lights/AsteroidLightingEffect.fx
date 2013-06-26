@@ -110,7 +110,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	}
 	// add lighter color for asteroid
 	//color += float3(0.1f, 0.1f, 0.1f);
-	//color += float3(0.3f, 0.3f, 0.3f);
+	color += float3(0.3f, 0.3f, 0.3f);
 	//color += AccentColor * 0.2f;
 
 	// Start with ambient lighting

@@ -17,8 +17,10 @@ namespace _3DRTSGame
 		ChangeDirection,
 		Attack
 	}
-	public class Fighter : Object
+	public class Fighter : Object, IDamageable
 	{
+		protected static readonly int DEF_HIT_POINT = 30;
+
 		public FighterState State { get; private set; }
 		public Vector3 Target { get; set; }
 		public Vector3 StartPosition { get; private set; }
@@ -38,67 +40,9 @@ namespace _3DRTSGame
 		private SoundEffect shootSound;
 		private List<SoundEffectInstance> currentSounds = new List<SoundEffectInstance>();
 
-        public override object Clone()
-        {
-            Fighter cloned = (Fighter)MemberwiseClone();
 
-            if (changeDirWayPoints != null) {
-                cloned.changeDirWayPoints = new List<Vector3>();
-                foreach (Vector3 v in changeDirWayPoints) {
-                    cloned.changeDirWayPoints.Add(v);
-                }
-            }
-            if (positions != null) {
-                cloned.positions = new List<Vector3>();
-                foreach (Vector3 v in positions) {
-                    cloned.positions.Add(v);
-                }
-            }
-            if (currentSounds != null) {
-                cloned.currentSounds = new List<SoundEffectInstance>();
-                foreach (SoundEffectInstance v in currentSounds) {
-                    cloned.currentSounds.Add(v);
-                }
-            }
-            if (obstacles != null) {
-                cloned.obstacles = new List<BoundingSphere>();
-                foreach (BoundingSphere v in obstacles) {
-                    cloned.obstacles.Add(v);
-                }
-            }
-            if (engineTrailEffect != null) {
-                cloned.engineTrailEffect = (BillboardStrip)engineTrailEffect.Clone();
-            }
-
-
-            //return base.Clone();
-            return cloned;
-        }
-
-		private void Initialize()
-		{
-			// Initialize default up position. this value is used for calculating Up vector later.
-			upPosition = Position + Vector3.UnitY;
-
-			viewSphere = new BoundingSphere(Position, 500);// 2000,100
-			obstacles = new List<BoundingSphere>();
-
-			// Initialize waypoints
-			changeDirWayPoints = new List<Vector3>();
-			wayPoints0 = new Vector3[] {
-				Target + Vector3.Normalize(StartPosition - Target) * 500,
-				Target + Vector3.UnitY * 400,
-				Target - Vector3.Normalize(StartPosition - Target) * 500,
-				Target - Vector3.UnitY * 400,
-			};
-			yawDebug = new Vector3[] {
-				Target + Vector3.Normalize(StartPosition - Target) * 500,
-				Target + Vector3.UnitX * 500,
-				Target - Vector3.Normalize(StartPosition - Target) * 500,
-				Target - Vector3.UnitX * 500,
-			};
-			currentWayPoint = wayPoints0[0];
-		}
+		#region pribate mehods
+		
 		private void UpdateLocus()
 		{
 			if (IsActive) {
@@ -155,47 +99,6 @@ namespace _3DRTSGame
 			}
 		}
 		
-		protected override void UpdateWorldMatrix()
-		{
-			Direction.Normalize();
-			//Up = Vector3.UnitY; // Upが誤っているので表示されない
-			Up = Vector3.Normalize(upPosition - Position);
-			Up.Normalize();
-			Right = Vector3.Cross(Direction, Up);
-			Right.Normalize();
-
-			Vector3 projectedDirection = Direction - Vector3.Dot(Direction, Vector3.UnitY) * Vector3.UnitY;
-			float angleX = (float)Math.Acos((double)(Vector3.Dot(Direction, projectedDirection)
-				/ (Direction.Length() * projectedDirection.Length())));
-			//float angleY = Math.Atan();
-			//float angleZ = Math.Atan();
-
-			// ContentProcessorで処理した結果、デフォルトでUnitXの方向を向いているので、Directionと内積を取って角度を求めて回転させる。
-			// Worldの3軸を直接変更した方が簡単だと思ったがUpが定まらないので無理
-			/*_world = Matrix.Identity;
-			_world = Matrix.CreateScale(Scale)
-				//* Matrix.CreateRotationY((-Vector3.Dot(Vector3.UnitX, Direction) + MathHelper.ToRadians(90)))
-				* Matrix.CreateFromYawPitchRoll(angleX//Vector3.Dot(Vector3.UnitZ, Direction
-					, 0//-Vector3.Dot(Vector3.UnitY, Direction) + MathHelper.ToRadians(90)
-					, 0)
-				* Matrix.CreateTranslation(Position);*/
-
-			/*_world = Matrix.Identity;
-			_world *= Matrix.CreateScale(Scale);
-			_world.Forward *= Direction;
-			_world.Up *= Up;
-			_world.Right *= Right;
-			_world *= Matrix.CreateTranslation(Position);*/
-			_world = Matrix.Identity;
-			_world.Forward = Direction;
-			_world.Up = Up; ;
-			_world.Right = Right;/**/
-			_world *= Matrix.CreateScale(Scale);
-			_world *= Matrix.CreateTranslation(Position);
-
-			/*_world = Matrix.CreateWorld(Position, Direction, Vector3.Up);
-			_world *= Matrix.CreateScale(Scale);*/
-		}
 		private void BasicAttackMove()
 		{
 			if ((Target - Position).Length() < 1000) State = FighterState.Attack;
@@ -390,6 +293,93 @@ namespace _3DRTSGame
 				}
 			}
 		}
+		#endregion
+
+		protected override void UpdateWorldMatrix()
+		{
+			Direction.Normalize();
+			//Up = Vector3.UnitY; // Upが誤っているので表示されない
+			Up = Vector3.Normalize(upPosition - Position);
+			Up.Normalize();
+			Right = Vector3.Cross(Direction, Up);
+			Right.Normalize();
+
+			Vector3 projectedDirection = Direction - Vector3.Dot(Direction, Vector3.UnitY) * Vector3.UnitY;
+			float angleX = (float)Math.Acos((double)(Vector3.Dot(Direction, projectedDirection)
+				/ (Direction.Length() * projectedDirection.Length())));
+			//float angleY = Math.Atan();
+			//float angleZ = Math.Atan();
+
+			// ContentProcessorで処理した結果、デフォルトでUnitXの方向を向いているので、Directionと内積を取って角度を求めて回転させる。
+			// Worldの3軸を直接変更した方が簡単だと思ったがUpが定まらないので無理
+			/*_world = Matrix.Identity;
+			_world = Matrix.CreateScale(Scale)
+				//* Matrix.CreateRotationY((-Vector3.Dot(Vector3.UnitX, Direction) + MathHelper.ToRadians(90)))
+				* Matrix.CreateFromYawPitchRoll(angleX//Vector3.Dot(Vector3.UnitZ, Direction
+					, 0//-Vector3.Dot(Vector3.UnitY, Direction) + MathHelper.ToRadians(90)
+					, 0)
+				* Matrix.CreateTranslation(Position);*/
+
+			/*_world = Matrix.Identity;
+			_world *= Matrix.CreateScale(Scale);
+			_world.Forward *= Direction;
+			_world.Up *= Up;
+			_world.Right *= Right;
+			_world *= Matrix.CreateTranslation(Position);*/
+			_world = Matrix.Identity;
+			_world.Forward = Direction;
+			_world.Up = Up; ;
+			_world.Right = Right;/**/
+			_world *= Matrix.CreateScale(Scale);
+			_world *= Matrix.CreateTranslation(Position);
+
+			/*_world = Matrix.CreateWorld(Position, Direction, Vector3.Up);
+			_world *= Matrix.CreateScale(Scale);*/
+		}
+		public void Damage()
+		{
+			HitPoint--;
+
+			if (HitPoint <= 0) {
+				Die();
+			}
+		}
+		public override object Clone()
+        {
+            Fighter cloned = (Fighter)MemberwiseClone();
+
+            if (changeDirWayPoints != null) {
+                cloned.changeDirWayPoints = new List<Vector3>();
+                foreach (Vector3 v in changeDirWayPoints) {
+                    cloned.changeDirWayPoints.Add(v);
+                }
+            }
+            if (positions != null) {
+                cloned.positions = new List<Vector3>();
+                foreach (Vector3 v in positions) {
+                    cloned.positions.Add(v);
+                }
+            }
+            if (currentSounds != null) {
+                cloned.currentSounds = new List<SoundEffectInstance>();
+                foreach (SoundEffectInstance v in currentSounds) {
+                    cloned.currentSounds.Add(v);
+                }
+            }
+            if (obstacles != null) {
+                cloned.obstacles = new List<BoundingSphere>();
+                foreach (BoundingSphere v in obstacles) {
+                    cloned.obstacles.Add(v);
+                }
+            }
+            if (engineTrailEffect != null) {
+                cloned.engineTrailEffect = (BillboardStrip)engineTrailEffect.Clone();
+            }
+
+
+            //return base.Clone();
+            return cloned;
+        }
 		public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
 		{
 			if (IsActive) {
@@ -445,6 +435,32 @@ namespace _3DRTSGame
 
 
         // Constructor
+		private void Initialize()
+		{
+			// Initialize default up position. this value is used for calculating Up vector later.
+			upPosition = Position + Vector3.UnitY;
+
+			viewSphere = new BoundingSphere(Position, 500);// 2000,100
+			obstacles = new List<BoundingSphere>();
+
+			// Initialize waypoints
+			changeDirWayPoints = new List<Vector3>();
+			wayPoints0 = new Vector3[] {
+				Target + Vector3.Normalize(StartPosition - Target) * 500,
+				Target + Vector3.UnitY * 400,
+				Target - Vector3.Normalize(StartPosition - Target) * 500,
+				Target - Vector3.UnitY * 400,
+			};
+			yawDebug = new Vector3[] {
+				Target + Vector3.Normalize(StartPosition - Target) * 500,
+				Target + Vector3.UnitX * 500,
+				Target - Vector3.Normalize(StartPosition - Target) * 500,
+				Target - Vector3.UnitX * 500,
+			};
+			currentWayPoint = wayPoints0[0];
+
+			HitPoint = DEF_HIT_POINT;
+		}
 		public Fighter(Vector3 position, Vector3 target, float scale, string filePath)
 			:base(position, scale, filePath)
 		{
@@ -456,6 +472,7 @@ namespace _3DRTSGame
 			positions = new List<Vector3>();
 			engineTrailEffect = new BillboardStrip(Level.graphicsDevice, content, content.Load<Texture2D>("Textures\\Lines\\Line2T1"),//"Textures\\Lines\\Line2T1"
 				new Vector2(10, 100), positions);
+			//shootSound = content.Load<SoundEffect>("SoundEffects\\laser1");//License\\LAAT1
 			shootSound = content.Load<SoundEffect>("SoundEffects\\License\\LAAT1");
 
 			Initialize();

@@ -15,6 +15,8 @@ namespace _3DRTSGame
 		public static Level level;
 		public static ContentManager content;
 		public static SpriteBatch spriteBatch;
+		private static readonly int DEF_HIT_POINT;
+		
 
 		public Effect maskEffect;
 		protected Vector3 _direction, _up, _down, _right;
@@ -28,6 +30,7 @@ namespace _3DRTSGame
 		protected readonly float BoundingSphereScale = 0.95f;
 		public Matrix RotationMatrix = Matrix.CreateRotationX(MathHelper.PiOver2);
 		public bool RenderBoudingSphere { get; set; }
+		public int HitPoint { get; protected set; }
 
 
 		public Model Model { get; protected set; }
@@ -246,11 +249,12 @@ namespace _3DRTSGame
 			BoundingSphere targetSphere =
 					  new BoundingSphere(o.Position,
 							   o.Model.Meshes[0].BoundingSphere.Radius *
-									 BoundingSphereScale);
+				//BoundingSphereScale);
+									 o.Scale);
 
 			BoundingSphere mySphere = new BoundingSphere(
 				Position,
-				Model.Meshes[0].BoundingSphere.Radius);
+				Model.Meshes[0].BoundingSphere.Radius * Scale);
 
 			return targetSphere.Intersects(mySphere);
 		}
@@ -402,7 +406,7 @@ namespace _3DRTSGame
 						//Material.SetEffectParameters(effect);// light mapだけの時は消すべきかも
 					}
 				}
-				GraphicsDevice de = Level.graphicsDevice;
+				//GraphicsDevice de = Level.graphicsDevice;
 				mesh.Draw();
 			}
 		}

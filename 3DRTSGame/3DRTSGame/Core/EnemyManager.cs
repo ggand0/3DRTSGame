@@ -56,6 +56,7 @@ namespace _3DRTSGame
 
 		private static readonly int ASTEROID_MAX_SPAWN_NUM = 15;
 		private static readonly int FIGHTER_MAX_SPAWN_NUM = 8;
+		private static readonly int INTERVAL_SEC = 10;
 
 		private Level4 level;
 		private Random random = new Random();
@@ -65,12 +66,13 @@ namespace _3DRTSGame
 		/// Spawnし終わったかどうか
 		/// </summary>
 		public bool WaveEnd { get; private set; }
+		/// <summary>
+		/// 現在のWave数（インデックス）
+		/// </summary>
+		public int WaveCount { get; private set; }
 
 		private WaveState state;
-		//private float start;
-		//private DateTime start;
 		private int count, start;
-		private Dictionary<String, object[]> arguments = new Dictionary<string, object[]>();
 
         private Dictionary<string, Object> enemiesOrg = new Dictionary<string, Object>();
 
@@ -85,7 +87,7 @@ namespace _3DRTSGame
 			for (int i = 0; i < asteroidNum; i++) {
 				//random = new Random();
 				level.Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius))
-					, level.sun.Position, 0.05f, "Models\\Asteroid"));
+					, level.sun.Position, 0.05f, 10, "Models\\Asteroid"));
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				//Asteroids[i].SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
 			}
@@ -95,7 +97,7 @@ namespace _3DRTSGame
 			if (level.Enemies.Count < ASTEROID_MAX_SPAWN_NUM) {// = 15 -5
 				float radius = 3000;
 				Asteroid a = new Asteroid(new Vector3(NextDouble(random, -radius, radius)
-					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, "Models\\Asteroid");
+					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, 5, "Models\\Asteroid");
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				//a.SetModelEffect(shadowEffect, true);					// set effect to each modelmeshpart
 				a.IsActive = true;
@@ -139,8 +141,13 @@ namespace _3DRTSGame
 				level.Enemies.Add(f);
 			}*/
             if (enemyType == typeof(Asteroid)) {
-                enemiesOrg["Asteroid"].Position = new Vector3(NextDouble(random, -radius, radius)
-                    , 0, NextDouble(random, -radius, radius));
+                /*enemiesOrg["Asteroid"].Position = new Vector3(NextDouble(random, -radius, radius)
+                    , 0, NextDouble(random, -radius, radius));*/
+
+				float aa = 0.15f, b = 0.5f, angle = MathHelper.ToRadians(1440);
+				enemiesOrg["Asteroid"].Position = level.TargetPlanets[0].Position +
+					new Vector3(aa * (float)Math.Exp(b * angle) * (float)Math.Cos(angle), 0,
+						aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));
                 enemiesOrg["Asteroid"].RenderBoudingSphere = false;
 
                 a = (Asteroid)enemiesOrg["Asteroid"].Clone();
@@ -148,17 +155,18 @@ namespace _3DRTSGame
 
                 level.Models.Add(a);
                 level.Enemies.Add(a);
+				level.Asteroids.Add(a);
             } else if (enemyType == typeof(Fighter)) {
                 enemiesOrg["Fighter"].Position = new Vector3(NextDouble(random, -radius, radius),
                     NextDouble(random, -radius, radius), NextDouble(random, -radius, radius));
                 enemiesOrg["Fighter"].RenderBoudingSphere = false;
-                //enemiesOrg["Fighter"].Target = level.TargetPlanets[0];
 
                 f = (Fighter)enemiesOrg["Fighter"].Clone();
                 f.Target = level.TargetPlanets[0].Position;
 
                 level.Models.Add(f);
                 level.Enemies.Add(f);
+				level.Fighters.Add(f);
             }
 		}
 		public void Update(GameTime gameTime)
@@ -179,25 +187,22 @@ namespace _3DRTSGame
 				//int time = (int)(DateTime.Now - start).TotalSeconds;
 				int time = (count - start);
 
-				if (time > waves[0].MaxTimeSec * 60) {
+				if (time > waves[WaveCount].MaxTimeSec * 60) {
 					state = WaveState.Interval;
 					start = count;
-				} else if (time % (waves[0].SpawnRate * 60) == 0) {// 60FPS
-					for (int n = 0; n < waves[0].SpawnNum; n++) {
+				} else if (time % (waves[WaveCount].SpawnRate * 60) == 0) {// 60FPS
+					for (int n = 0; n < waves[WaveCount].SpawnNum; n++) {
 						double prob = random.NextDouble();
 						double probs = prob;
 						double sum = 0;
 
-						foreach (EnemyInfo i in waves[0].EnemyData) {
-							/*if (prob < waves[0].EnemyData[0].SpawnProbability) {// 要修正
+						foreach (EnemyInfo i in waves[WaveCount].EnemyData) {
+							/*if (prob < waves[WaveCount].EnemyData[0].SpawnProbability) {// 要修正
 								SpawnEnemies(i.EnemyType);
 								break;
 							}*/
 							if (prob + sum < i.SpawnProbability) {
 								SpawnEnemies(i.EnemyType);
-								if (i.EnemyType.Name == "Fighter") {
-									string d = "ok";
-								}
 								break;
 							} else {
 								//sum += i.SpawnProbability;
@@ -209,10 +214,14 @@ namespace _3DRTSGame
 				}
 
 			} else if (state == WaveState.Interval) {
-				if (count - start > 10 * 60) {// 10秒で次のwaveへ
-					// wavesのカウントに達していたらクリア
+				if (count - start > 10 * INTERVAL_SEC) {// 10秒で次のwaveへ
+					WaveCount++;
 
-					// 残っているなら次のwaveへ
+					if (WaveCount == waves.Count) {// wavesのカウントに達していたらクリア
+						WaveEnd = true;
+					} else {// 残っているなら次のwaveへ
+						state = WaveState.Start;
+					}
 				}
 			}
 		}
@@ -220,17 +229,13 @@ namespace _3DRTSGame
 
         private void Initialize()
 		{
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
-
-			arguments.Add("_3DRTSGame.Asteroid", new object[] {
-			});
-			arguments.Add("_3DRTSGame.Fighter", new object[] {
-			});
-
+			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 1f) }, 0, 1, 4, 3000, 30));
+			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 1, 4, 3000, 30));
 			state = WaveState.Start;
 
             // asteroid:4引数コンストラクタ以外を使うとeffectが初期化されずにnullのままになるので注意
-            enemiesOrg.Add("Asteroid", new Asteroid(Vector3.Zero, Vector3.Zero, 0.05f, "Models\\Asteroid"));
+			enemiesOrg.Add("Asteroid", new Asteroid(Vector3.Zero, Vector3.Zero, 0.05f, 10, "Models\\Asteroid"));
             enemiesOrg.Add("Fighter", new Fighter(Vector3.Zero, Vector3.Zero, 20f, "Models\\fighter0"));
 		}
 		public EnemyManager(Level4 level)

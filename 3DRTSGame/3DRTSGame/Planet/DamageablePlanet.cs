@@ -19,6 +19,33 @@ namespace _3DRTSGame
 		private Texture2D lifeBar, lifeBarBack;
 		public int HitPoint { get; private set; }
 		private static BasicEffect basicEffect;
+		private SoundEffect hitSound;
+		private List<SoundEffectInstance> currentSounds = new List<SoundEffectInstance>();
+		private EnergyShieldEffect shieldEffect;
+		public bool ShieldEnabled { get; protected set; }
+
+		/// <summary>
+		/// 他のオブジェクトと同様のリスト管理
+		/// </summary>
+		protected void ManageSounds()
+		{
+			for (int i = currentSounds.Count - 1; i >= 0; i--) {
+				if (currentSounds[i].State != SoundState.Playing) {
+					currentSounds[i].Dispose();
+					currentSounds.RemoveAt(i);
+				}
+			}
+		}
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+			ManageSounds();
+
+			if (ShieldEnabled) {
+				shieldEffect.Position = Position;
+				shieldEffect.Update(gameTime);
+			}
+		}
 
 		protected void DrawLifeBar(SpriteBatch spriteBatch)
 		{
@@ -33,8 +60,6 @@ namespace _3DRTSGame
 			Vector2 drawPos = new Vector2(v.X + lengthRatio * 200, v.Y - lengthRatio * 100);//new Vector2(v.X - lifeBar.Width / 2f, v.Y - 50);
 			int endOfLifeBarGreen = (int)((HitPoint / (float)DEF_HIT_POINT) * lifeBar.Width);
 			
-			
-
 			//graphicsDevice.SetRenderTarget(null);
 			spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
 			//graphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
@@ -92,18 +117,20 @@ namespace _3DRTSGame
 		{
 			HitPoint--;
 			if (HitPoint <= 0) {
-				IsActive = false;
-				IsAlive = false;
+				Die();
 			}
+
+			// ヒットした時のSE
+			/*SoundEffectInstance hs = hitSound.CreateInstance();
+			hs.Volume = 0.01f;
+			hs.Play();
+			currentSounds.Add(hs);*/
 		}
 
 		// Constructor
 		public DamageablePlanet(Vector3 position, GraphicsDevice graphicsDevice, ContentManager content)
-			:base(position, graphicsDevice, content)
+			:this(position, Vector3.Zero, graphicsDevice, content)
 		{
-			HitPoint = DEF_HIT_POINT;
-			lifeBar = content.Load<Texture2D>("Textures\\UI\\LifeBar2");
-			lifeBarBack = content.Load<Texture2D>("Textures\\UI\\LifeBar2Back");
 		}
 		public DamageablePlanet(Vector3 position, Vector3 starPosition, GraphicsDevice graphics, ContentManager content)
 			: base(position, starPosition, graphics, content) 
@@ -112,8 +139,11 @@ namespace _3DRTSGame
 			lifeBar = content.Load<Texture2D>("Textures\\UI\\LifeBar2");
 			lifeBarBack = content.Load<Texture2D>("Textures\\UI\\LifeBar2Back");
 			basicEffect = new BasicEffect(graphics);
+			hitSound = content.Load<SoundEffect>("SoundEffects\\explosion0");
 
-			
+			ShieldEnabled = true;
+			shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 500);//300
+			level.transparentEffects.Add(shieldEffect);
 		}
 	}
 }

@@ -42,7 +42,7 @@ namespace _3DRTSGame
 		private void Initialize()
 		{
 			interfaces.Add(new MouseCursor());
-			//interfaces.Add(new UnitPanel());
+			interfaces.Add(new UIString());
 		}
 
 		public UIManager()

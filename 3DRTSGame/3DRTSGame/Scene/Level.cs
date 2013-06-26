@@ -20,6 +20,7 @@ namespace _3DRTSGame
 
 
 		public Camera camera { get; protected set; }
+		public Player player { get; protected set; }
 		protected Debug debug;
 		protected EffectManager effectManager;
 		protected bool displayGrid;
@@ -67,6 +68,7 @@ namespace _3DRTSGame
 			Bullets = new List<Bullet>();
 			Enemies = new List<Object>();
 			transparentEffects = new List<EnergyShieldEffect>();
+			player = new Player();
 
 			EnergyShieldEffect.level = this;
 			BoundingSphereRenderer.level = this;
@@ -77,6 +79,7 @@ namespace _3DRTSGame
 			EnergyRingEffect.level = this;
 			Planet.level = this;
 			Star.level = this;
+			UIObject.level = this;
 		}
 		protected virtual void HandleInput()
 		{

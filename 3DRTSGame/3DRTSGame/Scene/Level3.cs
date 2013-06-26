@@ -64,7 +64,7 @@ namespace _3DRTSGame
 			asteroids[1].SetModelEffect(lightingEffect, true);*/
             for (int i = 0; i < asteroidNum; i++) {
 				//random = new Random();
-				Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)), star.Position, 0.05f, "Models\\Asteroid"));
+				Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)), star.Position, 0.05f, 1, "Models\\Asteroid"));
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				Asteroids[i].SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
 			}/**/
@@ -309,7 +309,7 @@ namespace _3DRTSGame
 			}*/
 			if (Asteroids.Count < 15) {// = 15 -5
 				float radius = 3000;
-				Asteroid a = new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)), star.Position, 0.05f, "Models\\Asteroid");
+				Asteroid a = new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)), star.Position, 0.05f, 1, "Models\\Asteroid");
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				a.SetModelEffect(shadowEffect, true);					// set effect to each modelmeshpart
 				a.IsActive = true;

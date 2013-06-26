@@ -197,7 +197,7 @@ namespace _3DRTSGame
 			visibleEnemies = new List<Object>();
 			chargeTime = 60;
 			sensorSphere = new BoundingSphere(position, 1000);
-			shootSound = content.Load<SoundEffect>("SoundEffects\\laser1");
+			shootSound = content.Load<SoundEffect>("SoundEffects\\laser2");
 		}
 		public Turret(Vector3 position, float scale, string fileName)
 			: base(position, scale, fileName)

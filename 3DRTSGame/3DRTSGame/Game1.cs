@@ -69,6 +69,7 @@ namespace _3DRTSGame
 			Object.content = Content;
 			UIObject.content = Content;
 			Bullet.content = Content;
+			new DebugOverlay(GraphicsDevice, Content);
 
 			base.Initialize();
 		}
@@ -84,6 +85,7 @@ namespace _3DRTSGame
 			// 新規の SpriteBatch を作成します。これはテクスチャーの描画に使用できます。
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			Debug.game = this;
+			UIObject.game = this;
 			Debug.spriteBatch = this.spriteBatch;
 			Object.spriteBatch = spriteBatch;
 			UIObject.spriteBatch = spriteBatch;

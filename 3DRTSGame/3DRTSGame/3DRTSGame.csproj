@@ -96,8 +96,12 @@
     <Compile Include="Camera\ArcBallCamera.cs" />
     <Compile Include="Camera\Camera.cs" />
     <Compile Include="Camera\RTSCamera.cs" />
+    <None Include="Core\Damage.cs" />
+    <None Include="Core\DamageManager.cs" />
     <Compile Include="Core\EnemyManager.cs" />
+    <Compile Include="Core\IAttackable.cs" />
     <Compile Include="Core\IDamageable.cs" />
+    <Compile Include="Core\Player.cs" />
     <Compile Include="Core\ProductionManager.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Effect\EffectManager.cs" />
@@ -181,6 +185,8 @@
     <Compile Include="Terrain\SphericalTerrain2.cs" />
     <Compile Include="Terrain\Terrain.cs" />
     <Compile Include="Terrain\Water.cs" />
+    <Compile Include="UI\UIGauge.cs" />
+    <Compile Include="UI\UIString.cs" />
     <Compile Include="UI\UnitPanel.cs" />
     <Compile Include="UI\MouseCursor.cs" />
     <Compile Include="UI\UIManager.cs" />

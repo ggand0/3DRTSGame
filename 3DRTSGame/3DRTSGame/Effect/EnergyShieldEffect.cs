@@ -86,7 +86,7 @@ namespace _3DRTSGame
 			this.graphics = graphics;
 			this.Position = position;
 			this.Scale = Matrix.CreateScale(scale);
-			mesh = new Object(position, "Models\\SkySphereMesh");
+			mesh = new Object(position, "Models\\sphere2");//Models\\SkySphereMesh
 
 			mesh.ScaleVector = new Vector3(size.X, size.Y, 1);// 元々Blenderで作成した素材なので傾いている。それに合わせて、rescaleする成分を調整
 			mesh.RotationMatrix = Matrix.Identity * Matrix.CreateRotationZ(MathHelper.ToRadians(90))
@@ -98,7 +98,7 @@ namespace _3DRTSGame
 
 			effect.Parameters["RimColor"].SetValue(new Vector4(Color.LightGreen.ToVector3(), 0.05f));
 			//effect.Parameters["RimColor"].SetValue(new Vector4(Color.Blue.ToVector3(), 0.05f));
-			effect.Parameters["WaveSpeed"].SetValue(3.0f);
+			effect.Parameters["WaveSpeed"].SetValue(0.5f);//3.0
 			effect.Parameters["BaseTexture"].SetValue(tex);
 			effect.Parameters["RefractionMap"].SetValue(level.Sky.TextureCube);
 			effect.Parameters["NormalMap"].SetValue(content.Load<Texture2D>("waterbump"));

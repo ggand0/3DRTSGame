@@ -21,7 +21,7 @@ namespace _3DRTSGame
 		private EnergyShieldEffect shieldEffect;
 
         private List<Object> visibleEnemies;
-		private BoundingSphere sensorSphere;
+		public BoundingSphere SensorSphere { get; private set; }
 
 		private Vector3 SearchTarget(int tactics)
 		{
@@ -161,6 +161,7 @@ namespace _3DRTSGame
         private int chargeTime;
         private bool canShoot;
         public SatelliteWeapon Weapon { get; protected set; }
+		public bool ShieldEnabled { get; protected set; }
 
 		private void UpdateLocus()
 		{
@@ -177,11 +178,11 @@ namespace _3DRTSGame
 		}
 		private void CheckEnemies()
 		{
-			sensorSphere.Center = Position;
+			SensorSphere = new BoundingSphere(Position, SensorSphere.Radius);
 
 			visibleEnemies.Clear();
 			foreach (Object o in level.Enemies) {
-				if (o.IsHitWith(sensorSphere)) {
+				if (o.IsHitWith(SensorSphere)) {
 					visibleEnemies.Add(o);
 				}
 			}
@@ -217,7 +218,7 @@ namespace _3DRTSGame
 				//shootSoundInstance.Play();
 				if (!Level.mute) {
 				    SoundEffectInstance ls = shootSound.CreateInstance();
-				    ls.Volume = 0.1f;
+				    ls.Volume = 0.05f;
 				    ls.Play();
 				    currentSounds.Add(ls);
 				}
@@ -233,11 +234,14 @@ namespace _3DRTSGame
 				}
 			}
 
-			shieldEffect.Position = Position;
-			shieldEffect.Update(gameTime);
+			if (ShieldEnabled) {
+				shieldEffect.Position = Position;
+				shieldEffect.Update(gameTime);
+			}
+
 			stripCount++;
 			//if (stripCount % 15 == 0)
-				UpdateLocus();
+			UpdateLocus();
 			billboardStrip.Update(gameTime);
 		}
 		int stripCount;
@@ -268,6 +272,7 @@ namespace _3DRTSGame
 		public ArmedSatellite(SatelliteWeapon weaponType, Vector3 position, Vector3 center, float scale, string fileName, string SEPath)
 			: base(true, position, center, scale, fileName)
 		{
+			ShieldEnabled = true;
 			//random = new Random();
 			this.Weapon = weaponType;
 			chargeTime = weaponType == SatelliteWeapon.Laser ? random.Next(10, 70) : random.Next(60, 120);
@@ -279,7 +284,7 @@ namespace _3DRTSGame
 			billboardStrip = new BillboardStrip(Level.graphicsDevice, content, content.Load<Texture2D>("Textures\\Lines\\Line1T1"), new Vector2(10, 200), positions);//Line1T1
 
 			visibleEnemies = new List<Object>();
-			sensorSphere = new BoundingSphere(Position, 1000);
+			SensorSphere = new BoundingSphere(Position, 150);//1000
 			RenderBoudingSphere = false;
 
 

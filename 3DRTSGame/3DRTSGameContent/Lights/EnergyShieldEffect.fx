@@ -50,10 +50,10 @@ texture NormalMap;
 	sampler2D NormalSampler = sampler_state {
 	texture = <NormalMap>;
 };
-float WaveLength = 0.6;
+float WaveLength = 1.2;//0.6
 float WaveHeight = 0.2;
 float Time = 0;
-float WaveSpeed = 0.5f;//0.04f;
+float WaveSpeed = 0.01f;//0.04f;//0.5f
 
 
 struct VertexShaderInput
@@ -83,7 +83,6 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     float4 worldPosition = mul(input.Position, World);
     float4 viewPosition = mul(worldPosition, View);
     output.Position = mul(viewPosition, Projection);
-
 	output.Normal = mul(input.Normal, World);
 
 	// get the vector from the camera to the vertex
@@ -91,11 +90,11 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
     /*float4 viewPosition = mul(worldPosition, View);
     output.Position = mul(viewPosition, Projection);*/
-	
 	output.PositionCopy = output.Position;
 	//output.Normal = normalize(mul(matInverseWorld, input.Normal));
 	//output.ViewDirection = normalize(vecEye - output.Position);
 	output.TexCoord = input.TexCoord;
+
 
 	float3 PosWorldr = (mul(input.Position, World));
 	float3 ViewDir = normalize(PosWorldr - vecEye);

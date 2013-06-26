@@ -521,6 +521,7 @@ namespace _3DRTSGame
 			SetEffectParameter(simpleEffect, "BasicTexture", Mercator);
 
 			IsActive = true;
+			Scale = a_radius;
 		}
 		#endregion
 	}

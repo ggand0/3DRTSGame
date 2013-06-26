@@ -98,8 +98,8 @@ namespace _3DRTSGame
 				0 + game.menuFont.MeasureString("A").Y * menu.Length);
 			//maskTexture = ownerLevel.LoadImage("whiteBoard");
 			maskTexture = content.Load<Texture2D>("Textures\\whiteBoard");
-			//selectSound = ownerLevel.LoadSound("select");
-			//enterSound = ownerLevel.LoadSound("enter");
+			selectSound = content.Load<SoundEffect>("SoundEffects\\Menu\\selectSound");
+			enterSound = content.Load<SoundEffect>("SoundEffects\\Menu\\enterSound");
 			//ownerLevel.BGM.Volume = 1.0f - BGM_FADE_VOLUME;
 		}
 

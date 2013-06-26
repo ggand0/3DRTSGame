@@ -54,7 +54,7 @@ namespace _3DRTSGame
         private Vector3 tmpCameraPos;
         private Matrix RotationMatrix = Matrix.Identity;
 		private EnemyManager enemyManager;
-		private UIManager uiManager = new UIManager();
+		private UIManager uiManager;
 		private ProductionManager productionManager;
 
 
@@ -71,7 +71,7 @@ namespace _3DRTSGame
 			for (int i = 0; i < asteroidNum; i++) {
 				//random = new Random();
 				Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)),
-					star.Position, 0.05f, "Models\\Asteroid"));
+					star.Position, 0.05f, 10, "Models\\Asteroid"));
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				//Asteroids[i].SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
 			}
@@ -81,7 +81,9 @@ namespace _3DRTSGame
 			base.Initialize();
 			enemyManager = new EnemyManager(this);
 			productionManager = new ProductionManager(this);
-			new DebugOverlay(graphicsDevice, content);
+			uiManager = new UIManager();
+			
+			//new DebugOverlay(graphicsDevice, content);
 
 			// Entities
 			Models = new List<Object>();
@@ -156,14 +158,15 @@ namespace _3DRTSGame
 
 
 			// Load satellites
-			//Satellite = new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\ISS", "SoundEffects\\laser1");
+			/*//Satellite = new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\ISS", "SoundEffects\\laser1");
 			Satellite = new ArmedSatellite(new Vector3(300, 50, 300), sun.Position, 5, "Models\\ISS", "SoundEffects\\laser0");
 			Models.Add(Satellite);
 			//Models.Add(new Satellite(false, waterPlanet.Position + new Vector3(400, 100, 600), waterPlanet.Position, 100f, "Models\\spacestation4"));
 			Models.Add(new SpaceStation(false, waterPlanet.Position + new Vector3(400, 100, 600), waterPlanet.Position, 100f, "Models\\spacestation4"));
-
 			//Models.Add(new ArmedSatellite(waterPlanet.Position + new Vector3(400, 50, 0), waterPlanet.Position, 0.01f, "Models\\TDRS", "SoundEffects\\License\\LAAT0"));
-			Models.Add(new ArmedSatellite(SatelliteWeapon.Missile, waterPlanet.Position + new Vector3(400, 50, 0), waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0"));// deepspace,10 / rosetta,10
+			Models.Add(new ArmedSatellite(SatelliteWeapon.Missile, waterPlanet.Position + new Vector3(400, 50, 0),
+				waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0"));// deepspace,10 / rosetta,10
+			*/
 
 			
 			//Models.Add(new ArmedSatellite(waterPlanet.Position + new Vector3(400, 50, 0), waterPlanet.Position, 0.01f, "Models\\TDRS", "SoundEffects\\laser0"));
@@ -224,7 +227,7 @@ namespace _3DRTSGame
 			EnergyRingEffect.game = game;
 			discoidEffect = new EnergyRingEffect(content, graphicsDevice, new Vector3(0, 0, 0), new Vector2(300));
 			EnergyShieldEffect.game = game;
-			shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
+			//shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
 			explosionTest = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, true, "Xml\\Particle\\particleExplosion0.xml", true);
 			smallExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
 			//smallExplosion = new ExplosionEffect(content, device, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", true);
@@ -234,111 +237,26 @@ namespace _3DRTSGame
 			lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));
 		}
 
-		Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)//Nullable<Vector3>
+		// 戻り値をNullable<Vector3>にしようと思ったけどできない
+		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)
 		{
 			float? distance = ray.Intersects(plane);
 			//return distance.HasValue ? ray.Position + ray.Direction * distance.Value : null;
 			return distance.HasValue ? ray.Position + ray.Direction * distance.Value : Vector3.Zero;
 		}
-		Vector2 mouseOrgPos, curPos, prevPos;
-		float leftrightRot, updownRot;
-		protected override void HandleInput()
-		{
-			base.HandleInput();
-
-			MouseState ms = Mouse.GetState();
-			ButtonState bs = ms.LeftButton;
-			//if (MouseInput.IsOnButtonDownL()) {
-			if (false) {
-				Vector2 mousePos = MouseInput.GetMousePosition();
-
-				// rayとplaneのintersection pointを計算する
-				Vector3 nearsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 0f);
-				Vector3 farsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 1f);
-
-				Matrix world = Matrix.CreateTranslation(0, 0, 0);
-				Vector3 nearPoint = graphicsDevice.Viewport.Unproject(nearsource, camera.Projection, camera.View, world);
-				Vector3 farPoint = graphicsDevice.Viewport.Unproject(farsource, camera.Projection, camera.View, world);
-				// Create a ray from the near clip plane to the far clip plane.
-				Vector3 direction = farPoint - nearPoint;
-				direction.Normalize();
-				Ray pickRay = new Ray(nearPoint, direction);
-				Plane planeXZ = new Plane(Vector3.Up, 0);
-				float spawnHeight = -200;
-				Plane planeGround = new Plane(Vector3.Up, -spawnHeight);
-
-				Vector3 intersectionPoint = GetRayPlaneIntersectionPoint(pickRay, planeGround);
-				//Models.Add(new ArmedSatellite(intersectionPoint, 10, "Models\\ISS"));
-				Models.Add(new Object(intersectionPoint, 20, "Models\\cube"));
-				Models[Models.Count - 1].RenderBoudingSphere = false;
-			}
-
-			/*if (MouseInput.IsOnButtonDownR()) {
-				mouseOrgPos = MouseInput.GetMousePositiion();
-				leftrightRot = updownRot = 0;
-			}
-			if (MouseInput.BUTTONR()) {
-				float rotationSpeed = 5;
-				Vector2 mousePos = MouseInput.GetMousePositiion();
-
-				// rayとplaneのintersection pointを計算する
-				Vector3 nearsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 0f);
-				Vector3 farsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 1f);
-
-				Matrix world = Matrix.CreateTranslation(0, 0, 0);
-				Vector3 nearPoint = graphicsDevice.Viewport.Unproject(nearsource, camera.Projection, camera.View, world);
-				Vector3 farPoint = graphicsDevice.Viewport.Unproject(farsource, camera.Projection, camera.View, world);
-				// Create a ray from the near clip plane to the far clip plane.
-				Vector3 direction = farPoint - nearPoint;
-				direction.Normalize();
-
-				float xDifference = curPos.X - mouseOrgPos.X;
-				float yDifference = curPos.Y - mouseOrgPos.Y;
-				leftrightRot -= rotationSpeed * xDifference;// * amount
-				updownRot -= rotationSpeed * yDifference;
-				Mouse.SetPosition((int)mouseOrgPos.X, (int)mouseOrgPos.Y);
-			}
-*/
-			float stickSensitivity = 0.2f;
-			//  スティックが倒されていればDirectionを再計算する
-			if (JoyStick.Vector.Length() > stickSensitivity) {
-				/*double analogAngle = Math.Atan2(JoyStick.Vector.Y, JoyStick.Vector.X);
-				float speed = JoyStick.Vector.Length() * 30;
-				analogAngle += MathHelper.ToRadians(-90);
-                
-				Vector3 tmpVelocity = Vector3.Zero;
-				tmpDirention = tmpCameraPos - camera.Position;
-				tmpDirention = new Vector3(tmpDirention.X, 0, tmpDirention.Z);
-				RotationMatrix = Matrix.CreateRotationY((float)analogAngle);
-				// 面白い動き : //RotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(JoyStick.Vector.Y)) * Matrix.CreateRotationX(MathHelper.ToRadians(-JoyStick.Vector.X));
-				tmpDirention = Vector3.TransformNormal(tmpDirention, RotationMatrix);
-				tmpDirention = Vector3.Normalize(tmpDirention);// プロパティなので代入しないと反映されないことに注意
-				tmpVelocity = new Vector3(tmpDirention.X * speed, tmpVelocity.Y, tmpDirention.Z * speed);
-
-				tmpCameraPos += tmpVelocity;*/
-			}
-			/*if (JoyStick.stickDirection == Direction.LEFT) {
-				tmpCameraPos += new Vector3(-10, 0, 0);
-			} else if (JoyStick.stickDirection == Direction.RIGHT) {
-				tmpCameraPos += new Vector3(10, 0, 0);
-			}
-			if (JoyStick.stickDirection == Direction.UP) {
-				tmpCameraPos += new Vector3(0, 0, 10);
-			} else if (JoyStick.stickDirection == Direction.DOWN) {
-				tmpCameraPos += new Vector3(0, 0, -10);
-			}*/
-		}
 		public override void Reset()
 		{
 			/*player = new Player(this);
-		   playerBullets = new List<Bullet>();
-		   enemies = new List<Enemy>();
-		   enemyBullets = new List<Bullet>();
-		   score = 0;
-		   count = 0;
-		   time = 0.0;
-		   BGM.Volume = 1.0f;
-		   BGM.Play();*/
+			playerBullets = new List<Bullet>();
+			enemies = new List<Enemy>();
+			enemyBullets = new List<Bullet>();
+			score = 0;
+			count = 0;
+			time = 0.0;
+			BGM.Volume = 1.0f;
+			BGM.Play();*/
+			Initialize();
+			Load();
 
 			base.Reset();
 
@@ -355,59 +273,49 @@ namespace _3DRTSGame
 		{
 			base.Collide();
 
-			/*foreach (Object o in asteroids) {
-				if (o.IsActive && discoidEffect.IsHitWith(o.transformedBoundingSphere)) {
-					o.IsActive = false;
-
-					ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();// positionは与えなおさないとｗ
-					e.Position = o.Position;
-					foreach (ExplosionParticleEmitter ep in e.emitters) {
-						ep.Position = e.Position;// もう既にparticlesは初期化されてしまってるので手遅れｗｗ
-					}
-					//e.Run();
-					//effectManager.Add(e);
-				}
-			}*/
-			foreach (Bullet b in Bullets) {
-				//foreach (Object a in Asteroids) {
-				foreach (Object o in Enemies) {
-					if (o is Asteroid && b.IsActive && o.IsActive && b.IsHitWith(o)) {
-						//a.IsActive = false;
-						//b.IsActive = false;
-						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
-						o.Die();
-						
-
-						//ExplosionEffect e = (random.Next(0, 2) == 0) ? (ExplosionEffect)smallExplosion.Clone() : (ExplosionEffect)bigExplosion.Clone();
-						//ExplosionEffect e = (ExplosionEffect)bigExplosion.Clone();
-						ExplosionEffect e = null;
-						/*double p = random.NextDouble();
-						if (p <= 0.5) {
-							e = (ExplosionEffect)smallExplosion.Clone();
-						} else if (p <= 0.9) {
-							e = (ExplosionEffect)midExplosion.Clone();
-						} else {
-							e = (ExplosionEffect)bigExplosion.Clone();
-						}*/
-
-						e = (ExplosionEffect)smallExplosion.Clone();
-						e.Position = o.Position;
-						e.Run();
-						effectManager.Add(e);/**/
-					}
-
-				
-
-				//foreach (Object o in Enemies) {
-					if (o is Fighter /*&& (b is Missile)*/ && o.IsActive && b.IsActive && b.Identification == IFF.Friend && b.IsHitWith(o)) {
-						 //b.IsActive = false;
-						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
-						o.Die();
+			// AsteroidとTargetPlanets
+			foreach (Asteroid a in Asteroids) {
+				foreach (DamageablePlanet p in TargetPlanets) {
+					if (a.IsActive && p.IsActive && a.IsHitWith(p)) {
+						a.Damage();
+						p.Damage();
 
 						ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
-						e.Position = o.Position;
+						e.Position = a.Position;
 						e.Run();
-						effectManager.Add(e);/**/
+						effectManager.Add(e);
+					}
+				}
+			}
+
+			// BulletとObject
+			foreach (Bullet b in Bullets) {
+				foreach (Object o in Enemies) {
+					if (o is Asteroid && b.IsActive && o.IsActive && b.IsHitWith(o)) {
+						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
+						(o as Asteroid).Damage();
+						
+						player.AddMoney(o);
+
+						if (!o.IsActive) {
+							ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
+							e.Position = o.Position;
+							e.Run();
+							effectManager.Add(e);
+						}
+					}
+
+					if (o is Fighter && o.IsActive && b.IsActive && b.Identification == IFF.Friend && b.IsHitWith(o)) {
+						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
+						(o as Fighter).Damage();
+						player.AddMoney(o);
+
+						if (!o.IsActive) {
+							ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
+							e.Position = o.Position;
+							e.Run();
+							effectManager.Add(e);
+						}
 					}
 				}
 
@@ -433,29 +341,19 @@ namespace _3DRTSGame
 					}
 				}
 			}
-			BoundingSphere bs = new BoundingSphere(planet.Position, 200);
-			if (discoidEffect.IsHitWith(bs)) {
-				//planet.IsActive = false;
-				//effectManager.Add(new ExplosionEffect(content, device, planet.Position, Vector2.One));
-			}
 
 
-			// Remove dead objects
+			#region Remove dead objects
 			if (Asteroids.Count > 0) {
 				for (int j = 0; j < Asteroids.Count; j++) {
 					if (!Asteroids[j].IsAlive) {
-                        
 						Asteroids.RemoveAt(j);
 					}
 				}
 			}
 			if (Bullets.Count > 0) {
-				//for (int j = 0; j < Bullets.Count; j++) {
                 for (int j = Bullets.Count - 1; j >= 0; j--) {
 					if (!Bullets[j].IsActive) {
-                        /*if (Bullets[j] is LaserBillboardBullet) {
-                            (Bullets[j] as LaserBillboardBullet).Dispose();
-                        }*/
 						Bullets.RemoveAt(j);
 					}
 				}
@@ -470,35 +368,17 @@ namespace _3DRTSGame
 					Enemies.RemoveAt(j);
 				}
 			}
+			for (int j = Fighters.Count - 1; j >= 0; j--) {
+				if (!Fighters[j].IsAlive) {
+					Fighters.RemoveAt(j);
+				}
+			}
+			#endregion
 		}
 		public override void Update(GameTime gameTime)
 		{
 			float elapsed = (float)gameTime.TotalGameTime.TotalSeconds;
 			count++;
-			/*if (count % 1001 >= 0 && Asteroids.Count == 0) {
-				spawned = false;
-				count = 0;
-			}
-			if (!spawned) {
-				AddAsteroids(15, 2000);
-				for (int i = 0; i < Asteroids.Count; i++) {
-					Asteroids[i].IsActive = true;
-					Asteroids[i].RenderBoudingSphere = false;
-					Asteroids[i].SetModelEffect(shadowEffect, true);
-					Models.Add(Asteroids[i]);
-				}
-				spawned = true;
-			}*/
-			/*if (Asteroids.Count < MAX_SPAWN_NUM) {// = 15 -5
-				float radius = 3000;
-				Asteroid a = new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)), star.Position, 0.05f, "Models\\Asteroid");
-				//Asteroids[i].Scale = 0.02f;//0.1f;
-				//a.SetModelEffect(shadowEffect, true);					// set effect to each modelmeshpart
-				a.IsActive = true;
-				a.RenderBoudingSphere = false;
-				Asteroids.Add(a);
-				Models.Add(a);
-			}*/
 
 			enemyManager.Update(gameTime);
 			productionManager.Update(gameTime);
@@ -519,7 +399,7 @@ namespace _3DRTSGame
                 if (o.IsAlive) o.Update(gameTime);
             }
             if (Models.Count > 100) {
-                throw new Exception("そろそろModelsのDelete処理を書くこと");
+                //throw new Exception("そろそろModelsのDelete処理を書くこと");
             }
             foreach (Bullet b in Bullets) {
                 if (b.IsAlive) b.Update(gameTime);
@@ -527,14 +407,6 @@ namespace _3DRTSGame
 
             if (planet.IsAlive) planet.Update(gameTime);
 
-
-            //discoidEffect.Update(gameTime);
-
-            //shieldEffect.Position = Satellite.Position;
-            //shieldEffect.Update(gameTime);
-
-            //explosionTest.Update(gameTime);
-            //bigExplosion.Update(gameTime);
             lb.Update(gameTime);
 
             Collide();
@@ -616,9 +488,8 @@ namespace _3DRTSGame
 			effectManager.Draw(gameTime, camera);
 
 			foreach (EnergyShieldEffect ese in transparentEffects) {
-				//ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
+				ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
 			}
-
 
 			// Draw UIs
 			productionManager.Draw(gameTime);
