@@ -53,11 +53,13 @@ namespace _3DRTSGame
 			Vector3 transformed = Vector3.Transform(Position, level.camera.View);
 			float depthRatio = level.camera.FarPlaneDistance / -transformed.Z;
 			float lengthRatio = depthRatio / 10000f;
+			//float lengthRatio = depthRatio / level.camera.FarPlaneDistance / 1000f;
 			float defRatio = lifeBar.Height / (float)lifeBar.Width;
 
 			Viewport viewport = graphicsDevice.Viewport;
 			Vector3 v = viewport.Project(Position + Vector3.Up * (Scale), level.camera.Projection, level.camera.View, Matrix.Identity);
-			Vector2 drawPos = new Vector2(v.X + lengthRatio * 200, v.Y - lengthRatio * 100);//new Vector2(v.X - lifeBar.Width / 2f, v.Y - 50);
+			//Vector2 drawPos = new Vector2(v.X + lengthRatio * 200, v.Y - lengthRatio * 100);//new Vector2(v.X - lifeBar.Width / 2f, v.Y - 50);
+			Vector2 drawPos = new Vector2(v.X + lengthRatio * 200, v.Y - lengthRatio * 50);
 			int endOfLifeBarGreen = (int)((HitPoint / (float)DEF_HIT_POINT) * lifeBar.Width);
 			
 			//graphicsDevice.SetRenderTarget(null);

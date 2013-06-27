@@ -19,7 +19,7 @@ namespace _3DRTSGame
 	}
 	public class Fighter : Object, IDamageable
 	{
-		protected static readonly int DEF_HIT_POINT = 30;
+		//protected static readonly int DEF_HIT_POINT = 30;
 
 		public FighterState State { get; private set; }
 		public Vector3 Target { get; set; }
@@ -266,24 +266,25 @@ namespace _3DRTSGame
 			Vector3 planeToCenter = bs.Center - Position;
 			float distancePlaneToCenter = Vector3.Dot(planeToCenter, Up);
 			Vector3 projectedCenter = bs.Center - distancePlaneToCenter * Up;
+			bool isLeft = IsLeft(projectedDirection, projectedCenter);
 
-			avoidVelocity += IsLeft(projectedDirection, projectedCenter) ? _world.Right : _world.Left;
+			avoidVelocity += isLeft ? _world.Right : _world.Left;// RightもLeftも0のケースが...
 
 
 			// DirectionとRightからなる平面上での左右判定（上下どちらに避けるか）
 			//Vector3 planeToCenter2 = bs.Center - Position;
 			float distancePlaneToCenter2 = Vector3.Dot(planeToCenter, Right);
 			Vector3 projectedCenter2 = bs.Center - distancePlaneToCenter * Right;
+			bool isLeft2 = IsLeft(projectedDirection2, projectedCenter2);
 
-			avoidVelocity += IsLeft(projectedDirection2, projectedCenter2) ? _world.Up : _world.Down;
+			avoidVelocity += isLeft2 ? _world.Up : _world.Down;
 			
 
 			Velocity += avoidVelocity * avoidSpeed;
 			//Velocity += Vector3.UnitX * avoidSpeed;
 		}
-		private void AvoidCollision()//AddAvoidanceVelocity
+		private void AvoidCollision()
 		{
-			
 			Vector3 projectedDirection = Direction - Vector3.Dot(Direction, Up) * Up;
 			Vector3 projectedDirection2 = Direction - Vector3.Dot(Direction, Right) * Right;
 
@@ -303,6 +304,15 @@ namespace _3DRTSGame
 			Up.Normalize();
 			Right = Vector3.Cross(Direction, Up);
 			Right.Normalize();
+
+			// UpとDirectionが同軸上に存在してしまった場合は例外的に個別に決める
+			if (Right == Vector3.Zero) {
+				if (Direction == new Vector3(0, -1, 0) || Direction == new Vector3(0, 1, 0)) {
+					Up = new Vector3(1, 0, 0);
+					Right = Vector3.Cross(Direction, Up);
+					Right.Normalize();
+				}
+			}
 
 			Vector3 projectedDirection = Direction - Vector3.Dot(Direction, Vector3.UnitY) * Vector3.UnitY;
 			float angleX = (float)Math.Acos((double)(Vector3.Dot(Direction, projectedDirection)
@@ -328,8 +338,8 @@ namespace _3DRTSGame
 			_world *= Matrix.CreateTranslation(Position);*/
 			_world = Matrix.Identity;
 			_world.Forward = Direction;
-			_world.Up = Up; ;
-			_world.Right = Right;/**/
+			_world.Up = Up;
+			_world.Right = Right;
 			_world *= Matrix.CreateScale(Scale);
 			_world *= Matrix.CreateTranslation(Position);
 
@@ -401,7 +411,7 @@ namespace _3DRTSGame
 				UpdateWorldMatrix();
 				transformedBoundingSphere = new BoundingSphere(
 						Position
-						, Model.Meshes[0].BoundingSphere.Radius * Scale);/**/
+						, Model.Meshes[0].BoundingSphere.Radius * Scale);
 
 				stripCount++;
 				//if (stripCount % 5 == 0)
@@ -458,8 +468,6 @@ namespace _3DRTSGame
 				Target - Vector3.UnitX * 500,
 			};
 			currentWayPoint = wayPoints0[0];
-
-			HitPoint = DEF_HIT_POINT;
 		}
 		public Fighter(Vector3 position, Vector3 target, float scale, string filePath)
 			:base(position, scale, filePath)
@@ -476,6 +484,8 @@ namespace _3DRTSGame
 			shootSound = content.Load<SoundEffect>("SoundEffects\\License\\LAAT1");
 
 			Initialize();
+			MaxHitPoint = 30;
+			HitPoint = MaxHitPoint;
 		}
 	}
 }

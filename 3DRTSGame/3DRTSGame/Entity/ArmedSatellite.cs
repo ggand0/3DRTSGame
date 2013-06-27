@@ -151,7 +151,6 @@ namespace _3DRTSGame
 					break;
 			}
 		}
-
 		private BillboardStrip billboardStrip;
 		private List<Vector3> positions;
 

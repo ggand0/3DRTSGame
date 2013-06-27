@@ -253,3 +253,15 @@ Content\Textures\UI\GlowRing2.xnb
 Content\SoundEffects\Menu\enterSound.xnb
 Content\SoundEffects\Menu\selectSound.xnb
 Content\SoundEffects\laser2.xnb
+Content\Textures\UI\Icons\ccw.xnb
+Content\Textures\UI\Icons\cw.xnb
+Content\Textures\UI\Icons\iss.xnb
+Content\Textures\UI\Icons\laser.xnb
+Content\Textures\UI\Icons\rocket0.xnb
+Content\Textures\UI\Icons\rocket1.xnb
+Content\Textures\UI\Icons\sattelite.xnb
+Content\Textures\UI\Icons\sattelite_l.xnb
+Content\Textures\UI\Icons\sattelite_m.xnb
+Content\Textures\UI\Icons\world.xnb
+Content\Textures\UI\Icons\move.xnb
+Content\Textures\UI\Icons\halt.xnb

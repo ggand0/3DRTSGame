@@ -37,7 +37,9 @@ namespace _3DRTSGame
 			Vector3 v2 = Vector3.Normalize(Center - Position);
 
 			//return Vector3.Dot(v1, v2) - (float)Math.PI/2f;
-			return (float)Math.Acos(Vector3.Dot(v1, v2));
+			//return (float)Math.Acos(Vector3.Dot(v1, v2));// 正規化されているので距離で割る必要は無いはず
+			float angle = (float)Math.Acos(Vector3.Dot(v1, v2));
+			return def.Z > Position.Z ? -angle : angle;// 角度の大きさしか分からないのでこれで調整
 		}
 
 		public override void Update(GameTime gameTime)

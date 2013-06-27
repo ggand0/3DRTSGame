@@ -12,7 +12,8 @@ namespace _3DRTSGame
 	{
 		public static SpriteBatch spriteBatch;
 		private List<UIObject> interfaces = new List<UIObject>();
-		private static UnitPanel mainPanel = new UnitPanel();
+		private static UnitPanel mainPanel = new UnitPanel();// staticにしようと思っていたけど無理
+		private MouseCursor cursor;
 
 
 		public static Type GetUnitType()
@@ -33,21 +34,24 @@ namespace _3DRTSGame
 			base.Draw(gameTime);
 
 			spriteBatch.Begin();
+			mainPanel.Draw(gameTime);
 			foreach (UIObject ui in interfaces) {
 				ui.Draw(gameTime);
 			}
-			mainPanel.Draw(gameTime);
+			cursor.Draw(gameTime);
 			spriteBatch.End();
 		}
 		private void Initialize()
 		{
-			interfaces.Add(new MouseCursor());
 			interfaces.Add(new UIString());
+			interfaces.Add(new UIEnemyGauge());
+			//interfaces.Add(new MouseCursor());// BackToFrontで描画しているので一番最後に追加するようにする
 		}
 
 		public UIManager()
 		{
-			
+			//mainPanel = new UnitPanel();
+			cursor = new MouseCursor();
 			Initialize();
 		}
 	}

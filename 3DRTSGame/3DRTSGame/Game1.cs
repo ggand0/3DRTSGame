@@ -43,8 +43,9 @@ namespace _3DRTSGame
 			//Width = this.graphics.PreferredBackBufferWidth;
 			//Height = graphics.PreferredBackBufferHeight;
 
-			Width = 960;
-			Height = 540;
+			//Width = 960; Height = 540;
+			//Width = 1280; Height = 760;
+			Width = 1024; Height = 768;
 			this.graphics.PreferredBackBufferWidth = (int)Width;
 			this.graphics.PreferredBackBufferHeight = (int)Height;
 			//this.graphics.PreferredBackBufferWidth = 600;

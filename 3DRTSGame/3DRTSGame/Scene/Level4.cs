@@ -175,10 +175,10 @@ namespace _3DRTSGame
 			//Models.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Enemies.Add(Models[Models.Count - 1]);
 			Fighters = new List<Fighter>();
-			Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
-			Fighters.Add(new Fighter(new Vector3(100, 1000, 100), waterPlanet.Position, 20f, "Models\\fighter0"));
+			//Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
+			//Fighters.Add(new Fighter(new Vector3(100, 1000, 100), waterPlanet.Position, 20f, "Models\\fighter0"));
 			Fighters.Add(new Fighter(new Vector3(-100, -1000, -100), waterPlanet.Position, 20f, "Models\\fighter0"));
-			Fighters.Add(new Fighter(new Vector3(-2000, 50, -1000), waterPlanet.Position, 20f, "Models\\fighter0"));
+			//Fighters.Add(new Fighter(new Vector3(-2000, 50, -1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			foreach (Fighter f in Fighters) {
 				Enemies.Add(f);
 			}
@@ -277,7 +277,8 @@ namespace _3DRTSGame
 			foreach (Asteroid a in Asteroids) {
 				foreach (DamageablePlanet p in TargetPlanets) {
 					if (a.IsActive && p.IsActive && a.IsHitWith(p)) {
-						a.Damage();
+						//a.Damage();
+						a.Die();
 						p.Damage();
 
 						ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
@@ -295,7 +296,7 @@ namespace _3DRTSGame
 						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
 						(o as Asteroid).Damage();
 						
-						player.AddMoney(o);
+						if (!o.IsActive) player.AddMoney(o);
 
 						if (!o.IsActive) {
 							ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
@@ -308,7 +309,7 @@ namespace _3DRTSGame
 					if (o is Fighter && o.IsActive && b.IsActive && b.Identification == IFF.Friend && b.IsHitWith(o)) {
 						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
 						(o as Fighter).Damage();
-						player.AddMoney(o);
+						if (!o.IsActive) player.AddMoney(o);
 
 						if (!o.IsActive) {
 							ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();

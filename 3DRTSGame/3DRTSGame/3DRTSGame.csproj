@@ -185,7 +185,8 @@
     <Compile Include="Terrain\SphericalTerrain2.cs" />
     <Compile Include="Terrain\Terrain.cs" />
     <Compile Include="Terrain\Water.cs" />
-    <Compile Include="UI\UIGauge.cs" />
+    <Compile Include="UI\UIButton.cs" />
+    <Compile Include="UI\UIEnemyGauge.cs" />
     <Compile Include="UI\UIString.cs" />
     <Compile Include="UI\UnitPanel.cs" />
     <Compile Include="UI\MouseCursor.cs" />

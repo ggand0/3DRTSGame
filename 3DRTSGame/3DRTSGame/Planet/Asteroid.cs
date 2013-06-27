@@ -11,7 +11,7 @@ namespace _3DRTSGame
 {
 	public class Asteroid : Object, IDamageable
 	{
-		protected static readonly int DEF_HIT_POINT = 30;
+		//protected static readonly int DEF_HIT_POINT = 30;
 
 		public Vector3 Destination { get; set; }
 		public float Speed { get; private set; }
@@ -136,7 +136,8 @@ namespace _3DRTSGame
 			SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
 
 			revolutionAngle = CalcInitialAngle();
-			HitPoint = DEF_HIT_POINT;
+			MaxHitPoint = 15;
+			HitPoint = MaxHitPoint;
 		}
 	}
 }

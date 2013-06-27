@@ -15,7 +15,7 @@ namespace _3DRTSGame
 		public static Level level;
 		public static ContentManager content;
 		public static SpriteBatch spriteBatch;
-		private static readonly int DEF_HIT_POINT;
+		
 		
 
 		public Effect maskEffect;
@@ -30,7 +30,15 @@ namespace _3DRTSGame
 		protected readonly float BoundingSphereScale = 0.95f;
 		public Matrix RotationMatrix = Matrix.CreateRotationX(MathHelper.PiOver2);
 		public bool RenderBoudingSphere { get; set; }
-		public int HitPoint { get; protected set; }
+
+		//private static readonly int DEF_HIT_POINT;
+		private int _hitPoint;
+		public int HitPoint
+		{
+			get { return (int)MathHelper.Clamp(_hitPoint, 0, MaxHitPoint); }// プロパティ自分で書きたかっただけ。わざわざclampしなくても良いと思う
+			set { _hitPoint = value; }
+		}
+		public int MaxHitPoint { get; protected set; }
 
 
 		public Model Model { get; protected set; }
@@ -489,6 +497,7 @@ namespace _3DRTSGame
 			Load();
 			_boundingSphereRenderer = new BoundingSphereRenderer(game);
 			_boundingSphereRenderer.OnCreateDevice();
+			MaxHitPoint = 1;
 		}
 
 		protected Random random;
@@ -512,6 +521,7 @@ namespace _3DRTSGame
 			RotationMatrix = Matrix.Identity;
 			_boundingSphereRenderer = new BoundingSphereRenderer(game);
 			_boundingSphereRenderer.OnCreateDevice();
+			MaxHitPoint = 1;
 		}
 		#endregion
 	}
