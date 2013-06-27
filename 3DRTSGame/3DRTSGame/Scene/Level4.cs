@@ -42,7 +42,7 @@ namespace _3DRTSGame
 		private UIManager uiManager;
 		private ProductionManager productionManager;
 
-		private static readonly int ASTEROID_POOL_NUM = 15;
+		private static readonly int ASTEROID_POOL_NUM = 30;
 		public Queue<Asteroid> AsteroidPool { get; private set; }
 
 
@@ -349,8 +349,6 @@ namespace _3DRTSGame
 			if (Asteroids.Count > 0) {
 				for (int j = 0; j < Asteroids.Count; j++) {
 					if (!Asteroids[j].IsAlive) {
-						// オブジェクトプールに戻してから削除
-						AsteroidPool.Enqueue(Asteroids[j]);
 						Asteroids.RemoveAt(j);
 					}
 				}
@@ -362,12 +360,7 @@ namespace _3DRTSGame
 					}
 				}
 			}
-			for (int j = Models.Count-1; j >=0; j--) {
-				if (!Models[j].IsAlive) {
-					Models.RemoveAt(j);
-				}
-			}
-            for (int j = Enemies.Count-1; j >= 0; j--) {
+			for (int j = Enemies.Count-1; j >= 0; j--) {
 				if (!Enemies[j].IsAlive) {
 					Enemies.RemoveAt(j);
 				}
@@ -375,6 +368,20 @@ namespace _3DRTSGame
 			for (int j = Fighters.Count - 1; j >= 0; j--) {
 				if (!Fighters[j].IsAlive) {
 					Fighters.RemoveAt(j);
+				}
+			}
+			for (int j = Models.Count-1; j >=0; j--) {
+				if (!Models[j].IsAlive) {
+					if (Models[j] is Asteroid) {
+						// 逆でも良いと思うけど、先に個別リストで消してから最後にModelsでプールに戻した後Removeしている。
+						// オブジェクトプールに戻してから削除(戻す際には蘇生させてから)
+						Models[j].IsActive = true;
+						Models[j].IsAlive = true;
+						Models[j].HitPoint = Models[j].MaxHitPoint;
+						AsteroidPool.Enqueue(Models[j] as Asteroid);
+					}
+
+					Models.RemoveAt(j);
 				}
 			}
 			#endregion
@@ -410,8 +417,6 @@ namespace _3DRTSGame
             }
 
             if (planet.IsAlive) planet.Update(gameTime);
-
-            lb.Update(gameTime);
 
             Collide();
 

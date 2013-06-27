@@ -476,7 +476,7 @@ namespace _3DRTSGame
 			Material = new _3DRTSGame.Material();
 			random = new Random();
 			IsActive = true;
-			RenderBoudingSphere = true;
+			RenderBoudingSphere = false;
 			RotationMatrix = Matrix.Identity;
 			Load();
 			_boundingSphereRenderer = new BoundingSphereRenderer(game);
@@ -500,7 +500,7 @@ namespace _3DRTSGame
 
 			random = new Random();
 			IsActive = true;
-			RenderBoudingSphere = true;
+			RenderBoudingSphere = false;
 			Load(fileName);
 			RotationMatrix = Matrix.Identity;
 			_boundingSphereRenderer = new BoundingSphereRenderer(game);

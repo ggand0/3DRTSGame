@@ -119,6 +119,10 @@ namespace _3DRTSGame
 			base.Draw(View, Projection, CameraPosition);
 		}
 
+		public void Initialize()
+		{
+			revolutionAngle = CalcInitialAngle();
+		}
 		public Asteroid(Vector3 position, float scale, string fileName)
 			:this(position, Vector3.Zero, scale, 1, fileName)
 		{

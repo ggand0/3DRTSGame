@@ -151,8 +151,22 @@ namespace _3DRTSGame
                 enemiesOrg["Asteroid"].RenderBoudingSphere = false;
 
                 //a = (Asteroid)enemiesOrg["Asteroid"].Clone();
-				a = level.AsteroidPool.Dequeue();
-                a.Destination = level.TargetPlanets[0].Position;
+				if (level.AsteroidPool.Count > 0) {
+					a = level.AsteroidPool.Dequeue();
+					a.Position = level.TargetPlanets[0].Position +
+						new Vector3(aa * (float)Math.Exp(b * angle) * (float)Math.Cos(angle), 0,
+							aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));
+					a.Destination = level.TargetPlanets[0].Position;
+					//a.Scale = 0.05f;
+
+					// 何故かtrueになってくれてないのでここでも蘇生作業してみる
+					a.IsActive = true;
+					a.IsAlive = true;
+					// angleのせいかも
+					a.Initialize();
+				} else {
+					a = (Asteroid)enemiesOrg["Asteroid"].Clone();
+				}
 
                 level.Models.Add(a);
                 level.Enemies.Add(a);
