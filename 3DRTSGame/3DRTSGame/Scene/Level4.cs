@@ -17,22 +17,15 @@ namespace _3DRTSGame
 		public Object Teapot { get; private set; }
 		public ArmedSatellite Satellite { get; private set; }
 
-		PrelightingRenderer renderer;
-		GridRenderer grid;
-
-        // Effect test
-		FlameParticleEmitter ps;
-		ExplosionParticleEmitter eps;
-		DiscoidParticleEmitter discoid;
-		ParticleEmitter basicEmitter, beamEmitter;
-		EnergyRingEffect discoidEffect;
-		EnergyShieldEffect shieldEffect;
-		ExplosionEffect explosionTest, smallExplosion, bigExplosion, midExplosion;
-		Planet planet;
-		Star star;
-		public Sun sun { get; private set; }
+		private PrelightingRenderer renderer;
+		private GridRenderer grid;
+		private EnergyRingEffect discoidEffect;
+		private ExplosionEffect explosionTest, smallExplosion, bigExplosion, midExplosion;
+		private Planet planet;
+		private Star star;
 		private Sun sunCircle;
-		Effect shadowEffect;
+		private Effect shadowEffect;
+		public Sun sun { get; private set; }
 		public List<Asteroid> Asteroids { get; private set; }
 		public List<Planet> Planets { get; private set; }
 		public List<DamageablePlanet> TargetPlanets { get; private set; }
@@ -41,21 +34,18 @@ namespace _3DRTSGame
 
         private Random random;
         private List<ExplosionEffect> ex = new List<ExplosionEffect>();
-		private bool spawned;
 		private int count;
 		//ParticleSettings setting;
         private LaserBillboard lb;
-		/// <summary>
-		/// 小惑星の最大spawn数
-		/// </summary>
-		private static readonly int MAX_SPAWN_NUM = 15;
-
-        private Vector3 tmpDirention;
-        private Vector3 tmpCameraPos;
         private Matrix RotationMatrix = Matrix.Identity;
 		private EnemyManager enemyManager;
 		private UIManager uiManager;
 		private ProductionManager productionManager;
+
+		private static readonly int ASTEROID_POOL_NUM = 15;
+		public Queue<Asteroid> AsteroidPool { get; private set; }
+
+
 
 
         /// <summary>
@@ -64,6 +54,15 @@ namespace _3DRTSGame
 		public static float NextDouble(Random r, double min, double max)
 		{
 			return (float)(min + r.NextDouble() * (max - min));
+		}
+
+		private void LoadObjectPool()
+		{
+			AsteroidPool = new Queue<Asteroid>();
+			for (int i = 0; i < ASTEROID_POOL_NUM; i++) {
+				// どうせ使うときに値変えるので適当に設定
+				AsteroidPool.Enqueue(new Asteroid(Vector3.Zero, 1f, "Models\\Asteroid"));
+			}
 		}
 		private void AddAsteroids(int asteroidNum, float radius)
 		{
@@ -112,6 +111,9 @@ namespace _3DRTSGame
 		{
 			base.Load();
 
+			// Set up object pool
+			LoadObjectPool();
+
 			// Set up the reference grid and sample camera
 			grid.LoadGraphicsContent(graphicsDevice);
 
@@ -154,7 +156,6 @@ namespace _3DRTSGame
 			foreach (Object o in Asteroids) {
 				Enemies.Add(o);
 			}
-			spawned = true;
 
 
 			// Load satellites
@@ -228,13 +229,13 @@ namespace _3DRTSGame
 			discoidEffect = new EnergyRingEffect(content, graphicsDevice, new Vector3(0, 0, 0), new Vector2(300));
 			EnergyShieldEffect.game = game;
 			//shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
-			explosionTest = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, true, "Xml\\Particle\\particleExplosion0.xml", true);
+			//explosionTest = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, true, "Xml\\Particle\\particleExplosion0.xml", true);
 			smallExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
 			//smallExplosion = new ExplosionEffect(content, device, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", true);
 			bigExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
 			midExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
 
-			lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));
+			//lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));
 		}
 
 		// 戻り値をNullable<Vector3>にしようと思ったけどできない
@@ -348,6 +349,8 @@ namespace _3DRTSGame
 			if (Asteroids.Count > 0) {
 				for (int j = 0; j < Asteroids.Count; j++) {
 					if (!Asteroids[j].IsAlive) {
+						// オブジェクトプールに戻してから削除
+						AsteroidPool.Enqueue(Asteroids[j]);
 						Asteroids.RemoveAt(j);
 					}
 				}

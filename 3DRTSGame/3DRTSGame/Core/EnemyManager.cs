@@ -150,7 +150,8 @@ namespace _3DRTSGame
 						aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));
                 enemiesOrg["Asteroid"].RenderBoudingSphere = false;
 
-                a = (Asteroid)enemiesOrg["Asteroid"].Clone();
+                //a = (Asteroid)enemiesOrg["Asteroid"].Clone();
+				a = level.AsteroidPool.Dequeue();
                 a.Destination = level.TargetPlanets[0].Position;
 
                 level.Models.Add(a);
@@ -212,7 +213,6 @@ namespace _3DRTSGame
 						}
 					}
 				}
-
 			} else if (state == WaveState.Interval) {
 				if (count - start > 10 * INTERVAL_SEC) {// 10秒で次のwaveへ
 					WaveCount++;

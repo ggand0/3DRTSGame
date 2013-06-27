@@ -15,10 +15,8 @@ namespace _3DRTSGame
 		public static Level level;
 		public static ContentManager content;
 		public static SpriteBatch spriteBatch;
-		
-		
 
-		public Effect maskEffect;
+		//public Effect maskEffect;
 		protected Vector3 _direction, _up, _down, _right;
 		protected BoundingSphereRenderer _boundingSphereRenderer;
 		public BoundingSphere transformedBoundingSphere { get; protected set; }
@@ -46,10 +44,6 @@ namespace _3DRTSGame
 		/// ボーンの変換行列
 		/// </summary>
 		public Matrix[] Transforms { get; set; }
-		/// <summary>
-		/// 位置ベクトル
-		/// </summary>
-		//public Vector3 Position { get; set; }
 		/// <summary>
 		/// 速度ベクトル
 		/// </summary>
@@ -102,7 +96,6 @@ namespace _3DRTSGame
 				}
 			}
 		}
-		//public bool IsActive { get; set; }
 		public float Scale;
 		public Vector3 ScaleVector { get; set; }
 
@@ -136,7 +129,7 @@ namespace _3DRTSGame
 			Effect pointLightEffect = content.Load<Effect>("Lights\\PointLightEffect");
 			Effect spotLightEffect = content.Load<Effect>("Lights\\SpotLightEffect");
 			Effect multiLightingEffect = content.Load<Effect>("Lights\\MultiLightingeffect");*/
-			maskEffect = content.Load<Effect>("Lights\\CreateMaskEffect");
+			
 			//SetModelEffect(lightingEffect, true);
 			//SetModelEffect(multiLightingEffect, true);
 
@@ -164,6 +157,8 @@ namespace _3DRTSGame
 				new Vector3(0.5f, 0.5f, 0.5f),
 				new Vector3(0.5f, 0.5f, 0.5f) };
 			Material = mat;*/
+
+			//maskEffect = content.Load<Effect>("Lights\\CreateMaskEffect");
 		}
 		/// <summary>
 		/// ワールド行列を再構築する
@@ -432,27 +427,16 @@ namespace _3DRTSGame
 		/// </summary>
 		public void DrawMask(Matrix View, Matrix Projection, Vector3 CameraPosition, ref RenderTarget2D rt, float criteria)
 		{
-			maskEffect.Parameters["colour"].SetValue(Color.Black.ToVector3());
+			/*maskEffect.Parameters["colour"].SetValue(Color.Black.ToVector3());
 			maskEffect.Parameters["wvp"].SetValue(World * View * Projection);
 
-			// calc Z value
-			/*Vector3 transformed = Vector3.Transform(Position, View);
-			// positionだけで判断しているせいで、床のマスク作成にバグあり！
-			if (transformed.Z > criteria) {// 基準より前にいたら、マスク作成
-				//Level.graphicsDevice.SetRenderTarget(rt);
-				CacheEffects();
-				SetModelEffect(maskEffect ,true);
-				DrawMesh(View, Projection, CameraPosition);
-				RestoreEffects();
-				//Level.graphicsDevice.SetRenderTarget(null);
-			}*/
 
 			// Shader内でピクセル単位でマスクを描画するようにした
 			maskEffect.Parameters["DepthValue"].SetValue(criteria);
 			CacheEffects();
 			SetModelEffect(maskEffect, true);
 			DrawMesh(View, Projection, CameraPosition);
-			RestoreEffects();
+			RestoreEffects();*/
 		}
 		/// <summary>
 		/// ReflectionMap作成のためにClipPlaneを決定する
