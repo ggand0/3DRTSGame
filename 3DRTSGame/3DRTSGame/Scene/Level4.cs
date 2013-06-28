@@ -315,13 +315,18 @@ namespace _3DRTSGame
 					if (o is Fighter && o.IsActive && b.IsActive && b.Identification == IFF.Friend && b.IsHitWith(o)) {
 						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
 						(o as Fighter).Damage();
-						if (!o.IsActive) player.AddMoney(o);
 
 						if (!o.IsActive) {
-							ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
+							player.AddMoney(o);
+
+							/*ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
 							e.Position = o.Position;
 							e.Run();
-							effectManager.Add(e);
+							effectManager.Add(e);*/
+							ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
+							effectTmp.Reset(o.Position);
+							effectTmp.Run();
+							effectManager.Add(effectTmp);
 						}
 					}
 				}
