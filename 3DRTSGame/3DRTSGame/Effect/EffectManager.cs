@@ -14,7 +14,7 @@ namespace _3DRTSGame
 	public class EffectManager
 	{
 		public static Game1 game;
-		private static Level level;
+		public static Level level;
 
 		public List<SpecialEffect> Effects { get; private set; }
 		
@@ -37,6 +37,11 @@ namespace _3DRTSGame
 			if (Effects.Count > 0) {
 				for (int j = 0; j < Effects.Count; j++) {
 					if (Effects[j].Removable) {
+						// ExplosionEffectはobject poolingをしているので再利用する
+						if (Effects[j] is ExplosionEffect) {
+							level.SmallExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+						}
+
 						Effects.RemoveAt(j);
 					}
 				}

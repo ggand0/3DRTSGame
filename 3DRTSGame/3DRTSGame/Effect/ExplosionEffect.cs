@@ -94,6 +94,14 @@ namespace _3DRTSGame
 			}
 			Available = false;
 		}
+		public void Reset(Vector3 position)
+		{
+			Removable = false;
+			this.Position = position;
+			/*foreach (ExplosionParticleEmitter e in emitters) {
+				e.Reset(position);
+			}*/
+		}
 		public object Clone()
 		{
 			ExplosionEffect cloned = (ExplosionEffect)MemberwiseClone();

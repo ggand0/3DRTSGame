@@ -44,8 +44,9 @@ namespace _3DRTSGame
 
 		private static readonly int ASTEROID_POOL_NUM = 30;
 		public Queue<Asteroid> AsteroidPool { get; private set; }
-
-
+		private static readonly int SMALL_EXPLOSION_EFFECT_NUM = 50;
+		//public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
+		private ExplosionEffect effectTmp;
 
 
         /// <summary>
@@ -62,6 +63,12 @@ namespace _3DRTSGame
 			for (int i = 0; i < ASTEROID_POOL_NUM; i++) {
 				// どうせ使うときに値変えるので適当に設定
 				AsteroidPool.Enqueue(new Asteroid(Vector3.Zero, 1f, "Models\\Asteroid"));
+			}
+
+			
+			smallExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
+			for (int i = 0; i < SMALL_EXPLOSION_EFFECT_NUM; i++) {
+				SmallExplosionPool.Enqueue((ExplosionEffect)smallExplosion.Clone());
 			}
 		}
 		private void AddAsteroids(int asteroidNum, float radius)
@@ -81,8 +88,6 @@ namespace _3DRTSGame
 			enemyManager = new EnemyManager(this);
 			productionManager = new ProductionManager(this);
 			uiManager = new UIManager();
-			
-			//new DebugOverlay(graphicsDevice, content);
 
 			// Entities
 			Models = new List<Object>();
@@ -90,13 +95,10 @@ namespace _3DRTSGame
 			Ground.RenderBoudingSphere = false;
 			Models.Add(Ground);
 			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube");
-			//Models.Add(Target);
 
 
 			// Initializes camera
-			//camera = new ArcBallCamera(Vector3.Zero);
 			camera = new ArcBallCamera(Vector3.Zero);
-			//camera.Initialize(game, Vector3.Zero);
 			ParticleEmitter.camera = camera;
 
 			// Set up the reference grid
@@ -228,14 +230,13 @@ namespace _3DRTSGame
 			EnergyRingEffect.game = game;
 			discoidEffect = new EnergyRingEffect(content, graphicsDevice, new Vector3(0, 0, 0), new Vector2(300));
 			EnergyShieldEffect.game = game;
-			//shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
+			/*//shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
 			//explosionTest = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, true, "Xml\\Particle\\particleExplosion0.xml", true);
 			smallExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
 			//smallExplosion = new ExplosionEffect(content, device, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", true);
 			bigExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
 			midExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
-
-			//lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));
+			//lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));*/
 		}
 
 		// 戻り値をNullable<Vector3>にしようと思ったけどできない
@@ -297,13 +298,17 @@ namespace _3DRTSGame
 						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
 						(o as Asteroid).Damage();
 						
-						if (!o.IsActive) player.AddMoney(o);
-
 						if (!o.IsActive) {
-							ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
+							player.AddMoney(o);
+
+							/*ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
 							e.Position = o.Position;
 							e.Run();
-							effectManager.Add(e);
+							effectManager.Add(e);*/
+							ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
+							effectTmp.Reset(o.Position);
+							effectTmp.Run();
+							effectManager.Add(effectTmp);
 						}
 					}
 

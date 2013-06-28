@@ -393,7 +393,6 @@ namespace _3DRTSGame
 			}
 			
 			effect.Parameters["FadeInTime"].SetValue(FadeInTime);
-
 			effect.Parameters["ParticleColor"].SetValue(ParticleColor.ToVector4());
 			effect.Parameters["AttachColor"].SetValue(true);
 			//effect.Parameters["Rotation"].SetValue(Rotation);
@@ -436,8 +435,8 @@ namespace _3DRTSGame
 				//vertexBuffers.SetData<ParticleVertex>(particles);
 				// Create and set the index buffer
 				indexBuffers = new IndexBuffer(graphicsDevice,
-				IndexElementSize.ThirtyTwoBits,
-				ParticleNum * 6 * crossBillboardNum, BufferUsage.WriteOnly);
+					IndexElementSize.ThirtyTwoBits,
+					ParticleNum * 6 * crossBillboardNum, BufferUsage.WriteOnly);
 				//indexBuffers.SetData<int>(indices);
 			} else {
 				// Create vertex and index buffers to accomodate all particles
@@ -446,7 +445,6 @@ namespace _3DRTSGame
 				indexBuffers = new IndexBuffer(graphicsDevice,
 					IndexElementSize.ThirtyTwoBits, ParticleNum * 6,
 					BufferUsage.WriteOnly);
-				
 			}
 			GenerateParticles();
 			start = DateTime.Now;
@@ -454,6 +452,19 @@ namespace _3DRTSGame
 			this.emitNumPerFrame = 10;
 			this.maxEmitFrameCount = ParticleNum / emitNumPerFrame;
 			blendState = BlendState.AlphaBlend;
+		}
+		/// <summary>
+		/// オブジェクトプーリング用
+		/// </summary>
+		public void Reset(Vector3 position)
+		{
+			Vector3 z = Vector3.Zero;
+			for (int i = 0; i < ParticleNum * 4; i += 4) {
+				particles[i + 0] = new ParticleVertex(position, new Vector2(0, 0), z, 0, -1, 0, z);
+				particles[i + 1] = new ParticleVertex(position, new Vector2(0, 1), z, 0, -1, 0, z);
+				particles[i + 2] = new ParticleVertex(position, new Vector2(1, 1), z, 0, -1, 0, z);
+				particles[i + 3] = new ParticleVertex(position, new Vector2(1, 0), z, 0, -1, 0, z);
+			}
 		}
 
 
