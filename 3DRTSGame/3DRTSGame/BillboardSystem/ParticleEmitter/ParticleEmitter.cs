@@ -450,6 +450,7 @@ namespace _3DRTSGame
 			start = DateTime.Now;
 
 			this.emitNumPerFrame = 10;
+			activeParticlesNum = 0;
 			this.maxEmitFrameCount = ParticleNum / emitNumPerFrame;
 			blendState = BlendState.AlphaBlend;
 		}
@@ -458,6 +459,8 @@ namespace _3DRTSGame
 		/// </summary>
 		public void Reset(Vector3 position)
 		{
+			activeParticlesNum = 0;
+
 			Vector3 z = Vector3.Zero;
 			for (int i = 0; i < ParticleNum * 4; i += 4) {
 				particles[i + 0] = new ParticleVertex(position, new Vector2(0, 0), z, 0, -1, 0, z);

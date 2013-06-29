@@ -45,6 +45,8 @@ namespace _3DRTSGame
 		private static readonly int ASTEROID_POOL_NUM = 30;
 		public Queue<Asteroid> AsteroidPool { get; private set; }
 		private static readonly int SMALL_EXPLOSION_EFFECT_NUM = 50;
+		private static readonly int MID_EXPLOSION_EFFECT_NUM = 50;
+		private static readonly int BIG_EXPLOSION_EFFECT_NUM = 10;
 		//public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
 		private ExplosionEffect effectTmp;
 
@@ -66,9 +68,18 @@ namespace _3DRTSGame
 			}
 
 			
-			smallExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
+			smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
 			for (int i = 0; i < SMALL_EXPLOSION_EFFECT_NUM; i++) {
 				SmallExplosionPool.Enqueue((ExplosionEffect)smallExplosion.Clone());
+			}
+			
+			midExplosion = new ExplosionEffect(content, graphicsDevice, "mid", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
+			for (int i = 0; i < MID_EXPLOSION_EFFECT_NUM; i++) {
+				MidExplosionPool.Enqueue((ExplosionEffect)midExplosion.Clone());
+			}
+			bigExplosion = new ExplosionEffect(content, graphicsDevice, "big", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
+			for (int i = 0; i < BIG_EXPLOSION_EFFECT_NUM; i++) {
+				BigExplosionPool.Enqueue((ExplosionEffect)bigExplosion.Clone());
 			}
 		}
 		private void AddAsteroids(int asteroidNum, float radius)
@@ -86,7 +97,7 @@ namespace _3DRTSGame
 		{
 			base.Initialize();
 			enemyManager = new EnemyManager(this);
-			productionManager = new ProductionManager(this);
+			//productionManager = new ProductionManager(this); // Skyロード後に初期化する
 			uiManager = new UIManager();
 
 			// Entities
@@ -120,12 +131,12 @@ namespace _3DRTSGame
 			grid.LoadGraphicsContent(graphicsDevice);
 
 			Sky = new SkySphere(content, graphicsDevice, content.Load<TextureCube>("Textures\\SkyBox\\space4"), 100);// set 11 for debug
+			productionManager = new ProductionManager(this);
 
 			// Load stars
 			star = new Star(new Vector3(-500, 100, 500), graphicsDevice, content, StarType.G);
-			//star = new Star(-LightPosition, device, content, StarType.G);
-			LightPosition = star.Position;
-			//sun = new Sun(new Vector3(-500, 100, 500), graphicsDevice, content, spriteBatch);
+			//LightPosition = star.Position;
+
 			sun = new Sun(new Vector3(-2000, 500, 2000), graphicsDevice, content, spriteBatch);
 			sunCircle = new Sun(LightPosition, graphicsDevice, content, spriteBatch);
 
@@ -283,10 +294,17 @@ namespace _3DRTSGame
 						a.Die();
 						p.Damage();
 
-						ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
-						e.Position = a.Position;
-						e.Run();
-						effectManager.Add(e);
+						if (MidExplosionPool.Count > 0) {
+							ExplosionEffect effectTmp = MidExplosionPool.Dequeue();
+							effectTmp.Reset(a.Position);
+							effectTmp.Run();
+							effectManager.Add(effectTmp);
+						} else {// 足りなかったら小さい爆発エフェクトで誤魔化す
+							ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
+							e.Position = a.Position;
+							e.Run();
+							effectManager.Add(e);
+						}
 					}
 				}
 			}
@@ -301,14 +319,17 @@ namespace _3DRTSGame
 						if (!o.IsActive) {
 							player.AddMoney(o);
 
-							/*ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
-							e.Position = o.Position;
-							e.Run();
-							effectManager.Add(e);*/
-							ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
-							effectTmp.Reset(o.Position);
-							effectTmp.Run();
-							effectManager.Add(effectTmp);
+							if (MidExplosionPool.Count > 0) {
+								ExplosionEffect effectTmp = MidExplosionPool.Dequeue();
+								effectTmp.Reset(o.Position);
+								effectTmp.Run();
+								effectManager.Add(effectTmp);
+							} else {
+								ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
+								e.Position = o.Position;
+								e.Run();
+								effectManager.Add(e);
+							}
 						}
 					}
 
@@ -319,14 +340,17 @@ namespace _3DRTSGame
 						if (!o.IsActive) {
 							player.AddMoney(o);
 
-							/*ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
-							e.Position = o.Position;
-							e.Run();
-							effectManager.Add(e);*/
-							ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
-							effectTmp.Reset(o.Position);
-							effectTmp.Run();
-							effectManager.Add(effectTmp);
+							if (SmallExplosionPool.Count > 0) {
+								ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
+								effectTmp.Reset(o.Position);
+								effectTmp.Run();
+								effectManager.Add(effectTmp);
+							} else {
+								ExplosionEffect e = (ExplosionEffect)smallExplosion.Clone();
+								e.Position = o.Position;
+								e.Run();
+								effectManager.Add(e);
+							}
 						}
 					}
 				}

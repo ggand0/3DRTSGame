@@ -39,7 +39,20 @@ namespace _3DRTSGame
 					if (Effects[j].Removable) {
 						// ExplosionEffectはobject poolingをしているので再利用する
 						if (Effects[j] is ExplosionEffect) {
-							level.SmallExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+							switch ((Effects[j] as ExplosionEffect).Type) {
+								default:
+									break;
+								case "small":
+									level.SmallExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+									break;
+								case "mid":
+									level.MidExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+									break;
+								case "big":
+									level.BigExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+									break;
+							}
+							
 						}
 
 						Effects.RemoveAt(j);

@@ -33,6 +33,7 @@ namespace _3DRTSGame
 
 		private float speed;
 		public bool Repeat { get; private set; }
+		public string Type { get; private set; }
 		
 
 		public override void Update(GameTime gameTime)
@@ -98,6 +99,7 @@ namespace _3DRTSGame
 		{
 			Removable = false;
 			this.Position = position;
+			count = 0;// これでRemovableを管理しているので重要
 			/*foreach (ExplosionParticleEmitter e in emitters) {
 				e.Reset(position);
 			}*/
@@ -148,6 +150,7 @@ namespace _3DRTSGame
 		}
 
 
+
 		/// <summary>
 		/// ファイルから情報をロードしてエミッタを生成する。
 		/// runをfalseにする場合は、実行メソッドを後で手動で呼ぶ必要がある。
@@ -160,12 +163,13 @@ namespace _3DRTSGame
 		/// <param name="filePath">ロードするファイルの相対パス</param>
 		/// <param name="run">すぐ動作させるかどうか。</param>
 		public ExplosionEffect(ContentManager content, GraphicsDevice graphics,
-			Vector3 position, Vector2 size, bool repeat, string filePath, bool run)
+			string type, Vector3 position, Vector2 size, bool repeat, string filePath, bool run)
 		{
 			this.content = content;
 			this.graphicsDevice = graphics;
 			this.Position = position;
 			this.Repeat = repeat;
+			this.Type = type;
 			emitters = new List<ExplosionParticleEmitter>();
 
 			// lua test

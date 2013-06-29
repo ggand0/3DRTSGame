@@ -26,7 +26,8 @@ namespace _3DRTSGame
 			None
 		}
 		private SelectionState state;
-		private Object uiModel;
+		private Dictionary<Type, Object> uiModels;
+		private Object currentUIModel;
 		private BillboardSystem uiRing;
 
 		private Dictionary<string, int> unitCosts;
@@ -75,19 +76,20 @@ namespace _3DRTSGame
 				//currentSelection = UIManager.GetUnitType();
 				isDragging = true;
 				
-				//object[] args = new object[] { SatelliteWeapon.Missile, level.waterPlanet.Position + new Vector3(400, 50, 0),waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0" };
-				object[] args = new object[] { Vector3.Zero, 10, "Models\\DeepSpace" };
-				uiModel = (Object)Activator.CreateInstance(currentSelection, args);// キャストしたらダメな気がするが...モデル表示するだけだからいいか
-				if (uiRing == null) {
-					uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
-						new Vector2(512), new Vector3[] { uiModel.Position });
-				}
+				//object[] args = new object[] { SatelliteWeapon.Missile, level.waterPlanet.Position + new Vector3(400, 50, 0),
+				//waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0" };
+				// キャストしたらダメな気がするが...モデル表示するだけだからいいか
+				// メチャクチャ重いのでこれもpreloadさせることに
+				//object[] args = new object[] { Vector3.Zero, 10, "Models\\DeepSpace" };
+				//currentUIModel = (Object)Activator.CreateInstance(currentSelection, args);
+				currentUIModel = uiModels[currentSelection];
+
 			}
 			if (isDragging && MouseInput.IsOnButtonUpL() && CanDeploy()) {
 				isDragging = false;
 
 				// 3D空間上の位置をGet
-				Vector3 intersectionPoint = uiModel.Position;//Get3DMousePoint();
+				Vector3 intersectionPoint = currentUIModel.Position;//Get3DMousePoint();
 
 				level.Models.Add(new ArmedSatellite(intersectionPoint, 10, "Models\\DeepSpace"));
 				//level.Models.Add(new Object(intersectionPoint, 20, "Models\\cube"));
@@ -107,15 +109,15 @@ namespace _3DRTSGame
 		public void Draw(GameTime gameTime)
 		{
 			if (isDragging) {
-				uiModel.Position = Get3DMousePoint();
-				uiModel.World = Matrix.CreateScale(uiModel.Scale) * Matrix.CreateTranslation(uiModel.Position);
+				currentUIModel.Position = Get3DMousePoint();
+				currentUIModel.World = Matrix.CreateScale(currentUIModel.Scale) * Matrix.CreateTranslation(currentUIModel.Position);
 				//uiModel.Update(gameTime);
 
 				Camera c = level.camera;
-				uiModel.Draw(c.View, c.Projection, c.Position);
+				currentUIModel.Draw(c.View, c.Projection, c.Position);
 
 				//uiRing.Position = uiModel.Position;
-				uiRing.SetPosition(uiModel.Position);
+				uiRing.SetPosition(currentUIModel.Position);
 				uiRing.Draw(c.View, c.Projection, Vector3.UnitX, Vector3.UnitZ);
 			}
 		}
@@ -123,6 +125,12 @@ namespace _3DRTSGame
 		public ProductionManager(Level4 level)
 		{
 			this.level = level;
+
+			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
+						new Vector2(512), new Vector3[] {Vector3.Zero });//currentUIModel.Position
+			uiModels = new Dictionary<Type, Object>();
+			uiModels.Add(typeof(ArmedSatellite), new ArmedSatellite(Vector3.Zero, 10, "Models\\DeepSpace"));
+
 		}
 		// 使ってない
 		public ProductionManager(Level4 level, UIManager uiManager)
@@ -131,11 +139,13 @@ namespace _3DRTSGame
 			this.player = level.player;
 			this.UIManager = uiManager;
 			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
-				Vector2.One, new Vector3[] { uiModel.Position });
+				Vector2.One, new Vector3[] { currentUIModel.Position });
 
 			unitCosts = new Dictionary<string, int>();
 			unitCosts.Add("ArmedSatellite", 100);
 			unitCosts.Add("SpaceStation", 500);
+
+
 		}
 	}
 }

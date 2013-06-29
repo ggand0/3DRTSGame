@@ -37,6 +37,8 @@ namespace _3DRTSGame
 		public List<EnergyShieldEffect> transparentEffects { get; set; }
 
 		public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
+		public Queue<ExplosionEffect> MidExplosionPool { get; private set; }
+		public Queue<ExplosionEffect> BigExplosionPool { get; private set; }
 
 		/// <summary>
 		/// GraphicsDeviceのStateをデフォルトの状態に戻す。
@@ -65,6 +67,8 @@ namespace _3DRTSGame
 			Enemies = new List<Object>();
 			transparentEffects = new List<EnergyShieldEffect>();
 			SmallExplosionPool = new Queue<ExplosionEffect>();
+			MidExplosionPool = new Queue<ExplosionEffect>();
+			BigExplosionPool = new Queue<ExplosionEffect>();
 			player = new Player();
 
 			EnergyShieldEffect.level = this;

@@ -27,12 +27,17 @@ namespace _3DRTSGame
 
 		public bool Reset { get; set; }
 		public int Type { get; private set; }
+		/// <summary>
+		/// 既に一度起動されていて、新たにAddParticleする必要がないかどうか。object pooling関係
+		/// </summary>
+		public bool AddedParticles { get; set; }
 
 		public bool EnableScripting { get; private set; }
 		private Lua lua;
 		private string scriptPath;
 
 		protected override void RandomDirectionExplosion()
+		//protected void RandomDirectionExplosion(bool addParticles = false)
 		{
 			for (int i = 0; i < ParticleNum; i++) {
 				float duration = (float)(rand.Next(0, 20)) / 10f + 2;
@@ -94,13 +99,15 @@ namespace _3DRTSGame
 			} else {
 				switch (Type) {
 					case 0:
-						RandomDirectionExplosion();
+						//this.RandomDirectionExplosion(AddedParticles);
+						this.RandomDirectionExplosion();
 						break;
 					case 1:
 						DiscoidExplosion();
 						break;
 				}
 			}
+			AddedParticles = true;
 		}
 
 

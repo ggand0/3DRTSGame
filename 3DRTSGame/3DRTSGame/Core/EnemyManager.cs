@@ -157,7 +157,7 @@ namespace _3DRTSGame
 						new Vector3(aa * (float)Math.Exp(b * angle) * (float)Math.Cos(angle), 0,
 							aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));
 					a.Destination = level.TargetPlanets[0].Position;
-					//a.Scale = 0.05f;
+					a.Scale = 0.05f;
 
 					// 何故かtrueになってくれてないのでここでも蘇生作業してみる
 					a.IsActive = true;
