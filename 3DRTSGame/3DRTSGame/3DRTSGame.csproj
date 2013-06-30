@@ -177,6 +177,7 @@
     <Compile Include="Scene\MenuScene.cs" />
     <Compile Include="Scene\PauseScene.cs" />
     <Compile Include="Scene\Scene.cs" />
+    <Compile Include="Scene\TitleScene.cs" />
     <Compile Include="Sound\SoundControl.cs" />
     <Compile Include="Terrain\HeightMap.cs" />
     <Compile Include="Terrain\PerlinGenerator.cs" />

@@ -12,7 +12,7 @@ namespace _3DRTSGame
 	{
 		public static SpriteBatch spriteBatch;
 		private List<UIObject> interfaces = new List<UIObject>();
-		private static UnitPanel mainPanel = new UnitPanel();// staticにしようと思っていたけど無理
+		public static UnitPanel mainPanel = new UnitPanel();// staticにしようと思っていたけど無理
 		private MouseCursor cursor;
 
 
@@ -28,6 +28,7 @@ namespace _3DRTSGame
 			foreach (UIObject ui in interfaces) {
 				ui.Update(gameTime);
 			}
+			mainPanel.Update(gameTime);
 		}
 		public override void Draw(GameTime gameTime)
 		{

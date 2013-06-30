@@ -244,22 +244,38 @@ namespace _3DRTSGame
 		}
 		private bool IsGoingToCollide(BoundingSphere target)
 		{
-			Vector3 v = Direction * 100;
+			Vector3 v = Direction * 300;
 			Vector3 dir = target.Center - Position;
 			Vector3 dirProjected = Vector3.Dot(v, dir) * v / (v.Length() * v.Length());
 			Vector3 b = dirProjected - dir;
 
-			return target.Radius > b.Length();
+			float l1 = v.Length();
+			float l2 = dirProjected.Length();
+			return target.Radius > b.Length() && l1 > l2;
 		}
 		private bool IsLeft(Vector3 vector, Vector3 targetPoint)
 		{
 			return Math.Sin(vector.X * (targetPoint.Y - 0) - vector.Y * (targetPoint.X - 0)) > 0;
 		}
+		private float CalcAvoidSpeed(float distance, float radius)
+		{
+			//float A = 0, B = 13000, n = 1, m = 2.5f, d = distance / 25f;
+			float A = 0, B = 10 * radius, n = 1, m = 3.0f, d = distance / 25f;
+
+			return -A / (float)Math.Pow(d, n) + B / (float)Math.Pow(d, m);
+		}
 		private void AddAvoidanceVelocity(Vector3 projectedDirection, Vector3 projectedDirection2, BoundingSphere bs)
 		{
 			// 距離の近さに応じて速さを調整するべきだろう
 			float distance = (bs.Center - Position).Length();
-			float avoidSpeed = 2.5f * 1 / (distance / 100f);
+			//float avoidSpeed = 1f;
+			//float avoidSpeed = 2.5f / (distance / 100f);
+			//float avoidSpeed = 2.5f / (distance / 25f);
+			//float avoidSpeed = 1000000 / (distance * distance);
+
+			// 回避速度にはポテンシャル関数を使うのはどうか？
+			float avoidSpeed = CalcAvoidSpeed(distance, bs.Radius);
+
 			Vector3 avoidVelocity = Vector3.Zero;
 
 			// DirectionとUpからなる平面上での、Directionにおける障害物中心点の左右判定（左右どちらに避けるか）

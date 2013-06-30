@@ -31,6 +31,7 @@ namespace _3DRTSGame
 		public Color ParticleColor { get; set; }
 		public BlendState blendState { get; set; }
 		public BillboardMode Mode { get; private set; }
+		public bool RenderBoundingBox { get; set; }
 
 		/// <summary>
 		/// Position of this emitter.
@@ -418,9 +419,11 @@ namespace _3DRTSGame
 			graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
 			// Draw BoundingBox for debug
-			 int size = 10;
-			 BoundingBoxRenderer.Render(new BoundingBox(new Vector3(-size / 2.0f, -size / 2.0f, -size / 2.0f) + Position, new Vector3(size / 2.0f, size / 2.0f, size / 2.0f) + Position)
-				 , graphicsDevice, camera.View, camera.Projection, Color.White);
+			if (RenderBoundingBox) {
+				int size = 10;
+				BoundingBoxRenderer.Render(new BoundingBox(new Vector3(-size / 2.0f, -size / 2.0f, -size / 2.0f) + Position, new Vector3(size / 2.0f, size / 2.0f, size / 2.0f) + Position)
+					, graphicsDevice, camera.View, camera.Projection, Color.White);
+			}
 		}
 
 
@@ -499,6 +502,7 @@ namespace _3DRTSGame
 			this.Mode = mode;
 
 			effect = content.Load<Effect>("Billboard\\ParticleEffect");
+			RenderBoundingBox = false;
 
 			// 基本的にはすぐに初期化。
 			// Cloneして使うときなどはfalseを与えておく。

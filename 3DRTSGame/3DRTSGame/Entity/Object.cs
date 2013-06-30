@@ -37,6 +37,7 @@ namespace _3DRTSGame
 			set { _hitPoint = value; }
 		}
 		public int MaxHitPoint { get; protected set; }
+		public bool IsSelected { get; set; }
 
 
 		public Model Model { get; protected set; }

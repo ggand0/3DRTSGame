@@ -29,6 +29,7 @@ namespace _3DRTSGame
 		private Dictionary<Type, Object> uiModels;
 		private Object currentUIModel;
 		private BillboardSystem uiRing;
+		//private Satellite tmpSatellite;
 
 		private Dictionary<string, int> unitCosts;
 
@@ -91,10 +92,13 @@ namespace _3DRTSGame
 				// 3D空間上の位置をGet
 				Vector3 intersectionPoint = currentUIModel.Position;//Get3DMousePoint();
 
-				level.Models.Add(new ArmedSatellite(intersectionPoint, 10, "Models\\DeepSpace"));
-				//level.Models.Add(new Object(intersectionPoint, 20, "Models\\cube"));
-				level.Models[level.Models.Count - 1].RenderBoudingSphere = false;
-				//level.Models.Add(new ArmedSatellite(MouseInput.GetMousePosition(), 5, ""));
+				//level.Models.Add(new ArmedSatellite(intersectionPoint, 10, "Models\\DeepSpace"));
+				//level.Models[level.Models.Count - 1].RenderBoudingSphere = false;
+				Satellite tmpSatellite = level.SatellitePool.Dequeue();
+				//tmpSatellite.Position = intersectionPoint;
+				tmpSatellite.Initialize(intersectionPoint);
+				level.Models.Add(tmpSatellite);
+				level.Satellites.Add(tmpSatellite);
 			}
 		}
 		public void Update(GameTime gameTime)
@@ -144,8 +148,6 @@ namespace _3DRTSGame
 			unitCosts = new Dictionary<string, int>();
 			unitCosts.Add("ArmedSatellite", 100);
 			unitCosts.Add("SpaceStation", 500);
-
-
 		}
 	}
 }

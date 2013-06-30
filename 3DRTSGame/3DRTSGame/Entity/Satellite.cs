@@ -23,6 +23,8 @@ namespace _3DRTSGame
 		public float Roll { get; protected set; }
 		public float Pitch { get; protected set; }
 		private float rotationSpeed, revolutionSpeed, revolutionAngle;
+		protected BillboardSystem uiRing;
+		public bool RevolutionClockwise { get; set; }
 
 		private Vector3 initialPoint;
 		private float CalcInitialAngle()
@@ -42,6 +44,14 @@ namespace _3DRTSGame
 			return def.Z > Position.Z ? -angle : angle;// 角度の大きさしか分からないのでこれで調整
 		}
 
+		/// <summary>
+		/// object pooling用に、外部から初期化できるようなメソッド
+		/// </summary>
+		public void Initialize(Vector3 position)
+		{
+			this.Position = position;
+			revolutionAngle = CalcInitialAngle();
+		}
 		public override void Update(GameTime gameTime)
 		{
 			if (Rotate) {
@@ -49,7 +59,15 @@ namespace _3DRTSGame
 			}
 			if (Revolution) {
 				revolutionSpeed = DEF_REVOLUTION_SPEED;//1
-				revolutionAngle += MathHelper.ToRadians(revolutionSpeed);
+
+				// 時計回りか反時計回りに公転
+				if (RevolutionClockwise) {
+					revolutionAngle += MathHelper.ToRadians(revolutionSpeed);
+				} else {
+					revolutionAngle -= MathHelper.ToRadians(revolutionSpeed);
+				}
+
+
 				Vector3 velocity = new Vector3((float)Math.Cos(revolutionAngle), 0,
 					(float)Math.Sin(revolutionAngle));
 				//Vector3 tmp = StarPosition + velocity * 3000;
@@ -78,6 +96,7 @@ namespace _3DRTSGame
 			Rotate = false;
 			Revolution = false;
 			this.initialPoint = position;
+			RevolutionClockwise = true;
 		}
 		public Satellite(bool revolution, Vector3 position, Vector3 center, float scale, string fileName)
 			:base(position, scale, fileName)
@@ -86,6 +105,7 @@ namespace _3DRTSGame
 			this.Center = center;
 			this.initialPoint = position;
 			revolutionAngle = CalcInitialAngle();
+			RevolutionClockwise = true;
 		}
 		#endregion
 	}

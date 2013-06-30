@@ -109,7 +109,7 @@ namespace _3DRTSGame
 			LevelNum = 3;
 
 			// 最初に表示するシーンを追加
-			PushScene(new Level4(null));
+			PushScene(new TitleScene(null));
 			//PushScene(new Level0(null));
 			//PushScene(Levels[LevelNum]);
 		}

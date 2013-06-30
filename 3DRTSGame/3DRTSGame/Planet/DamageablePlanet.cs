@@ -47,6 +47,7 @@ namespace _3DRTSGame
 			}
 		}
 
+
 		protected void DrawLifeBar(SpriteBatch spriteBatch)
 		{
 			// 以下、具体的数値は全てcamera.FarPlaneDistance = 10000000;時に調整したものであることに注意

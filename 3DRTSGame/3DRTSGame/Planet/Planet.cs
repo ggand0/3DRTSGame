@@ -351,6 +351,25 @@ namespace _3DRTSGame
 		}
 
 
+		/// <summary>
+		/// 気持ち小さ目の半径に設定
+		/// </summary>
+		/// <param name="o"></param>
+		/// <returns></returns>
+		public override bool IsHitWith(Object o)
+		{
+			BoundingSphere targetSphere =
+					  new BoundingSphere(o.Position,
+							   o.Model.Meshes[0].BoundingSphere.Radius *
+				//BoundingSphereScale);
+									 o.Scale);
+
+			BoundingSphere mySphere = new BoundingSphere(
+				Position,
+				Model.Meshes[0].BoundingSphere.Radius * Scale * 0.8f);
+
+			return targetSphere.Intersects(mySphere);
+		}
 		public override void SetModelEffect(Effect effect, bool CopyEffect)
 		{
 			foreach (ModelMesh mesh in Model.Meshes)

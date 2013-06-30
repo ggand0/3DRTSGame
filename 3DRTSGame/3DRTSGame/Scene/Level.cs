@@ -34,11 +34,13 @@ namespace _3DRTSGame
 		// Members for RTS game (used in Level3, 4)
 		public List<Bullet> Bullets { get; protected set; }
 		public List<Object> Enemies { get; private set; }
+		public List<Satellite> Satellites { get; private set; }
 		public List<EnergyShieldEffect> transparentEffects { get; set; }
 
 		public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
 		public Queue<ExplosionEffect> MidExplosionPool { get; private set; }
 		public Queue<ExplosionEffect> BigExplosionPool { get; private set; }
+		public Queue<Satellite> SatellitePool { get; private set; }
 
 		/// <summary>
 		/// GraphicsDeviceのStateをデフォルトの状態に戻す。
@@ -69,7 +71,9 @@ namespace _3DRTSGame
 			SmallExplosionPool = new Queue<ExplosionEffect>();
 			MidExplosionPool = new Queue<ExplosionEffect>();
 			BigExplosionPool = new Queue<ExplosionEffect>();
-			player = new Player();
+			SatellitePool = new Queue<Satellite>();
+			Satellites = new List<Satellite>();
+			
 
 			EnergyShieldEffect.level = this;
 			BoundingSphereRenderer.level = this;

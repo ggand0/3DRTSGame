@@ -29,7 +29,6 @@ namespace _3DRTSGame
 		public List<Asteroid> Asteroids { get; private set; }
 		public List<Planet> Planets { get; private set; }
 		public List<DamageablePlanet> TargetPlanets { get; private set; }
-		public List<Satellite> Satellites { get; private set; }
 		public List<Fighter> Fighters { get; private set; }
 
         private Random random;
@@ -47,6 +46,7 @@ namespace _3DRTSGame
 		private static readonly int SMALL_EXPLOSION_EFFECT_NUM = 50;
 		private static readonly int MID_EXPLOSION_EFFECT_NUM = 50;
 		private static readonly int BIG_EXPLOSION_EFFECT_NUM = 10;
+		private static readonly int MAX_SATELLITE_NUM = 10;
 		//public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
 		private ExplosionEffect effectTmp;
 
@@ -67,12 +67,10 @@ namespace _3DRTSGame
 				AsteroidPool.Enqueue(new Asteroid(Vector3.Zero, 1f, "Models\\Asteroid"));
 			}
 
-			
 			smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
 			for (int i = 0; i < SMALL_EXPLOSION_EFFECT_NUM; i++) {
 				SmallExplosionPool.Enqueue((ExplosionEffect)smallExplosion.Clone());
 			}
-			
 			midExplosion = new ExplosionEffect(content, graphicsDevice, "mid", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
 			for (int i = 0; i < MID_EXPLOSION_EFFECT_NUM; i++) {
 				MidExplosionPool.Enqueue((ExplosionEffect)midExplosion.Clone());
@@ -80,6 +78,11 @@ namespace _3DRTSGame
 			bigExplosion = new ExplosionEffect(content, graphicsDevice, "big", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
 			for (int i = 0; i < BIG_EXPLOSION_EFFECT_NUM; i++) {
 				BigExplosionPool.Enqueue((ExplosionEffect)bigExplosion.Clone());
+			}
+			//Satellite = new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\Dawn", "SoundEffects\\laser1");
+			for (int i = 0; i < MAX_SATELLITE_NUM; i++) {//
+				//SatellitePool.Enqueue((Satellite)Satellite.Clone());
+				SatellitePool.Enqueue(new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\Dawn", "SoundEffects\\laser1"));
 			}
 		}
 		private void AddAsteroids(int asteroidNum, float radius)
@@ -96,15 +99,17 @@ namespace _3DRTSGame
 		protected override void Initialize()
 		{
 			base.Initialize();
+			player = new Player(this);
 			enemyManager = new EnemyManager(this);
 			//productionManager = new ProductionManager(this); // Skyロード後に初期化する
 			uiManager = new UIManager();
+			
 
 			// Entities
 			Models = new List<Object>();
-			Ground = new Object(new Vector3(0, -500, 0), 1f, "Models\\ground");//-200
+			/*Ground = new Object(new Vector3(0, -500, 0), 1f, "Models\\ground");//-200
 			Ground.RenderBoudingSphere = false;
-			Models.Add(Ground);
+			Models.Add(Ground);*/
 			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube");
 
 
@@ -114,7 +119,7 @@ namespace _3DRTSGame
 
 			// Set up the reference grid
 			grid = new GridRenderer();
-			grid.GridColor = Color.DarkSeaGreen;//Color.LimeGreen;
+			grid.GridColor = Color.DarkSeaGreen * 0.3f;//Color.LimeGreen;
             grid.GridScale = 300f;//100f;
             grid.GridSize = 64;;//32;
 			// Set the grid to draw on the x/z plane around the origin
@@ -124,8 +129,7 @@ namespace _3DRTSGame
 		{
 			base.Load();
 
-			// Set up object pool
-			LoadObjectPool();
+			
 
 			// Set up the reference grid and sample camera
 			grid.LoadGraphicsContent(graphicsDevice);
@@ -139,6 +143,9 @@ namespace _3DRTSGame
 
 			sun = new Sun(new Vector3(-2000, 500, 2000), graphicsDevice, content, spriteBatch);
 			sunCircle = new Sun(LightPosition, graphicsDevice, content, spriteBatch);
+
+			// Set up object pool
+			LoadObjectPool();
 
 			// Load planets
 			Planets = new List<Planet>();
@@ -287,8 +294,9 @@ namespace _3DRTSGame
 			base.Collide();
 
 			// AsteroidとTargetPlanets
-			foreach (Asteroid a in Asteroids) {
-				foreach (DamageablePlanet p in TargetPlanets) {
+			foreach (DamageablePlanet p in TargetPlanets) {
+				foreach (Asteroid a in Asteroids) {
+				
 					if (a.IsActive && p.IsActive && a.IsHitWith(p)) {
 						//a.Damage();
 						a.Die();
@@ -304,6 +312,21 @@ namespace _3DRTSGame
 							e.Position = a.Position;
 							e.Run();
 							effectManager.Add(e);
+						}
+					}
+				}
+				foreach (Fighter f in Fighters) {
+					//if (f.IsActive && p.IsActive && f.IsHitWith(p)) {
+					if (f.IsActive && p.IsActive && p.IsHitWith(f)) {
+						//a.Damage();
+						f.Die();
+						p.Damage();
+
+						if (SmallExplosionPool.Count > 0) {
+							ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
+							effectTmp.Reset(f.Position);
+							effectTmp.Run();
+							effectManager.Add(effectTmp);
 						}
 					}
 				}
@@ -404,6 +427,11 @@ namespace _3DRTSGame
 					Fighters.RemoveAt(j);
 				}
 			}
+			for (int j = Satellites.Count - 1; j >= 0; j--) {
+				if (!Satellites[j].IsAlive) {
+					Satellites.RemoveAt(j);
+				}
+			}
 			for (int j = Models.Count-1; j >=0; j--) {
 				if (!Models[j].IsAlive) {
 					if (Models[j] is Asteroid) {
@@ -425,6 +453,7 @@ namespace _3DRTSGame
 			float elapsed = (float)gameTime.TotalGameTime.TotalSeconds;
 			count++;
 
+			player.Update();
 			enemyManager.Update(gameTime);
 			productionManager.Update(gameTime);
 
@@ -520,7 +549,7 @@ namespace _3DRTSGame
 				grid.ProjectionMatrix = camera.Projection;
 				grid.ViewMatrix = camera.View;
 				// draw the reference grid so it's easier to get our bearings
-				//grid.Draw();
+				grid.Draw();
 			}
 			DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitX * 1000, 1, Color.Red);
 			DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitY * 1000, 1, Color.Green);

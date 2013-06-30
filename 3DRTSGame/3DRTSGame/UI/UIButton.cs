@@ -8,6 +8,9 @@ namespace _3DRTSGame
 	/// </summary>
 	public class UIButton : UIObject
 	{
+		public string Name { get; private set; }
+		public bool Selected { get; private set; }
+
 		public bool IsSelected()
 		{
 			Vector2 pos = MouseInput.GetMousePosition();
@@ -20,31 +23,35 @@ namespace _3DRTSGame
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
+
+			Selected = IsSelected();
 		}
 		/// <summary>
 		/// 重くなるようならUnitPanel側で呼び出す（大まかな判定で計算量を減らせる）
 		/// </summary>
 		public void DrawFrameLine()
 		{
-			if (IsSelected()) {
-				int offset = 0;
-				Primitives2D.DrawRectangle(spriteBatch, new Rectangle((int)UIPosition.X + offset, (int)UIPosition.Y + offset,
-					(int)(texture.Width * scale - offset), (int)(texture.Height * scale) - offset), Color.White, 3);
-			}
+			int offset = 0;
+			Primitives2D.DrawRectangle(spriteBatch, new Rectangle((int)UIPosition.X + offset, (int)UIPosition.Y + offset,
+				(int)(texture.Width * scale - offset), (int)(texture.Height * scale) - offset), Color.White, 3);
+			
 		}
 		public override void Draw(GameTime gameTime)
 		{
 			base.Draw(gameTime);
 
 			spriteBatch.Draw(texture, UIPosition, null, Color.White, 0, Vector2.Zero, new Vector2(scale), SpriteEffects.None, 0);
-			DrawFrameLine();
+			if (Selected) {
+				DrawFrameLine();
+			}
 		}
 
-		public UIButton(Texture2D texture, Vector2 position, float scale)
+		public UIButton(Texture2D texture, Vector2 position, float scale, string name)
 		{
 			this.texture = texture;
 			this.UIPosition = position;
 			this.scale = scale;
+			this.Name = name;
 		}
 	}
 }

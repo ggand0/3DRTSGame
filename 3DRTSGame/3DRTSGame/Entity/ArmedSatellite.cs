@@ -249,8 +249,14 @@ namespace _3DRTSGame
 			base.Draw(View, Projection, CameraPosition);
 
 			billboardStrip.Draw(View, Projection, level.camera.Up, level.camera.Right, CameraPosition);
+
 			// levelのリストでまとめて描画させることにした
-			//shieldEffect.Draw(gameTime, View, Projection, CameraPosition, level.camera.Direction, level.camera.Up, level.camera.Right);	
+			//shieldEffect.Draw(gameTime, View, Projection, CameraPosition, level.camera.Direction, level.camera.Up, level.camera.Right);
+			if (IsSelected) {
+				//uiRing.SetPosition(new Vector3(Position.X, -200, Position.Z));
+				uiRing.SetPosition(Position);
+				uiRing.Draw(View, Projection, Vector3.UnitX, Vector3.UnitZ);
+			}
 		}
 
 		#region Constructors
@@ -289,6 +295,8 @@ namespace _3DRTSGame
 
             // 仮に作成しておく
             missileOrg = new Missile(IFF.Friend, this, null, 5.0f, Vector3.Zero, Position, 4, "Models\\AGM65Missile");
+			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
+						new Vector2(512), new Vector3[] { Vector3.Zero });//currentUIModel.Position
 		}
 		#endregion
 	}

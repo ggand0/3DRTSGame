@@ -176,7 +176,7 @@ namespace _3DRTSGame
                     NextDouble(random, -radius, radius), NextDouble(random, -radius, radius));
                 enemiesOrg["Fighter"].RenderBoudingSphere = false;
 
-                f = (Fighter)enemiesOrg["Fighter"].Clone();
+                Fighter f = (Fighter)enemiesOrg["Fighter"].Clone();
                 f.Target = level.TargetPlanets[0].Position;
 
                 level.Models.Add(f);
@@ -244,7 +244,9 @@ namespace _3DRTSGame
         private void Initialize()
 		{
 			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 1f) }, 0, 1, 4, 3000, 30));
+			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 1f) }, 0, 1, 4, 3000, 30));
+			
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Fighter), 1f) }, 0, 10, 1, 3000, 120));
 			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 1, 4, 3000, 30));
 			state = WaveState.Start;
 

@@ -16,7 +16,7 @@ namespace _3DRTSGame
 		private static readonly float MENU_FONT_SIZE = 28;
 		//public int Thickness { get; private set; }
 
-		private int height;
+		public String CurrentSelectedIcon { get; private set; }
 
 		private Texture2D[] cardTextures, iconTextures;// 位置計算のために用意
 		private UnitCard[] unitCards;
@@ -37,6 +37,27 @@ namespace _3DRTSGame
 		{
 			Vector2 pos = MouseInput.GetMousePosition();
 			return pos.Y >= new Vector2(0, Game1.Height - Thickness).Y;
+		}
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+
+			foreach (UIButton b in icons) {
+				b.Update(gameTime);
+			}
+
+			bool isSelectedSomething = false;
+			foreach (UIButton b in icons) {
+				b.Update(gameTime);
+				if (b.Selected) {
+					CurrentSelectedIcon = b.Name;
+					isSelectedSomething = true;
+					break;
+				}
+			}
+			if (!isSelectedSomething) {
+				CurrentSelectedIcon = "";
+			}
 		}
 
 		private void DrawStrings()
@@ -89,6 +110,14 @@ namespace _3DRTSGame
 				content.Load<Texture2D>("Textures\\UI\\Icons\\laser"),
 				content.Load<Texture2D>("Textures\\UI\\Icons\\rocket1")
 			};
+			string[] names = new string[] {
+				"halt",
+				"move",
+				"ccw",
+				"cw",
+				"laser",
+				"missile"
+			};
 			cardTextures = new Texture2D[] {
 				//content.Load<Texture2D>("Textures\\UI\\ui_deepsapce"),
 				//content.Load<Texture2D>("Textures\\UI\\ui_tdrs")
@@ -127,7 +156,7 @@ namespace _3DRTSGame
 			totalLength = 0;
 			scale = 0.5f;
 			for (int i = 0; i < iconTextures.Length; i++) {
-				icons[i] = new UIButton(iconTextures[i], pos + new Vector2(totalLength, 0), scale);
+				icons[i] = new UIButton(iconTextures[i], pos + new Vector2(totalLength, 0), scale, names[i]);
 				totalLength += iconTextures[i].Width * scale;
 			}
 
