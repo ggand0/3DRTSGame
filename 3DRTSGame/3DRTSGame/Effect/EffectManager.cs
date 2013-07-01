@@ -43,13 +43,13 @@ namespace _3DRTSGame
 								default:
 									break;
 								case "small":
-									level.SmallExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+									ObjectPool.SmallExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
 									break;
 								case "mid":
-									level.MidExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+									ObjectPool.MidExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
 									break;
 								case "big":
-									level.BigExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
+									ObjectPool.BigExplosionPool.Enqueue(Effects[j] as ExplosionEffect);
 									break;
 							}
 							

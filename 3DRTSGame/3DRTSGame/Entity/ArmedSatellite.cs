@@ -259,6 +259,15 @@ namespace _3DRTSGame
 			}
 		}
 
+		/// <summary>
+		/// object poolingの関係上コンストラクタに書けない処理をここに。
+		/// </summary>
+		public void Initialize()
+		{
+			shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
+			level.transparentEffects.Add(shieldEffect);
+
+		}
 		#region Constructors
 		public ArmedSatellite(Vector3 position, float scale, string fileName)
 			: this(position, Vector3.Zero, scale, fileName)
@@ -278,12 +287,11 @@ namespace _3DRTSGame
 			: base(true, position, center, scale, fileName)
 		{
 			ShieldEnabled = true;
-			//random = new Random();
 			this.Weapon = weaponType;
 			chargeTime = weaponType == SatelliteWeapon.Laser ? random.Next(10, 70) : random.Next(60, 120);
 			shootSound = content.Load<SoundEffect>(SEPath);
-			shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
-			level.transparentEffects.Add(shieldEffect);
+			//shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
+			//level.transparentEffects.Add(shieldEffect);
 
 			positions = new List<Vector3>();
 			billboardStrip = new BillboardStrip(Level.graphicsDevice, content, content.Load<Texture2D>("Textures\\Lines\\Line1T1"), new Vector2(10, 200), positions);//Line1T1

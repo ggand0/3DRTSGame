@@ -41,13 +41,12 @@ namespace _3DRTSGame
 		private UIManager uiManager;
 		private ProductionManager productionManager;
 
-		private static readonly int ASTEROID_POOL_NUM = 30;
+		/*private static readonly int ASTEROID_POOL_NUM = 30;
 		public Queue<Asteroid> AsteroidPool { get; private set; }
 		private static readonly int SMALL_EXPLOSION_EFFECT_NUM = 50;
 		private static readonly int MID_EXPLOSION_EFFECT_NUM = 50;
 		private static readonly int BIG_EXPLOSION_EFFECT_NUM = 10;
-		private static readonly int MAX_SATELLITE_NUM = 10;
-		//public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
+		private static readonly int MAX_SATELLITE_NUM = 10;*/
 		private ExplosionEffect effectTmp;
 
 
@@ -59,7 +58,8 @@ namespace _3DRTSGame
 			return (float)(min + r.NextDouble() * (max - min));
 		}
 
-		private void LoadObjectPool()
+		// ObjectPoolクラスへ移行
+		/*private void LoadObjectPool()
 		{
 			AsteroidPool = new Queue<Asteroid>();
 			for (int i = 0; i < ASTEROID_POOL_NUM; i++) {
@@ -84,7 +84,7 @@ namespace _3DRTSGame
 				//SatellitePool.Enqueue((Satellite)Satellite.Clone());
 				SatellitePool.Enqueue(new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\Dawn", "SoundEffects\\laser1"));
 			}
-		}
+		}*/
 		private void AddAsteroids(int asteroidNum, float radius)
 		{
 			Asteroids = new List<Asteroid>();
@@ -112,6 +112,7 @@ namespace _3DRTSGame
 			Models.Add(Ground);*/
 			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube");
 
+			
 
 			// Initializes camera
 			camera = new ArcBallCamera(Vector3.Zero);
@@ -137,6 +138,14 @@ namespace _3DRTSGame
 			Sky = new SkySphere(content, graphicsDevice, content.Load<TextureCube>("Textures\\SkyBox\\space4"), 100);// set 11 for debug
 			productionManager = new ProductionManager(this);
 
+			// Initialize Satellites
+			// object poolにインスタンスは作成してあるが、levelのリストへエフェクトを追加するなどの処理が終ってないのでここで済ます。
+			foreach (Satellite s in ObjectPool.SatellitePool) {
+				if (s is ArmedSatellite) {
+					(s as ArmedSatellite).Initialize();
+				}
+			}
+
 			// Load stars
 			star = new Star(new Vector3(-500, 100, 500), graphicsDevice, content, StarType.G);
 			//LightPosition = star.Position;
@@ -145,7 +154,7 @@ namespace _3DRTSGame
 			sunCircle = new Sun(LightPosition, graphicsDevice, content, spriteBatch);
 
 			// Set up object pool
-			LoadObjectPool();
+			//LoadObjectPool();
 
 			// Load planets
 			Planets = new List<Planet>();
@@ -302,8 +311,8 @@ namespace _3DRTSGame
 						a.Die();
 						p.Damage();
 
-						if (MidExplosionPool.Count > 0) {
-							ExplosionEffect effectTmp = MidExplosionPool.Dequeue();
+						if (ObjectPool.MidExplosionPool.Count > 0) {
+							ExplosionEffect effectTmp = ObjectPool.MidExplosionPool.Dequeue();
 							effectTmp.Reset(a.Position);
 							effectTmp.Run();
 							effectManager.Add(effectTmp);
@@ -322,8 +331,8 @@ namespace _3DRTSGame
 						f.Die();
 						p.Damage();
 
-						if (SmallExplosionPool.Count > 0) {
-							ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
+						if (ObjectPool.SmallExplosionPool.Count > 0) {
+							ExplosionEffect effectTmp = ObjectPool.SmallExplosionPool.Dequeue();
 							effectTmp.Reset(f.Position);
 							effectTmp.Run();
 							effectManager.Add(effectTmp);
@@ -342,8 +351,8 @@ namespace _3DRTSGame
 						if (!o.IsActive) {
 							player.AddMoney(o);
 
-							if (MidExplosionPool.Count > 0) {
-								ExplosionEffect effectTmp = MidExplosionPool.Dequeue();
+							if (ObjectPool.MidExplosionPool.Count > 0) {
+								ExplosionEffect effectTmp = ObjectPool.MidExplosionPool.Dequeue();
 								effectTmp.Reset(o.Position);
 								effectTmp.Run();
 								effectManager.Add(effectTmp);
@@ -363,8 +372,8 @@ namespace _3DRTSGame
 						if (!o.IsActive) {
 							player.AddMoney(o);
 
-							if (SmallExplosionPool.Count > 0) {
-								ExplosionEffect effectTmp = SmallExplosionPool.Dequeue();
+							if (ObjectPool.SmallExplosionPool.Count > 0) {
+								ExplosionEffect effectTmp = ObjectPool.SmallExplosionPool.Dequeue();
 								effectTmp.Reset(o.Position);
 								effectTmp.Run();
 								effectManager.Add(effectTmp);
@@ -440,7 +449,7 @@ namespace _3DRTSGame
 						Models[j].IsActive = true;
 						Models[j].IsAlive = true;
 						Models[j].HitPoint = Models[j].MaxHitPoint;
-						AsteroidPool.Enqueue(Models[j] as Asteroid);
+						ObjectPool.AsteroidPool.Enqueue(Models[j] as Asteroid);
 					}
 
 					Models.RemoveAt(j);

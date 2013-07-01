@@ -31,6 +31,7 @@ namespace _3DRTSGame
 		public List<Level> Levels { get; private set; }
 		public int LevelNum { get; private set; }
 		public bool MoveNextLevel { get; set; }
+		//public ObjectPool GameObjectPool { get; private set; }
 
 		public static float Width { get; private set; }
 		public static float Height { get; private set; }
@@ -107,6 +108,11 @@ namespace _3DRTSGame
 			Levels.Add(new Level2(null));
 			Levels.Add(new Level3(null));*/
 			LevelNum = 3;
+
+			//GameObjectPool = new ObjectPool(Content, GraphicsDevice);
+			//new ObjectPool(Content, GraphicsDevice);
+			ObjectPool.graphicsDevice = GraphicsDevice;
+			ObjectPool.content = Content;
 
 			// 最初に表示するシーンを追加
 			PushScene(new TitleScene(null));

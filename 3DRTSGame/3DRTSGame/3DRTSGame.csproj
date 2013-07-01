@@ -101,6 +101,7 @@
     <Compile Include="Core\EnemyManager.cs" />
     <Compile Include="Core\IAttackable.cs" />
     <Compile Include="Core\IDamageable.cs" />
+    <Compile Include="Core\ObjectPool.cs" />
     <Compile Include="Core\Player.cs" />
     <Compile Include="Core\ProductionManager.cs" />
     <Compile Include="Debug.cs" />
@@ -173,6 +174,7 @@
     <Compile Include="Scene\Level2.cs" />
     <Compile Include="Scene\Level3.cs" />
     <Compile Include="Scene\Level4.cs" />
+    <Compile Include="Scene\LoadingScene.cs" />
     <Compile Include="Scene\MaskMenuScene.cs" />
     <Compile Include="Scene\MenuScene.cs" />
     <Compile Include="Scene\PauseScene.cs" />

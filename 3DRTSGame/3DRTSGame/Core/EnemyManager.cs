@@ -151,8 +151,8 @@ namespace _3DRTSGame
                 enemiesOrg["Asteroid"].RenderBoudingSphere = false;
 
                 //a = (Asteroid)enemiesOrg["Asteroid"].Clone();
-				if (level.AsteroidPool.Count > 0) {
-					a = level.AsteroidPool.Dequeue();
+				if (ObjectPool.AsteroidPool.Count > 0) {
+					a = ObjectPool.AsteroidPool.Dequeue();
 					a.Position = level.TargetPlanets[0].Position +
 						new Vector3(aa * (float)Math.Exp(b * angle) * (float)Math.Cos(angle), 0,
 							aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));

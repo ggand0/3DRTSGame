@@ -37,10 +37,10 @@ namespace _3DRTSGame
 		public List<Satellite> Satellites { get; private set; }
 		public List<EnergyShieldEffect> transparentEffects { get; set; }
 
-		public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
+		/*public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
 		public Queue<ExplosionEffect> MidExplosionPool { get; private set; }
 		public Queue<ExplosionEffect> BigExplosionPool { get; private set; }
-		public Queue<Satellite> SatellitePool { get; private set; }
+		public Queue<Satellite> SatellitePool { get; private set; }*/
 
 		/// <summary>
 		/// GraphicsDeviceのStateをデフォルトの状態に戻す。
@@ -68,10 +68,10 @@ namespace _3DRTSGame
 			Bullets = new List<Bullet>();
 			Enemies = new List<Object>();
 			transparentEffects = new List<EnergyShieldEffect>();
-			SmallExplosionPool = new Queue<ExplosionEffect>();
+			/*SmallExplosionPool = new Queue<ExplosionEffect>();
 			MidExplosionPool = new Queue<ExplosionEffect>();
 			BigExplosionPool = new Queue<ExplosionEffect>();
-			SatellitePool = new Queue<Satellite>();
+			SatellitePool = new Queue<Satellite>();*/
 			Satellites = new List<Satellite>();
 			
 
@@ -147,6 +147,10 @@ namespace _3DRTSGame
 		{
 			Initialize();
 			Load();
+		}
+		static Level()
+		{
+			//Sky = new SkySphere(content, graphicsDevice, content.Load<TextureCube>("Textures\\SkyBox\\space4"), 100);// set 11 for debug
 		}
 	}
 }

@@ -94,7 +94,7 @@ namespace _3DRTSGame
 
 				//level.Models.Add(new ArmedSatellite(intersectionPoint, 10, "Models\\DeepSpace"));
 				//level.Models[level.Models.Count - 1].RenderBoudingSphere = false;
-				Satellite tmpSatellite = level.SatellitePool.Dequeue();
+				Satellite tmpSatellite = ObjectPool.SatellitePool.Dequeue();
 				//tmpSatellite.Position = intersectionPoint;
 				tmpSatellite.Initialize(intersectionPoint);
 				level.Models.Add(tmpSatellite);
