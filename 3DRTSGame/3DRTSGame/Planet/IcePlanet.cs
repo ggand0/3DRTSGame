@@ -35,6 +35,7 @@ namespace _3DRTSGame
 			Palette = content.Load<Texture2D>("Textures\\Planet\\frozen2");
 			Nz = 256;//128;
 
+
 			Generate(graphicsDevice);
 			SubType = 2;
 		}

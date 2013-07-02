@@ -290,8 +290,8 @@ namespace _3DRTSGame
 			this.Weapon = weaponType;
 			chargeTime = weaponType == SatelliteWeapon.Laser ? random.Next(10, 70) : random.Next(60, 120);
 			shootSound = content.Load<SoundEffect>(SEPath);
-			//shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
-			//level.transparentEffects.Add(shieldEffect);
+			shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
+			level.transparentEffects.Add(shieldEffect);
 
 			positions = new List<Vector3>();
 			billboardStrip = new BillboardStrip(Level.graphicsDevice, content, content.Load<Texture2D>("Textures\\Lines\\Line1T1"), new Vector2(10, 200), positions);//Line1T1

@@ -21,6 +21,7 @@ namespace _3DRTSGame
 		protected EffectManager effectManager;
 		protected bool displayGrid;
 		protected RenderTarget2D maskLayer;
+		protected bool insertLoadingScreen;
 
 		public List<Object> Models { get; protected set; }
 		//public List<IRenderable>  { get; protected set; }
@@ -146,7 +147,9 @@ namespace _3DRTSGame
 			:base(privousScene)
 		{
 			Initialize();
-			Load();
+			if (!insertLoadingScreen) {
+				Load();
+			}
 		}
 		static Level()
 		{

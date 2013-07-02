@@ -7,11 +7,20 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
+using System.Threading;
 
 namespace _3DRTSGame
 {
 	public class Level4 : Level
 	{
+		private enum LevelState
+		{
+			Loading,
+			Ready
+		}
+		private LevelState currentState;
+		private bool loaded;
+
 		public Object Target { get; private set; }
 		public Object Ground { get; private set; }
 		public Object Teapot { get; private set; }
@@ -98,6 +107,8 @@ namespace _3DRTSGame
 		}
 		protected override void Initialize()
 		{
+			insertLoadingScreen = true;
+
 			base.Initialize();
 			player = new Player(this);
 			enemyManager = new EnemyManager(this);
@@ -125,12 +136,15 @@ namespace _3DRTSGame
             grid.GridSize = 64;;//32;
 			// Set the grid to draw on the x/z plane around the origin
 			grid.WorldMatrix = Matrix.Identity;
+
+
+			Thread loadingThread = new Thread(this.Load);
+			loadingThread.Priority = ThreadPriority.Highest;
+			loadingThread.Start();
 		}
 		public override void Load()
 		{
 			base.Load();
-
-			
 
 			// Set up the reference grid and sample camera
 			grid.LoadGraphicsContent(graphicsDevice);
@@ -140,11 +154,11 @@ namespace _3DRTSGame
 
 			// Initialize Satellites
 			// object poolにインスタンスは作成してあるが、levelのリストへエフェクトを追加するなどの処理が終ってないのでここで済ます。
-			foreach (Satellite s in ObjectPool.SatellitePool) {
+			/*foreach (Satellite s in ObjectPool.SatellitePool) {
 				if (s is ArmedSatellite) {
 					(s as ArmedSatellite).Initialize();
 				}
-			}
+			}*/
 
 			// Load stars
 			star = new Star(new Vector3(-500, 100, 500), graphicsDevice, content, StarType.G);
@@ -155,6 +169,7 @@ namespace _3DRTSGame
 
 			// Set up object pool
 			//LoadObjectPool();
+			ObjectPool.Load();
 
 			// Load planets
 			Planets = new List<Planet>();
@@ -205,9 +220,9 @@ namespace _3DRTSGame
 			//Models.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Enemies.Add(Models[Models.Count - 1]);
 			Fighters = new List<Fighter>();
-			//Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
+			Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Fighters.Add(new Fighter(new Vector3(100, 1000, 100), waterPlanet.Position, 20f, "Models\\fighter0"));
-			Fighters.Add(new Fighter(new Vector3(-100, -1000, -100), waterPlanet.Position, 20f, "Models\\fighter0"));
+			//Fighters.Add(new Fighter(new Vector3(-100, -1000, -100), waterPlanet.Position, 20f, "Models\\fighter0"));// 同軸上だと正しく移動しないので注意
 			//Fighters.Add(new Fighter(new Vector3(-2000, 50, -1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			foreach (Fighter f in Fighters) {
 				Enemies.Add(f);
@@ -255,7 +270,7 @@ namespace _3DRTSGame
 
 			// Special effects
 			EnergyRingEffect.game = game;
-			discoidEffect = new EnergyRingEffect(content, graphicsDevice, new Vector3(0, 0, 0), new Vector2(300));
+			//discoidEffect = new EnergyRingEffect(content, graphicsDevice, new Vector3(0, 0, 0), new Vector2(300));
 			EnergyShieldEffect.game = game;
 			/*//shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
 			//explosionTest = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, true, "Xml\\Particle\\particleExplosion0.xml", true);
@@ -264,6 +279,8 @@ namespace _3DRTSGame
 			bigExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
 			midExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
 			//lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));*/
+
+			loaded = true;
 		}
 
 		// 戻り値をNullable<Vector3>にしようと思ったけどできない
@@ -462,119 +479,141 @@ namespace _3DRTSGame
 			float elapsed = (float)gameTime.TotalGameTime.TotalSeconds;
 			count++;
 
-			player.Update();
-			enemyManager.Update(gameTime);
-			productionManager.Update(gameTime);
+			if (currentState == LevelState.Loading) {
+				if (loaded) currentState = LevelState.Ready;
+			} else {
+				player.Update();
+				enemyManager.Update(gameTime);
+				productionManager.Update(gameTime);
 
-			base.Update(gameTime);
+				base.Update(gameTime);
 
-			HandleInput();
-			camera.Update(gameTime);
-            renderer.Update(gameTime);
-            LightPosition = renderer.Lights[0].Position;
+				HandleInput();
+				camera.Update(gameTime);
+				renderer.Update(gameTime);
+				LightPosition = renderer.Lights[0].Position;
 
-            Sky.Update(gameTime);
-            sun.Update(gameTime);
-            sunCircle.Position = renderer.Lights[0].Position;
-            sunCircle.Update(gameTime);
+				Sky.Update(gameTime);
+				sun.Update(gameTime);
+				sunCircle.Position = renderer.Lights[0].Position;
+				sunCircle.Update(gameTime);
 
-            foreach (Object o in Models) {
-                if (o.IsAlive) o.Update(gameTime);
-            }
-            if (Models.Count > 100) {
-                //throw new Exception("そろそろModelsのDelete処理を書くこと");
-            }
-            foreach (Bullet b in Bullets) {
-                if (b.IsAlive) b.Update(gameTime);
-            }
+				foreach (Object o in Models) {
+					if (o.IsAlive) o.Update(gameTime);
+				}
+				if (Models.Count > 100) {
+					//throw new Exception("そろそろModelsのDelete処理を書くこと");
+				}
+				foreach (Bullet b in Bullets) {
+					if (b.IsAlive) b.Update(gameTime);
+				}
 
-            if (planet.IsAlive) planet.Update(gameTime);
+				if (planet.IsAlive) planet.Update(gameTime);
 
-            Collide();
+				Collide();
 
-            effectManager.Update(gameTime);
-            uiManager.Update(gameTime);
+				effectManager.Update(gameTime);
+				uiManager.Update(gameTime);
+			}
 		}
+
+		private void DrawScene(GameTime gameTime)
+		{
+
+		}
+		Texture2D loadingScreen;
 		public override void Draw(GameTime gameTime)
 		{
-			base.Draw(gameTime);
+			if (currentState == LevelState.Loading) {
+				Thread.Sleep(100);
 
-			// Initialize values (for debug)
-			ResetGraphicDevice();
-			float sunDepth = Vector3.Transform(sun.Position, camera.View).Z;
-			//sunDepth =   Vector3.Transform(Vector3.Transform(Vector3.Transform(sun.Position, sun.World), camera.View), camera.Projection).Z;
-			//float sunFrontDepth = Vector3.Transform(Vector3.Transform(sun.Position + (Vector3.Normalize(sun.Position - camera.CameraPosition) * 200), sun.world), camera.View).Z;
-            camera.FarPlaneDistance = 10000000;// もっと短くてよい
-
-
-			// Draw pre-passes
-			/*graphicsDevice.SetRenderTarget(maskLayer);
-			graphicsDevice.Clear(Color.White);
-			foreach (Object o in Models) {
-				//o.DrawMask(camera.View, camera.Projection, camera.Position, ref maskLayer, sunDepth);
-				if (camera.BoundingVolumeIsInView(o.transformedBoundingSphere)) {
-					o.DrawMask(camera.View, camera.Projection, camera.Position, ref maskLayer, sunDepth);
+				lock (graphicsDevice) {
+					spriteBatch.Begin();
+					//マスクを表示
+					spriteBatch.Draw(loadingScreen, game.GraphicsDevice.Viewport.Bounds, Color.White);
+					spriteBatch.DrawString(game.menuFont, count.ToString(), Vector2.Zero, Color.Green);
+					spriteBatch.End();
 				}
-			}
-			graphicsDevice.SetRenderTarget(null);*/
-			graphicsDevice.SetRenderTarget(maskLayer);
-			graphicsDevice.Clear(Color.White);
-			graphicsDevice.SetRenderTarget(null);
-			renderer.PreDraw();
-			sun.PreDraw(camera.View, camera.Projection);
-			graphicsDevice.Clear(Color.White);
+			} else {
+				base.Draw(gameTime);
+
+				// Initialize values (for debug)
+				ResetGraphicDevice();
+				float sunDepth = Vector3.Transform(sun.Position, camera.View).Z;
+				//sunDepth =   Vector3.Transform(Vector3.Transform(Vector3.Transform(sun.Position, sun.World), camera.View), camera.Projection).Z;
+				//float sunFrontDepth = Vector3.Transform(Vector3.Transform(sun.Position + (Vector3.Normalize(sun.Position - camera.CameraPosition) * 200), sun.world), camera.View).Z;
+				camera.FarPlaneDistance = 10000000;// もっと短くてよい
 
 
-			// Draw environment
-			ResetGraphicDevice();
-			Sky.Draw(camera.View, camera.Projection, camera.Position);
-			ResetGraphicDevice();
-			//sun.Draw(true, camera.View, camera.Projection, maskLayer);
-			ResetGraphicDevice();
-			sunCircle.Draw(false, camera.View, camera.Projection);
-			//planet.Draw(camera.View, Matrix.CreateScale(200) * Matrix.CreateTranslation(new Vector3(-300, 0, -200)), camera.Projection, camera.Position);
-			//planet.Draw(new Vector3(-300, 0, -200), camera.View, camera.Projection, camera.Position);
-			//if (planet.IsActive) planet.Draw(camera.View, camera.Projection, camera.Position);
-			//star.Draw(camera.View, camera.Projection);
-
-
-			// Draw objects
-			foreach (Object o in Models) {
-				if (o.IsAlive && camera.BoundingVolumeIsInView(o.transformedBoundingSphere)) {
-					if (o is ArmedSatellite) {
-						(o as ArmedSatellite).Draw(gameTime, camera.View, camera.Projection, camera.Position);
-					} else {
-						o.Draw(camera.View, camera.Projection, camera.Position);
+				// Draw pre-passes
+				/*graphicsDevice.SetRenderTarget(maskLayer);
+				graphicsDevice.Clear(Color.White);
+				foreach (Object o in Models) {
+					//o.DrawMask(camera.View, camera.Projection, camera.Position, ref maskLayer, sunDepth);
+					if (camera.BoundingVolumeIsInView(o.transformedBoundingSphere)) {
+						o.DrawMask(camera.View, camera.Projection, camera.Position, ref maskLayer, sunDepth);
 					}
 				}
-			}
-			foreach (Bullet b in Bullets) {
-				if (b.IsActive) b.Draw(camera);
-			}
+				graphicsDevice.SetRenderTarget(null);*/
+				graphicsDevice.SetRenderTarget(maskLayer);
+				graphicsDevice.Clear(Color.White);
+				graphicsDevice.SetRenderTarget(null);
+				renderer.PreDraw();
+				sun.PreDraw(camera.View, camera.Projection);
+				graphicsDevice.Clear(Color.White);
 
-			// Draw debug overlays
-			renderer.Draw(gameTime);
-			if (displayGrid) {
-				grid.ProjectionMatrix = camera.Projection;
-				grid.ViewMatrix = camera.View;
-				// draw the reference grid so it's easier to get our bearings
-				grid.Draw();
+
+				// Draw environment
+				ResetGraphicDevice();
+				Sky.Draw(camera.View, camera.Projection, camera.Position);
+				ResetGraphicDevice();
+				//sun.Draw(true, camera.View, camera.Projection, maskLayer);
+				ResetGraphicDevice();
+				sunCircle.Draw(false, camera.View, camera.Projection);
+				//planet.Draw(camera.View, Matrix.CreateScale(200) * Matrix.CreateTranslation(new Vector3(-300, 0, -200)), camera.Projection, camera.Position);
+				//planet.Draw(new Vector3(-300, 0, -200), camera.View, camera.Projection, camera.Position);
+				//if (planet.IsActive) planet.Draw(camera.View, camera.Projection, camera.Position);
+				//star.Draw(camera.View, camera.Projection);
+
+
+				// Draw objects
+				foreach (Object o in Models) {
+					if (o.IsAlive && camera.BoundingVolumeIsInView(o.transformedBoundingSphere)) {
+						if (o is ArmedSatellite) {
+							(o as ArmedSatellite).Draw(gameTime, camera.View, camera.Projection, camera.Position);
+						} else {
+							o.Draw(camera.View, camera.Projection, camera.Position);
+						}
+					}
+				}
+				foreach (Bullet b in Bullets) {
+					if (b.IsActive) b.Draw(camera);
+				}
+
+				// Draw debug overlays
+				renderer.Draw(gameTime);
+				if (displayGrid) {
+					grid.ProjectionMatrix = camera.Projection;
+					grid.ViewMatrix = camera.View;
+					// draw the reference grid so it's easier to get our bearings
+					grid.Draw();
+				}
+				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitX * 1000, 1, Color.Red);
+				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitY * 1000, 1, Color.Green);
+				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitZ * 1000, 1, Color.Blue);
+				DebugOverlay.Singleton.Draw(camera.Projection, camera.View);
+
+				// Draw effects
+				effectManager.Draw(gameTime, camera);
+
+				foreach (EnergyShieldEffect ese in transparentEffects) {
+					ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
+				}
+
+				// Draw UIs
+				productionManager.Draw(gameTime);
+				uiManager.Draw(gameTime);
 			}
-			DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitX * 1000, 1, Color.Red);
-			DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitY * 1000, 1, Color.Green);
-			DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitZ * 1000, 1, Color.Blue);
-			DebugOverlay.Singleton.Draw(camera.Projection, camera.View);
-
-			// Draw effects
-			effectManager.Draw(gameTime, camera);
-
-			foreach (EnergyShieldEffect ese in transparentEffects) {
-				ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
-			}
-
-			// Draw UIs
-			productionManager.Draw(gameTime);
-			uiManager.Draw(gameTime);
 		}
 
 
@@ -582,6 +621,9 @@ namespace _3DRTSGame
 			: base(previousScene)
 		{
 			displayGrid = true;
+
+			currentState = LevelState.Loading;
+			loadingScreen = content.Load<Texture2D>("Textures\\UI\\loading");
 		}
 	}
 }

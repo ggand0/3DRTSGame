@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using System.Threading;
 
 namespace _3DRTSGame
 {
@@ -174,7 +175,10 @@ namespace _3DRTSGame
 					// desired effect (from .fx file)  
 					mesh.MeshParts[i].Effect = terrain;
 				}
-				mesh.Draw();
+
+				//lock (graphicsDevice) {
+					mesh.Draw();// critical section
+				
 			}
 			graphics.SetRenderTarget(null);
 			Mercator = RenderTarget;
@@ -273,10 +277,10 @@ namespace _3DRTSGame
 			}
 
 			if (renderType != PlanetRenderType.MultiColored)
-				using (Stream stream = File.OpenWrite("blendMap.png")) {
+				/*using (Stream stream = File.OpenWrite("blendMap.png")) {
 					BlendMap.SaveAsPng(stream, BlendMap.Width, BlendMap.Height);
 					stream.Position = 0;
-				}
+				}*/
 
 
 			for (int y = 0; y < TextureHeight; y++) {
@@ -531,9 +535,11 @@ namespace _3DRTSGame
 			this.graphicsDevice = graphics;
 			this.StarPosition = starPosition;
 			Position = position;
+
+			lock (graphicsDevice) {
+				LoadContent(content);
+			}
 			
-			
-			LoadContent(content);
 			// shadwo pre-draw用
 			basicEffect = new BasicEffect(graphics);
 			simpleEffect = content.Load<Effect>("Lights\\SimpleEffect");

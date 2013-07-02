@@ -85,8 +85,8 @@ namespace _3DRTSGame
 			MENU_ACTIONS
 			= new Action<TitleScene>[(int)TitleMenu.COUNT]{
             (TitleScene m)=>{//START_NEW_GAME
-				//PushScene(new Level4(this));
-				PushScene(new LoadingScene(this));
+				PushScene(new Level4(this));
+				//PushScene(new LoadingScene(this));
             },
              (TitleScene m)=>{//EXIT
                  game.Exit();
