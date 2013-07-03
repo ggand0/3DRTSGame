@@ -297,7 +297,7 @@ namespace _3DRTSGame
 			billboardStrip = new BillboardStrip(Level.graphicsDevice, content, content.Load<Texture2D>("Textures\\Lines\\Line1T1"), new Vector2(10, 200), positions);//Line1T1
 
 			visibleEnemies = new List<Object>();
-			SensorSphere = new BoundingSphere(Position, 150);//1000
+			SensorSphere = new BoundingSphere(Position,500);//1000 150
 			RenderBoudingSphere = false;
 
 

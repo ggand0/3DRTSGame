@@ -93,7 +93,6 @@ Content\Models\UtahTeapot.xnb
 Content\Models\UtahTeapotDef.xnb
 Content\Models\WaterMesh.xnb
 Content\Models\WaterMeshRotated.xnb
-Content\Models\Asteroid.xnb
 Content\Models\Ground.xnb
 Content\Models\pea_proj.xnb
 Content\Models\sphere.xnb
@@ -266,3 +265,4 @@ Content\Textures\UI\Icons\world.xnb
 Content\Textures\UI\Icons\move.xnb
 Content\Textures\UI\Icons\halt.xnb
 Content\Textures\UI\loading.xnb
+Content\Models\Asteroid.xnb

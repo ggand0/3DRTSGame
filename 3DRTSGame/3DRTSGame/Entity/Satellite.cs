@@ -14,7 +14,7 @@ namespace _3DRTSGame
 		private static readonly float DEF_REVOLUTION_SPEED = 0.25f;
 
 		public bool Rotate { get; protected set; }
-		public bool Revolution { get; protected set; }
+		//public bool Revolution { get; protected set; }
 		/// <summary>
 		/// Means planet position
 		/// </summary>
@@ -24,7 +24,10 @@ namespace _3DRTSGame
 		public float Pitch { get; protected set; }
 		private float rotationSpeed, revolutionSpeed, revolutionAngle;
 		protected BillboardSystem uiRing;
+
+		// プレイヤーから操作できるプロパティ：
 		public bool RevolutionClockwise { get; set; }
+		public bool Revolution { get; set; }
 
 		private Vector3 initialPoint;
 		private float CalcInitialAngle()

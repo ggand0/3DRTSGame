@@ -56,10 +56,15 @@ namespace _3DRTSGame
 			switch (name) {
 				default:
 					break;
+				case "halt":
+					(currentSelection as Satellite).Revolution = false;
+					break;
 				case "ccw":
+					(currentSelection as Satellite).Revolution = true;
 					(currentSelection as Satellite).RevolutionClockwise = false;
 					break;
 				case "cw":
+					(currentSelection as Satellite).Revolution = true;
 					(currentSelection as Satellite).RevolutionClockwise = true;
 					break;
 			}

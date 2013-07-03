@@ -342,6 +342,7 @@ namespace _3DRTSGame
 		/// <summary>
 		/// Sets the specified effect parameter to the given effect, if it
 		/// has that parameter
+		/// ＜Colorの場合は予めToVector4して渡すこと！！＞
 		/// </summary>
 		/// <param name="effect"></param>
 		/// <param name="paramName"></param>
@@ -360,6 +361,8 @@ namespace _3DRTSGame
 				effect.Parameters[paramName].SetValue((Matrix)val);
 			else if (val is Texture2D)
 				effect.Parameters[paramName].SetValue((Texture2D)val);
+			/*else if (val is Color)
+				effect.Parameters[paramName].SetValue((Color)val.ToVector4());*/
 		}
 		public virtual void Draw(GraphicsDevice device)
 		{
@@ -470,13 +473,14 @@ namespace _3DRTSGame
 		{
 		}
 		public Object(float scale, Vector3 position)
+			: base()
 		{
 			this.Position = position;
 			this.Scale = scale;
 
 			Material = new _3DRTSGame.Material();
-			random = new Random();
-			IsActive = true;
+			//random = new Random();
+			//IsActive = true;
 			RenderBoudingSphere = false;
 			RotationMatrix = Matrix.Identity;
 			Load();
@@ -485,7 +489,7 @@ namespace _3DRTSGame
 			MaxHitPoint = 1;
 		}
 
-		protected Random random;
+		
 		public Object(string fileName)
 			: this (Vector3.Zero, fileName)
 		{
@@ -495,12 +499,13 @@ namespace _3DRTSGame
 		{
 		}
 		public Object(Vector3 position, float scale, string fileName)
+			:base()
 		{
 			this.Position = position;
 			this.Scale = scale;
 
-			random = new Random();
-			IsActive = true;
+			//random = new Random();
+			//IsActive = true;
 			RenderBoudingSphere = false;
 			Load(fileName);
 			RotationMatrix = Matrix.Identity;

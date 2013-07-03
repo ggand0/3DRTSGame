@@ -19,6 +19,8 @@ namespace _3DRTSGame
 		/// (Yaw, Pitch, Roll)
 		/// </summary>
 		public Vector3 Rotation { get; protected set; }
+		public bool Stational { get; set; }
+		public bool RimLighting { get; set; }
 
 		private Effect lightingEffect;
 		private Vector3 rotationSpeed = new Vector3(0.1f,0.04f, 0);
@@ -27,23 +29,29 @@ namespace _3DRTSGame
 		private static readonly float DEF_REVOLUTION_SPEED = 0.05f;//0.0005f;
 		private float revolutionAngle, revolutionSpeed;
 
-		/// <summary>
-		/// Cloneメソッドを基底クラスで実装した場合、派生クラスで実装し直す必要あり
-		/// </summary>
-		/// <returns></returns>
-        public override object Clone()
-        {
-            Asteroid cloned = (Asteroid)MemberwiseClone();
+		private Matrix BuildRotationMatrix()
+		{
+			float yaw = Utility.NextDouble(random, 0, 360);
+			float pitch = Utility.NextDouble(random, 0, 360);
+			float roll = Utility.NextDouble(random, 0, 360);
 
-            if (lightingEffect != null) {
-                cloned.lightingEffect = lightingEffect.Clone();
-            }
+			return Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
+		}
+		private float CalcInitialAngle()
+		{
+			float radius = (Position - Destination).Length();
+			Vector3 velocity = new Vector3((float)Math.Cos(revolutionAngle), 0,
+					(float)Math.Sin(revolutionAngle));
+			Vector3 def = Destination + velocity * radius;
+			Vector3 v1 = Vector3.Normalize(Destination - def);
+			Vector3 v2 = Vector3.Normalize(Destination - Position);
 
-            return cloned;
-        }
+			//return (float)Math.Acos(Vector3.Dot(v1, v2));
+			return MathHelper.ToRadians(1440);
+		}
 		protected override void UpdateWorldMatrix()
 		{
-			_world = Matrix.CreateScale(Scale) * Matrix.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z) *
+			_world = Matrix.CreateScale(Scale) * RotationMatrix *//Matrix.CreateFromYawPitchRoll(Rotation.X, Rotation.Y, Rotation.Z) *
 				Matrix.CreateTranslation(Position);
 		}
 		protected virtual void Move(int pattern)
@@ -68,20 +76,22 @@ namespace _3DRTSGame
 					break;
 			}
 		}
-		private float CalcInitialAngle()
-		{
-			float radius = (Position - Destination).Length();
-			Vector3 velocity = new Vector3((float)Math.Cos(revolutionAngle), 0,
-					(float)Math.Sin(revolutionAngle));
-			Vector3 def = Destination + velocity * radius;
-			Vector3 v1 = Vector3.Normalize(Destination - def);
-			Vector3 v2 = Vector3.Normalize(Destination - Position);
+		
 
-			//return (float)Math.Acos(Vector3.Dot(v1, v2));
-			return MathHelper.ToRadians(1440);
-		}
+		/// <summary>
+		/// Cloneメソッドを基底クラスで実装した場合、派生クラスで実装し直す必要あり
+		/// </summary>
+		/// <returns></returns>
+        public override object Clone()
+        {
+            Asteroid cloned = (Asteroid)MemberwiseClone();
 
+            if (lightingEffect != null) {
+                cloned.lightingEffect = lightingEffect.Clone();
+            }
 
+            return cloned;
+        }
 		public void Damage()
 		{
 			HitPoint--;
@@ -100,7 +110,7 @@ namespace _3DRTSGame
 				Vector3 tmp = Center + velocity * radius;
 				Position = tmp;
 			*/
-			Move(1);
+			if (!Stational) Move(1);
 
 			UpdateWorldMatrix();
 			transformedBoundingSphere = new BoundingSphere(
@@ -114,11 +124,24 @@ namespace _3DRTSGame
 			blinkCount++;
 			if (blinkCount % 5 == 0) e += 60f;//30f;//.02f;
 			float dColor = (float)Math.Sin(e * 8) / 2.0f + 0.5f;
-			SetEffectParameter(lightingEffect, "AccentColor", Color.Red);
+			//SetEffectParameter(lightingEffect, "AccentColor", (Color.Red * dColor).ToVector4());
+			SetEffectParameter(lightingEffect, "AccentColor", (Color.Transparent).ToVector4());
+			SetEffectParameter(lightingEffect, "DoShadowMapping", false);
+			SetEffectParameter(lightingEffect, "DoRimLighting", true);
+			if (RimLighting) {
+				//Vector3 centerToCamera = Vector3.Normalize(CameraPosition - Position);
+				//SetEffectParameter(lightingEffect, "CenterToCamera", centerToCamera);
+
+				// 必ずSetModelEffectするときにCloneしないでfalseにしておく。
+				// otherwise参照されないのでここでパラメータ変えても全く反映されない
+				SetEffectParameter(lightingEffect, "CenterToCamera", Vector3.Negate(level.camera.Direction));
+			}
 
 			base.Draw(View, Projection, CameraPosition);
 		}
 
+
+		#region Constructors
 		public void Initialize()
 		{
 			revolutionAngle = CalcInitialAngle();
@@ -128,20 +151,39 @@ namespace _3DRTSGame
 		{
 		}
 		public Asteroid(Vector3 position, Vector3 destination, float scale, float speed, string fileName)
+			: this(position, destination, scale, speed, fileName, false)
+		{
+		}
+		public Asteroid(Vector3 position, Vector3 destination, float scale, float speed, string fileName, bool rimLighting)
 			: base(position, scale, fileName)
 		{
 			this.Destination = destination;
+			this.RimLighting = rimLighting;
 			Speed = speed;
+
+
 			//Rotation = new Vector3((float)random.NextDouble() / 200f, (float)random.NextDouble() / 200f, (float)random.NextDouble() / 200f);
 
 			lightingEffect = content.Load<Effect>("Lights\\AsteroidLightingEffect");	// load Prelighting Effect
-			SetEffectParameter(lightingEffect, "AccentColor", Color.Red);
-			// Accent Colorを後で変えたいので、変更をそのまま反映させるためfalseにする
-			SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
+			SetEffectParameter(lightingEffect, "AccentColor", Color.Red.ToVector4());
+			SetEffectParameter(lightingEffect, "DoShadowMapping", false);
+			SetEffectParameter(lightingEffect, "TextureEnabled", true);
+			SetEffectParameter(lightingEffect, "DoRimLighting", rimLighting);
+			if (rimLighting) {
+				SetEffectParameter(lightingEffect, "RimColor", Color.Red.ToVector4());
+				SetEffectParameter(lightingEffect, "CenterToCamera", level.camera.Direction);
+			}
+
+
+			// Accent Colorを後で変えたいので、変更をそのまま反映させるためfalseにする！
+			//SetModelEffect(lightingEffect, true);
+			SetModelEffect(lightingEffect, false);
 
 			revolutionAngle = CalcInitialAngle();
+			RotationMatrix = BuildRotationMatrix();
 			MaxHitPoint = 15;
 			HitPoint = MaxHitPoint;
 		}
+		#endregion
 	}
 }

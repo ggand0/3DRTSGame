@@ -8,6 +8,8 @@ namespace _3DRTSGame
 {
 	public class Drawable
 	{
+		protected Random random = new Random();
+
 		public bool IsActive { get; set; }
 		public bool IsAlive { get; set; }
 		public Vector3 Position { get; set; }

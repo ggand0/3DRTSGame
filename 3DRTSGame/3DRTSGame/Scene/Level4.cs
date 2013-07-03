@@ -43,8 +43,6 @@ namespace _3DRTSGame
         private Random random;
         private List<ExplosionEffect> ex = new List<ExplosionEffect>();
 		private int count;
-		//ParticleSettings setting;
-        private LaserBillboard lb;
         private Matrix RotationMatrix = Matrix.Identity;
 		private EnemyManager enemyManager;
 		private UIManager uiManager;
@@ -57,6 +55,7 @@ namespace _3DRTSGame
 		private static readonly int BIG_EXPLOSION_EFFECT_NUM = 10;
 		private static readonly int MAX_SATELLITE_NUM = 10;*/
 		private ExplosionEffect effectTmp;
+		private AsteroidBelt asteroidBelt;
 
 
         /// <summary>
@@ -167,6 +166,8 @@ namespace _3DRTSGame
 			sun = new Sun(new Vector3(-2000, 500, 2000), graphicsDevice, content, spriteBatch);
 			sunCircle = new Sun(LightPosition, graphicsDevice, content, spriteBatch);
 
+			asteroidBelt = new AsteroidBelt(this, Vector3.Zero);
+
 			// Set up object pool
 			//LoadObjectPool();
 			ObjectPool.Load();
@@ -236,7 +237,7 @@ namespace _3DRTSGame
 			shadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
 			Effect lightingEffect = content.Load<Effect>("PPModel");	// load Prelighting Effect
 			foreach (Object o in Models) {
-				o.RenderBoudingSphere = false;
+				//o.RenderBoudingSphere = false;
 				if (!(o is Asteroid)) {
 					o.SetModelEffect(shadowEffect, true);
 				}
@@ -498,6 +499,7 @@ namespace _3DRTSGame
 				sunCircle.Position = renderer.Lights[0].Position;
 				sunCircle.Update(gameTime);
 
+				asteroidBelt.Update(gameTime);
 				foreach (Object o in Models) {
 					if (o.IsAlive) o.Update(gameTime);
 				}
@@ -577,6 +579,7 @@ namespace _3DRTSGame
 
 
 				// Draw objects
+				asteroidBelt.Draw(gameTime);
 				foreach (Object o in Models) {
 					if (o.IsAlive && camera.BoundingVolumeIsInView(o.transformedBoundingSphere)) {
 						if (o is ArmedSatellite) {
@@ -589,6 +592,7 @@ namespace _3DRTSGame
 				foreach (Bullet b in Bullets) {
 					if (b.IsActive) b.Draw(camera);
 				}
+
 
 				// Draw debug overlays
 				renderer.Draw(gameTime);

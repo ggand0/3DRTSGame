@@ -80,7 +80,11 @@ namespace _3DRTSGame
 		private BasicEffect basicEffect;
 		private Effect simpleEffect;
 
+		private bool renderOrbitalLine = true;
+		private BillboardStrip orbitalLine;
 
+
+		
 		protected virtual void LoadContent(ContentManager content)
 		{
 			base.Load("Models\\sphere2");
@@ -91,6 +95,21 @@ namespace _3DRTSGame
 			//GenerateTags();
 			SetModelEffect(draw, false);
 			BuildPerm(graphicsDevice);
+
+
+			// 軌道の描画オブジェクトのロード
+			/*List<Vector3> orbitalPositions = new List<Vector3>();
+			float initialAngle = MathHelper.ToDegrees(Utility.CalcInitialAngle(Position, StarPosition, 0));
+			//for (float angle = initialAngle; angle < 360; angle += 10) {
+			for (float angle = initialAngle; angle < 720; angle += 10) {
+				Vector3 velocity = new Vector3((float)Math.Cos(MathHelper.ToRadians(angle)), 0,
+					(float)Math.Sin(MathHelper.ToRadians(angle)));
+				orbitalPositions.Add(StarPosition + (Position - StarPosition).Length() * velocity);
+			}
+			orbitalLine = new BillboardStrip(graphicsDevice, content, content.Load<Texture2D>("Textures\\Lines\\Line1T1"), new Vector2(500), orbitalPositions);
+			for (int i = 0; i < orbitalPositions.Count-1; i++) {
+				orbitalLine.AddVertices();
+			}*/
 		}
 
 		/// <summary>
@@ -398,7 +417,6 @@ namespace _3DRTSGame
 		}
 		public override void Draw(Matrix View, Matrix Projection, Vector3 CameraPosition)
 		{
-
 			/*//Matrix wvp = World * View * Projection;
 			Matrix World = Matrix.CreateScale(p_radius) * Matrix.CreateRotationY(roll) * Matrix.CreateRotationX(pitch);
 				//* Matrix.CreateTranslation(Position);
@@ -491,7 +509,13 @@ namespace _3DRTSGame
 					}
 					mesh.Draw();
 				}
+
+				if (renderOrbitalLine) {
+					orbitalLine.Draw(View, Projection, level.camera.Up, level.camera.Right, level.camera.Position);
+				}
 			}
+			
+
 			//graphics.RenderState.CullMode = CullMode.None;
 			graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 			graphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -519,6 +543,8 @@ namespace _3DRTSGame
 			transformedBoundingSphere = new BoundingSphere(
 				Vector3.Transform(Model.Meshes[0].BoundingSphere.Center, _world)
 				, Model.Meshes[0].BoundingSphere.Radius * _world.Forward.Length());
+
+			if (orbitalLine != null) orbitalLine.Update(gameTime);
 		}
 		#region Constructors
 		public Planet(GraphicsDevice graphics, ContentManager content)
@@ -547,6 +573,7 @@ namespace _3DRTSGame
 
 			IsActive = true;
 			Scale = a_radius;
+			renderOrbitalLine = false;
 		}
 		#endregion
 	}

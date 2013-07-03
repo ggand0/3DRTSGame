@@ -3,16 +3,12 @@ float4x4 View;
 float4x4 Projection;
 
 texture BasicTexture;
-// テクスチャの色をtex2D関数を使って取得するために、
-// テクスチャからどのように色を取り出す（サンプルする）かを表すサンプラを宣言しなければならない：
 sampler BasicTextureSampler = sampler_state {
 	texture = <BasicTexture>;
 
 	MinFilter = Anisotropic;// 異方性フィルタ
 	MagFilter = Anisotropic;
 	MipFilter = Linear;		// Mip-mapping
-	// U軸及びV軸方向のテクスチャアドレッシングモード（address mode）。サイズを変えた時（座標に(0, 1)を超える値を与えた時）の振る舞いで、
-	// clampなら引き伸ばされ、wrapなら位置が変わるだけ？
 	AddressU = Wrap;
 	AddressV = Wrap;
 };
@@ -21,12 +17,13 @@ float3 DiffuseColor = float3(1, 1, 1);
 float3 AmbientLightColor = float3(.2, .2, .2);
 float3 AmbientColor = float3(.2, .2, .2);
 float3 LightDirection = float3(1, 1, 1);
+//float3 LightColor = float3(0.5, 0.5, 0.5);
 float3 LightColor = float3(0.9, 0.9, 0.9);
 float SpecularPower = 32;
 float3 SpecularColor = float3(1, 1, 1);
 float3 CameraPosition;
 
-float4 AccentColor;
+float4 AccentColor = float4(1, 1, 1, 1);
 
 
 #include "..//PPShared.vsi"
@@ -47,6 +44,13 @@ float ShadowFarPlane;
 float ShadowMult = 0.3f;
 float ShadowBias =  0.001f;
 
+// Rim lighting
+bool DoRimLighting = false;
+float4 RimColor;
+float RimIntensity = 0.9f;         // Intensity of the rim light
+float3 CenterToCamera;
+float Shinniness = 0.5f;
+
 struct VertexShaderInput
 {
     float4 Position : POSITION0;
@@ -64,6 +68,7 @@ struct VertexShaderOutput
 	float3 Normal : TEXCOORD1;
 	float3 ViewDirection : TEXCOORD2;
 	float4 ShadowScreenPosition : TEXCOORD3;
+	float3 WorldPosition : TEXCOORD4;
 };
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
@@ -78,14 +83,13 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     // TODO: ここで頂点シェーダー コードを追加します。
 	output.UV = input.UV;// テクスチャを貼るだけなので場所は変えない
 	output.ViewDirection = worldPosition - CameraPosition;
-
+	output.WorldPosition = mul(input.Position, World);
 
 	output.ShadowScreenPosition = mul(mul(input.Position, World),
 		mul(ShadowView, ShadowProjection));
 
     return output;
 }
-
 
 
 float2 sampleShadowMap(float2 UV)
@@ -108,12 +112,14 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		// 対応するピクセルのテクスチャの色を持ってくるためにtex2D関数を使用
 		color *= tex2D(BasicTextureSampler, input.UV);
 	}
-	// add lighter color for asteroid
-	//color += float3(0.1f, 0.1f, 0.1f);
-	color += float3(0.3f, 0.3f, 0.3f);
+	// add lighter color since asteroid model has dark color(hard to see with def value).
+	color += float3(0.1f, 0.1f, 0.1f);
 	//color += AccentColor * 0.2f;
+	//color *= AccentColor;
+
 
 	// Start with ambient lighting
+	// Scaleが小さい場合宇宙空間の背景では見えないため、単にモデル全体を明るくすることにした
 	float3 lighting = AmbientColor;
 	float3 lightDir = normalize(LightDirection);
 	float3 normal = normalize(input.Normal);
@@ -126,12 +132,26 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	// Add specular highlights
 	lighting += pow(saturate(dot(refl, view)), SpecularPower) * SpecularColor;
 
-	// Scaleが小さい場合宇宙空間の背景では見えないため、単にモデル全体を明るくすることにした
-	//float3 lighting = float3(1,1,1);
+
+	// Rim lighting
+	float4 rim;
+	if (DoRimLighting) {
+		//norm = normalize(input.Normal);
+
+		float3 viewDir = normalize(CameraPosition - input.WorldPosition);
+		//float crossValue = dot(input.ViewDirection, CenterToCamera);// CenterToCameraが0のままェ...
+		//float crossValue = dot(viewDir, CenterToCamera);
+		float crossValue = dot(viewDir, normal);
+
+		rim = pow(1 - crossValue, 1.5f) * RimColor * RimIntensity;
+		//rim = pow(saturate(1 - crossValue), 1.5f) * RimColor * RimIntensity;
+		//lighting += rim;
+		//color += rim;
+	}
 
 
 	float shadow = 1;
-	if (DoShadowMapping) {
+	/* if (DoShadowMapping) {
 		float2 shadowTexCoord = postProjToScreen(input.ShadowScreenPosition)
 			+ halfPixel();
 		float ShadowBias = 0.001f;//0.001f
@@ -160,15 +180,18 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 			shadow = clamp(max(lit_factor, p), ShadowMult, 1.0f);
 		}
-	}
+	}*/
 
 
 	// Calculate final color
-	float3 output = saturate(lighting) * color * shadow;
-	float4 d = float4(0,0,0,0);
-	d += AccentColor;
-	//return float4(1,0,0,1);
-	return AccentColor.rgba;
+	//float3 output = saturate(lighting) * color * shadow;
+	//float3 output = rim;
+	float3 output = saturate(lighting) * color * shadow + rim;
+	return float4(output, 1);
+
+	//return float4(1,0,0,1);//ok
+	//return AccentColor;	// ng
+	//return float4(AccentColor.r, AccentColor.g, AccentColor.b, AccentColor.a);	// ng
 }
 
 technique Technique1

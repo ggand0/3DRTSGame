@@ -104,6 +104,7 @@
     <Compile Include="Core\ObjectPool.cs" />
     <Compile Include="Core\Player.cs" />
     <Compile Include="Core\ProductionManager.cs" />
+    <Compile Include="Core\Utility.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Effect\EffectManager.cs" />
     <Compile Include="Effect\EnergyRingEffect.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Misc\KeyInput.cs" />
     <Compile Include="Misc\MouseInput.cs" />
     <Compile Include="Planet\Asteroid.cs" />
+    <Compile Include="Planet\AsteroidBelt.cs" />
     <Compile Include="Planet\ChainedRenderTarget.cs" />
     <None Include="Planet\Cloud Generation\Flow.cs" />
     <None Include="Planet\Cloud Generation\FrictionMap.cs" />
@@ -161,6 +163,7 @@
     <Compile Include="Planet\IcePlanet.cs" />
     <Compile Include="Planet\MoltenPlanet.cs" />
     <Compile Include="Planet\Planet.cs" />
+    <Compile Include="Planet\PlanetarySystem.cs" />
     <Compile Include="Planet\RenderTargetState.cs" />
     <Compile Include="Planet\RockPlanet.cs" />
     <Compile Include="Planet\Star.cs" />
