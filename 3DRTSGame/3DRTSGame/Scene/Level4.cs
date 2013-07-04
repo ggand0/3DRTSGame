@@ -137,9 +137,12 @@ namespace _3DRTSGame
 			grid.WorldMatrix = Matrix.Identity;
 
 
-			Thread loadingThread = new Thread(this.Load);
-			loadingThread.Priority = ThreadPriority.Highest;
-			loadingThread.Start();
+			Thread loadingThread0 = new Thread(this.Load);
+			loadingThread0.Priority = ThreadPriority.Highest;
+			loadingThread0.Start();
+            Thread loadingThread1 = new Thread(ObjectPool.Load);
+            loadingThread1.Priority = ThreadPriority.Highest;
+            loadingThread1.Start();
 		}
 		public override void Load()
 		{
@@ -170,7 +173,7 @@ namespace _3DRTSGame
 
 			// Set up object pool
 			//LoadObjectPool();
-			ObjectPool.Load();
+			//ObjectPool.Load();
 
 			// Load planets
 			Planets = new List<Planet>();
@@ -194,7 +197,7 @@ namespace _3DRTSGame
 			// Load asteroids
 			random = new Random();
 			Asteroids = new List<Asteroid>();
-			AddAsteroids(5, 2000);
+			//AddAsteroids(5, 2000);
 			/*foreach (Asteroid o in Asteroids) {
 				Models.Add(o);
 			}*/
@@ -281,6 +284,9 @@ namespace _3DRTSGame
 			midExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
 			//lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));*/
 
+            while (true) {
+                if (ObjectPool.LOADED) break;
+            }
 			loaded = true;
 		}
 

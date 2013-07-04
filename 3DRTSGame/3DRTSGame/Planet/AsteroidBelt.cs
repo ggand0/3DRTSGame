@@ -8,7 +8,7 @@ namespace _3DRTSGame
 {
 	public class AsteroidBelt : Drawable
 	{
-		private static int ASTEROID_NUM = 200;
+		private static int ASTEROID_NUM = 30;//100だとCLoneにしても30秒以上かかる
 		private static Level level;
 
 		public List<Asteroid> Asteroids { get; private set; }
@@ -25,13 +25,17 @@ namespace _3DRTSGame
 		private void Load()
 		{
 			Asteroids = new List<Asteroid>();
+            Asteroid a = new Asteroid(Vector3.Zero, Vector3.Zero, 0.05f, 0, "Models\\Asteroid", true);
 			for (int i = 0; i < ASTEROID_NUM; i++) {
 				Vector3 pos = RandomRingPosition(Position, 3000, 3500);
+                a.Position = pos;
 				//Asteroids.Add(new Asteroid(pos, 0.05f, "Models\\Asteroid"));
-				Asteroids.Add(new Asteroid(pos, Vector3.Zero, 0.05f, 0, "Models\\Asteroid", true));
+
+				//Asteroids.Add(new Asteroid(pos, Vector3.Zero, 0.05f, 0, "Models\\Asteroid", true));
+                Asteroids.Add((Asteroid)a.Clone());
 			}
-			foreach (Asteroid a in Asteroids) {
-				a.Stational = true;
+			foreach (Asteroid aa in Asteroids) {
+				aa.Stational = true;
 			}
 		}
 
