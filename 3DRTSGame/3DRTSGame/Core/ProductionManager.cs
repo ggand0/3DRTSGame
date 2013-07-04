@@ -13,6 +13,8 @@ namespace _3DRTSGame
 	/// </summary>
 	public class ProductionManager
 	{
+		private static float DEF_SPAWN_HEIGHT = 0;
+
 		private Level4 level;
 		private Player player;
 
@@ -64,9 +66,8 @@ namespace _3DRTSGame
 			Vector3 direction = farPoint - nearPoint;
 			direction.Normalize();
 			Ray pickRay = new Ray(nearPoint, direction);
-			Plane planeXZ = new Plane(Vector3.Up, 0);
-			float spawnHeight = -200;
-			Plane planeGround = new Plane(Vector3.Up, -spawnHeight);
+			//Plane planeXZ = new Plane(Vector3.Up, 0);
+			Plane planeGround = new Plane(Vector3.Up, -DEF_SPAWN_HEIGHT);
 
 			return GetRayPlaneIntersectionPoint(pickRay, planeGround);
 		}
@@ -86,6 +87,11 @@ namespace _3DRTSGame
 				currentUIModel = uiModels[currentSelection];
 
 			}
+			if (isDragging) {// && !UnitPanel.IsMouseInside()) {
+				currentUIModel.Position = Get3DMousePoint();
+				currentUIModel.World = Matrix.CreateScale(currentUIModel.Scale) * Matrix.CreateTranslation(currentUIModel.Position);
+				//uiModel.Update(gameTime);
+			}
 			if (isDragging && MouseInput.IsOnButtonUpL() && CanDeploy()) {
 				isDragging = false;
 
@@ -96,9 +102,11 @@ namespace _3DRTSGame
 				//level.Models[level.Models.Count - 1].RenderBoudingSphere = false;
 				Satellite tmpSatellite = ObjectPool.SatellitePool.Dequeue();
 				//tmpSatellite.Position = intersectionPoint;
-				tmpSatellite.Initialize(intersectionPoint);
+				tmpSatellite.Initialize(intersectionPoint, level.TargetPlanets[0].Position);// いずれ任意の惑星に。
 				level.Models.Add(tmpSatellite);
 				level.Satellites.Add(tmpSatellite);
+
+				player.UseMoney(tmpSatellite);
 			}
 		}
 		public void Update(GameTime gameTime)
@@ -112,11 +120,7 @@ namespace _3DRTSGame
 		}
 		public void Draw(GameTime gameTime)
 		{
-			if (isDragging) {
-				currentUIModel.Position = Get3DMousePoint();
-				currentUIModel.World = Matrix.CreateScale(currentUIModel.Scale) * Matrix.CreateTranslation(currentUIModel.Position);
-				//uiModel.Update(gameTime);
-
+			if (isDragging && !UnitPanel.IsMouseInside()) {
 				Camera c = level.camera;
 				currentUIModel.Draw(c.View, c.Projection, c.Position);
 
@@ -129,6 +133,7 @@ namespace _3DRTSGame
 		public ProductionManager(Level4 level)
 		{
 			this.level = level;
+			this.player = level.player;
 
 			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
 						new Vector2(512), new Vector3[] {Vector3.Zero });//currentUIModel.Position

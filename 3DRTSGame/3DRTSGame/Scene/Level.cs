@@ -78,7 +78,8 @@ namespace _3DRTSGame
 
 			EnergyShieldEffect.level = this;
 			BoundingSphereRenderer.level = this;
-			Object.level = this;
+			//Object.level = this;
+			Drawable.level = this;
 			PrelightingRenderer.level = this;
 			Water.level = this;
 			GlassEffect.level = this;

@@ -243,9 +243,19 @@ namespace _3DRTSGame
 			UpdateLocus();
 			billboardStrip.Update(gameTime);
 		}
+
+
 		int stripCount;
+		private void SetEffectParameters()
+		{
+			SetEffectParameter(shadowEffect, "DoRimLighting", true);
+			SetEffectParameter(shadowEffect, "RimColor", Color.Blue.ToVector4());
+			//SetEffectParameter(shadowEffect, "CameraDirection", level.camera.Direction);/**/
+			SetEffectParameter(shadowEffect, "CameraPosition", level.camera.Position);
+		}
 		public void Draw(GameTime gameTime, Matrix View, Matrix Projection, Vector3 CameraPosition)
 		{
+			SetEffectParameters();
 			base.Draw(View, Projection, CameraPosition);
 
 			billboardStrip.Draw(View, Projection, level.camera.Up, level.camera.Right, CameraPosition);

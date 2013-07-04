@@ -43,18 +43,15 @@ namespace _3DRTSGame
 
 			//return Vector3.Dot(v1, v2) - (float)Math.PI/2f;
 			//return (float)Math.Acos(Vector3.Dot(v1, v2));// 正規化されているので距離で割る必要は無いはず
-			float angle = (float)Math.Acos(Vector3.Dot(v1, v2));
-			return def.Z > Position.Z ? -angle : angle;// 角度の大きさしか分からないのでこれで調整
+			//float angle = (float)Math.Acos(Vector3.Dot(v1, v2));
+
+			//atan2(mouseY - cirleCenterY, circleCenterX - mouseX);
+			float angle = (float)Math.Atan2(Position.Z - Center.Z, Position.X - Center.X);
+
+			//return def.Z > Position.Z ? -angle : angle;// 角度の大きさしか分からないのでこれで調整
+			return angle;
 		}
 
-		/// <summary>
-		/// object pooling用に、外部から初期化できるようなメソッド
-		/// </summary>
-		public void Initialize(Vector3 position)
-		{
-			this.Position = position;
-			revolutionAngle = CalcInitialAngle();
-		}
 		public override void Update(GameTime gameTime)
 		{
 			if (Rotate) {
@@ -92,6 +89,16 @@ namespace _3DRTSGame
 				* Matrix.CreateTranslation(Position);
 		}
 
+		/// <summary>
+		/// object pooling用に、外部から初期化できるようなメソッド
+		/// </summary>
+		public void Initialize(Vector3 position, Vector3 center)
+		{
+			this.Position = position;
+			//this.Center = center;
+			this.Center = new Vector3(center.X, position.Y, center.Z);
+			revolutionAngle = CalcInitialAngle();
+		}
 		#region Constructors
 		public Satellite(Vector3 position, float scale, string fileName)
 			: base(position)
@@ -105,7 +112,8 @@ namespace _3DRTSGame
 			:base(position, scale, fileName)
 		{
 			this.Revolution = revolution;
-			this.Center = center;
+			//this.Center = center;
+			this.Center = new Vector3(center.X, position.Y, center.Z);
 			this.initialPoint = position;
 			revolutionAngle = CalcInitialAngle();
 			RevolutionClockwise = true;

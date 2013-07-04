@@ -228,7 +228,7 @@ namespace _3DRTSGame
 					}
 				}
 			} else if (state == WaveState.Interval) {
-				if (count - start > 10 * INTERVAL_SEC) {// 10秒で次のwaveへ
+				if (count - start > 10 * INTERVAL_SEC && level.Enemies.Count == 0) {// 敵全滅かつ10秒経過で次のwaveへ
 					WaveCount++;
 
 					if (WaveCount == waves.Count) {// wavesのカウントに達していたらクリア
@@ -247,7 +247,7 @@ namespace _3DRTSGame
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 1f) }, 0, 1, 4, 3000, 60));
 			
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Fighter), 1f) }, 0, 10, 1, 3000, 30));
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 1, 4, 3000, 30));
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 5, 4, 3000, 30));
 			state = WaveState.Start;
 
             // asteroid:4引数コンストラクタ以外を使うとeffectが初期化されずにnullのままになるので注意

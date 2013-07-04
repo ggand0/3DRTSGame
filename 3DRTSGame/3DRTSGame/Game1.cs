@@ -64,11 +64,13 @@ namespace _3DRTSGame
 			// TODO: ここに初期化ロジックを追加します。
 			KeyConfig.LoadXML("KeyConfig", "Xml\\KeyConfig.xml");
 			Scene.Initialize(this, spriteBatch, Content);
+
+			Drawable.content = Content;
 			Object.game = this;
 			Camera.game = this;
 			
 			PointLight.game = this;
-			Object.content = Content;
+			
 			UIObject.content = Content;
 			Bullet.content = Content;
 			new DebugOverlay(GraphicsDevice, Content);
@@ -89,9 +91,10 @@ namespace _3DRTSGame
 			Debug.game = this;
 			UIObject.game = this;
 			Debug.spriteBatch = this.spriteBatch;
-			Object.spriteBatch = spriteBatch;
 			UIObject.spriteBatch = spriteBatch;
 			UIManager.spriteBatch = spriteBatch;
+			//Object.spriteBatch = spriteBatch;
+			Drawable.spriteBatch = spriteBatch;
 
 			Level.graphicsDevice = GraphicsDevice;
 			Level.content = Content;

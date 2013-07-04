@@ -50,10 +50,20 @@ float ShadowBias =  0.001f;
 float4 ClipPlane;
 bool ClipPlaneEnabled = true;
 
+// Rim lighting
+bool DoRimLighting = false;
+float4 RimColor;
+float RimIntensity = 0.3f;         // Intensity of the rim light
+//float3 CenterToCamera;
+float3 CameraPosition;
+float Shinniness = 0.5f;
+
+
 struct VertexShaderInput
 {
     float4 Position : POSITION0;
 	float2 UV : TEXCOORD0;
+	float3 Normal : NORMAL0;
 };
 struct VertexShaderOutput
 {
@@ -63,6 +73,7 @@ struct VertexShaderOutput
 	float4 ShadowScreenPosition : TEXCOORD2;
 
 	float3 WorldPosition : TEXCOORD3;
+	float3 Normal : TEXCOORD4;
 };
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
@@ -78,6 +89,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 	output.ShadowScreenPosition = mul(mul(input.Position, World),
 		mul(ShadowView, ShadowProjection));
+	output.Normal = mul(input.Normal, World);
 
 	return output;
 }
@@ -92,18 +104,6 @@ float2 sampleShadowMap(float2 UV)
 	return debug;
 	//return tex2D(shadowSampler, UV).rg;// returns read and green value
 }
-// borrowed filter
-/*float VSM_Filter(float2 texcoord, float fragDepth)
-{
-	float4 depth = tex2D( ShadowSmp, texcoord );
-
-	float depth_sq = depth.x * depth.x;
-	float variance = depth.y - depth_sq;
-	float md = fragDepth - depth.x;
-	float p = variance / (variance + (md * md));
-
-	return saturate(max( p, depth.x <= fragDepth ));	
-}*/
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
 	if (ClipPlaneEnabled) {
@@ -111,8 +111,6 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		clip(dot(float4(input.WorldPosition, 1), ClipPlane));
 	}// このモデルは全部>waterplane.heightだから実は今は関係ないな
 
-
-	//return float4(1,1,1,1);
 
 	// ライトマップから輝度値を取得して、元のテクスチャの色と合成する
     // Sample model's texture
@@ -160,7 +158,17 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	}
 
 
-	float4 finalColor = float4(basicTexture * DiffuseColor * light * shadow, 1);
+	// Rim lighting
+	float4 rim;
+	if (DoRimLighting) {
+		float3 normal = normalize(input.Normal);
+		float3 viewDir = normalize(CameraPosition - input.WorldPosition);
+		float crossValue = dot(viewDir, normal);
+		rim = pow(1 - crossValue, 1.5f) * RimColor * RimIntensity;
+	}
+
+
+	float4 finalColor = float4(basicTexture * DiffuseColor * light * shadow + rim, 1);
 	return finalColor;
 }
 
