@@ -11,10 +11,10 @@ namespace _3DRTSGame
 	public class Object : Drawable, IRenderable, ICloneable
 	{
 		#region Fields and Properties
-		public static Game1 game;
+		/*public static Game1 game;
 		public static Level level;
 		public static ContentManager content;
-		public static SpriteBatch spriteBatch;
+		public static SpriteBatch spriteBatch;*/
 
 		//public Effect maskEffect;
 		protected Vector3 _direction, _up, _down, _right;
@@ -28,6 +28,7 @@ namespace _3DRTSGame
 		protected readonly float BoundingSphereScale = 0.95f;
 		public Matrix RotationMatrix = Matrix.CreateRotationX(MathHelper.PiOver2);
 		public bool RenderBoudingSphere { get; set; }
+		public static Effect shadowEffect;
 
 		//private static readonly int DEF_HIT_POINT;
 		private int _hitPoint;
@@ -487,6 +488,9 @@ namespace _3DRTSGame
 			_boundingSphereRenderer = new BoundingSphereRenderer(game);
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
+
+			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
 		}
 
 		
@@ -512,6 +516,15 @@ namespace _3DRTSGame
 			_boundingSphereRenderer = new BoundingSphereRenderer(game);
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
+
+			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
+		}
+		static Object()
+		{
+			shadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
+			SetEffectParameter(shadowEffect, "DoShadowMapping", false);
+			SetEffectParameter(shadowEffect, "DoRimLighting", true);
 		}
 		#endregion
 	}

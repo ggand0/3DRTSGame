@@ -22,7 +22,7 @@ namespace _3DRTSGame
 		public bool Stational { get; set; }
 		public bool RimLighting { get; set; }
 
-		private Effect lightingEffect;
+		private static Effect lightingEffect;
 		private Vector3 rotationSpeed = new Vector3(0.1f,0.04f, 0);
 
 		//public override bool IsHitWith(Drawable d)
@@ -87,7 +87,7 @@ namespace _3DRTSGame
             Asteroid cloned = (Asteroid)MemberwiseClone();
 
             if (lightingEffect != null) {
-                cloned.lightingEffect = lightingEffect.Clone();
+                //cloned.lightingEffect = lightingEffect.Clone();
             }
 
             return cloned;
@@ -164,7 +164,7 @@ namespace _3DRTSGame
 
 			//Rotation = new Vector3((float)random.NextDouble() / 200f, (float)random.NextDouble() / 200f, (float)random.NextDouble() / 200f);
 
-			lightingEffect = content.Load<Effect>("Lights\\AsteroidLightingEffect");	// load Prelighting Effect
+			//lightingEffect = content.Load<Effect>("Lights\\AsteroidLightingEffect");	// load Prelighting Effect
 			SetEffectParameter(lightingEffect, "AccentColor", Color.Red.ToVector4());
 			SetEffectParameter(lightingEffect, "DoShadowMapping", false);
 			SetEffectParameter(lightingEffect, "TextureEnabled", true);
@@ -175,14 +175,18 @@ namespace _3DRTSGame
 			}
 
 
-			// Accent Colorを後で変えたいので、変更をそのまま反映させるためfalseにする！
-			//SetModelEffect(lightingEffect, true);
-			SetModelEffect(lightingEffect, false);
+			// Accent Colorを後で変えたいので、変更をそのまま反映させるためfalseにする！←というわけでもなかった...
+			SetModelEffect(lightingEffect, true);
+			//SetModelEffect(lightingEffect, false);
 
 			revolutionAngle = CalcInitialAngle();
 			RotationMatrix = BuildRotationMatrix();
 			MaxHitPoint = 15;
 			HitPoint = MaxHitPoint;
+		}
+		static Asteroid()
+		{
+			lightingEffect = content.Load<Effect>("Lights\\AsteroidLightingEffect");
 		}
 		#endregion
 	}

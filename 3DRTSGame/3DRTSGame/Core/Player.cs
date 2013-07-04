@@ -8,6 +8,15 @@ namespace _3DRTSGame
 {
 	public class Player
 	{
+		private enum MoveOrderState
+		{
+			NotOrdering,
+			SettingPosition,
+			SettingHeight,
+			Done
+		}
+		private MoveOrderState currentMoveOrderState = MoveOrderState.NotOrdering;
+
 		private static readonly int DEF_MONEY = 1000;
 		public int Cregit { get; set; }
 		public List<Object> Units { get; private set; }
@@ -67,11 +76,30 @@ namespace _3DRTSGame
 					(currentSelection as Satellite).Revolution = true;
 					(currentSelection as Satellite).RevolutionClockwise = true;
 					break;
+				case "move":
+					currentMoveOrderState = MoveOrderState.SettingPosition;
+					break;
 			}
 		}
 		private void HandleInput()
 		{
+			if (KeyInput.IsOnKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift)) {
+				if (currentMoveOrderState == MoveOrderState.SettingPosition) {
+					currentMoveOrderState = MoveOrderState.SettingHeight;
+				}
+			} else if (KeyInput.IsOnKeyUp(Microsoft.Xna.Framework.Input.Keys.LeftShift)) {
+				if (currentMoveOrderState == MoveOrderState.SettingHeight) {
+					currentMoveOrderState = MoveOrderState.SettingPosition;
+				}
+			}
+
+
 			if (MouseInput.IsOnButtonDownL()) {
+				// 移動指示
+				if (currentMoveOrderState == MoveOrderState.SettingPosition) {
+
+				}
+
 				if (UnitPanel.IsMouseInside()) {// ボタン選択
 					if (unitPanel.CurrentSelectedIcon != "") {// 何か操作アイコンが選択されていたら
 						ControlUnit(unitPanel.CurrentSelectedIcon);
@@ -104,6 +132,13 @@ namespace _3DRTSGame
 				Cregit += 10;
 			} else if (target is Fighter) {
 				Cregit += 20;
+			}
+		}
+		public void UseMoney(Object unit)
+		{
+			if (unit is ArmedSatellite) {
+				Cregit -= 500;
+			} else {
 			}
 		}
 		public void Update()

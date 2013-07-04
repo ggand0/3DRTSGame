@@ -237,12 +237,14 @@ namespace _3DRTSGame
 
 
 			// Set up light effects !!
-			shadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
-			Effect lightingEffect = content.Load<Effect>("PPModel");	// load Prelighting Effect
+			// Objectの中で行うことに。
+			/*shadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
+			//Effect lightingEffect = content.Load<Effect>("PPModel");	// load Prelighting Effect*/
 			foreach (Object o in Models) {
 				//o.RenderBoudingSphere = false;
 				if (!(o is Asteroid)) {
-					o.SetModelEffect(shadowEffect, true);
+					//o.SetModelEffect(Object.shadowEffect, true);
+					o.SetModelEffect(Object.shadowEffect, false);
 				}
 			}
 			foreach (Planet p in Planets) {
