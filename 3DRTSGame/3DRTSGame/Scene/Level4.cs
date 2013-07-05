@@ -137,7 +137,7 @@ namespace _3DRTSGame
 			grid.WorldMatrix = Matrix.Identity;
 
 
-			Thread loadingThread0 = new Thread(this.Load);
+			/**/Thread loadingThread0 = new Thread(this.Load);
 			loadingThread0.Priority = ThreadPriority.Highest;
 			loadingThread0.Start();
             Thread loadingThread1 = new Thread(ObjectPool.Load);
@@ -192,6 +192,7 @@ namespace _3DRTSGame
 			//Planets.Add(waterPlanet);
 			TargetPlanets.Add(waterPlanet);
 			Planets.Add(icePlanet);
+			//TargetPlanets.Add(icePlanet);
 			Planets.Add(gasGiant);
 
 			// Load asteroids
@@ -239,14 +240,23 @@ namespace _3DRTSGame
 			// Set up light effects !!
 			// Objectの中で行うことに。
 			/*shadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
-			//Effect lightingEffect = content.Load<Effect>("PPModel");	// load Prelighting Effect*/
+			//Effect lightingEffect = content.Load<Effect>("PPModel");	// load Prelighting Effect
 			foreach (Object o in Models) {
 				//o.RenderBoudingSphere = false;
 				if (!(o is Asteroid)) {
+					o.SetModelEffect(shadowEffect, true);
 					//o.SetModelEffect(Object.shadowEffect, true);
-					o.SetModelEffect(Object.shadowEffect, false);
+					//o.SetModelEffect(Object.shadowEffect, false);
 				}
-			}
+			}*/
+			/*shadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
+			foreach (Object o in Models) {
+				//o.RenderBoudingSphere = false;
+				if ((o is Planet)) {
+					o.SetModelEffect(shadowEffect, true);
+					//o.SetModelEffect(Object.shadowEffect, false);
+				}
+			}*/
 			foreach (Planet p in Planets) {
 				p.RenderBoudingSphere = false;
 				//p.SetModelEffect(shadowEffect, true);
@@ -625,6 +635,7 @@ namespace _3DRTSGame
 				// Draw UIs
 				productionManager.Draw(gameTime);
 				uiManager.Draw(gameTime);
+				player.Draw();
 			}
 		}
 

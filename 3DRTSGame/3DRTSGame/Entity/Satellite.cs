@@ -12,6 +12,15 @@ namespace _3DRTSGame
 	public class Satellite : Object
 	{
 		private static readonly float DEF_REVOLUTION_SPEED = 0.25f;
+		private static readonly float DEF_MOVE_SPEED = 1f;
+		private enum MovingState
+		{
+			Stational,
+			Moving,
+			Revolution
+		}
+		private MovingState currentMovingState = MovingState.Revolution;
+		private Vector3 currentDestination;
 
 		public bool Rotate { get; protected set; }
 		//public bool Revolution { get; protected set; }
@@ -52,7 +61,17 @@ namespace _3DRTSGame
 			return angle;
 		}
 
-		public override void Update(GameTime gameTime)
+		public void StartMove(Vector3 destination)
+		{
+			currentMovingState = MovingState.Moving;
+			currentDestination = destination;
+		}
+		public void EndMove()
+		{
+			Center = new Vector3(Center.X, currentDestination.Y, Center.Z);
+			currentMovingState = MovingState.Revolution;
+		}
+		private void UpdateRevolution()
 		{
 			if (Rotate) {
 				Roll += rotationSpeed;
@@ -78,6 +97,25 @@ namespace _3DRTSGame
 
 				Position = tmp;// ここが位置が与えた値と食い違う原因
 				//Position = tmp + initialPoint;
+			}
+		}
+		public override void Update(GameTime gameTime)
+		{
+			switch (currentMovingState) {
+				default:
+					UpdateRevolution();
+					break;
+				/*case MovingState.Revolution:
+					UpdateRevolution();
+					break;*/
+				case MovingState.Moving:
+					Vector3 v = Vector3.Normalize(currentDestination - Position) * DEF_MOVE_SPEED;
+					Position += v;
+
+					if ((currentDestination - Position).Length() < DEF_MOVE_SPEED) {
+						EndMove();
+					}
+					break;
 			}
 
 			base.Update(gameTime);

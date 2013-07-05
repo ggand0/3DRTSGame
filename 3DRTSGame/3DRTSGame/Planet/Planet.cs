@@ -95,7 +95,7 @@ namespace _3DRTSGame
 			//GenerateTags();
 			SetModelEffect(draw, false);
 			BuildPerm(graphicsDevice);
-
+			//base.SetModelEffect(shadowEffect, true);
 
 			// 軌道の描画オブジェクトのロード
 			/*List<Vector3> orbitalPositions = new List<Vector3>();
@@ -177,8 +177,6 @@ namespace _3DRTSGame
 		}
 		public void Generate(GraphicsDevice graphics)
 		{
-			//rts = new RenderTargetState(graphics, TextureWidth, TextureHeight, TextureWidth, TextureHeight);// このクラス消して直接setRenderTargetした方が絶対わかりやすいよな...
-			//rts.BeginRenderToTexture();
 			RenderTarget2D RenderTarget = new RenderTarget2D(graphics, TextureWidth, TextureHeight, false, SurfaceFormat.Color, DepthFormat.Depth24);
 			graphics.SetRenderTarget(RenderTarget);
 
@@ -196,7 +194,7 @@ namespace _3DRTSGame
 				}
 
 				//lock (graphicsDevice) {
-					mesh.Draw();// critical section
+				mesh.Draw();// critical section
 				
 			}
 			graphics.SetRenderTarget(null);
@@ -210,8 +208,6 @@ namespace _3DRTSGame
 				Mercator.SaveAsPng(stream, Mercator.Width, Mercator.Height);
 				stream.Position = 0;
 			}*/
-			//rts.DestroyBuffers();
-			//rts = null;
 
 			// generate normals
 			Color[] Map = new Color[TextureHeight * TextureWidth];
@@ -295,11 +291,12 @@ namespace _3DRTSGame
 				BlendMap.SetData<Color>(blend);
 			}
 
-			if (renderType != PlanetRenderType.MultiColored)
-				/*using (Stream stream = File.OpenWrite("blendMap.png")) {
+			/*if (renderType != PlanetRenderType.MultiColored) {// これを消し忘れたせいで酷い目にあった {}は大事！
+				using (Stream stream = File.OpenWrite("blendMap.png")) {
 					BlendMap.SaveAsPng(stream, BlendMap.Width, BlendMap.Height);
 					stream.Position = 0;
-				}*/
+				}
+			}*/
 
 
 			for (int y = 0; y < TextureHeight; y++) {
@@ -325,6 +322,12 @@ namespace _3DRTSGame
 			}
 
 			normalmap.SetData(pixels);
+			if (this is IcePlanet) {
+				using (Stream stream = File.OpenWrite("normalmap_ice.png")) {
+					normalmap.SaveAsPng(stream, normalmap.Width, normalmap.Height);
+					stream.Position = 0;
+				}
+			}
 		}
 		protected virtual void SetAtmosphereEffectParametersDetail()
 		{

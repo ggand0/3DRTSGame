@@ -365,7 +365,7 @@ namespace _3DRTSGame
 			/*else if (val is Color)
 				effect.Parameters[paramName].SetValue((Color)val.ToVector4());*/
 		}
-		public virtual void Draw(GraphicsDevice device)
+		public virtual void Draw(GraphicsDevice graphicsDevice)
 		{
 			// モデルの描画
 			Matrix[] transforms = new Matrix[Model.Bones.Count];
@@ -435,7 +435,6 @@ namespace _3DRTSGame
 			/*maskEffect.Parameters["colour"].SetValue(Color.Black.ToVector3());
 			maskEffect.Parameters["wvp"].SetValue(World * View * Projection);
 
-
 			// Shader内でピクセル単位でマスクを描画するようにした
 			maskEffect.Parameters["DepthValue"].SetValue(criteria);
 			CacheEffects();
@@ -489,8 +488,8 @@ namespace _3DRTSGame
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
 
-			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
-			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
+			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
 		}
 
 		
@@ -517,8 +516,8 @@ namespace _3DRTSGame
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
 
-			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
-			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
+			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
 		}
 		static Object()
 		{

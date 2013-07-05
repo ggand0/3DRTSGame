@@ -148,6 +148,7 @@ namespace _3DRTSGame
 			:base(privousScene)
 		{
 			Initialize();
+			//Load();
 			if (!insertLoadingScreen) {
 				Load();
 			}

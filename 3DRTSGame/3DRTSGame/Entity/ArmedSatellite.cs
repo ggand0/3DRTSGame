@@ -16,6 +16,7 @@ namespace _3DRTSGame
 	}
 	public class ArmedSatellite : Satellite
 	{
+		private static Effect satelliteShadowEffect;
 		private SoundEffect shootSound;
 		private List<SoundEffectInstance> currentSounds = new List<SoundEffectInstance>();
 		private EnergyShieldEffect shieldEffect;
@@ -315,7 +316,14 @@ namespace _3DRTSGame
             missileOrg = new Missile(IFF.Friend, this, null, 5.0f, Vector3.Zero, Position, 4, "Models\\AGM65Missile");
 			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
 						new Vector2(512), new Vector3[] { Vector3.Zero });//currentUIModel.Position
+			SetModelEffect(satelliteShadowEffect, false);
+		}
+
+		static ArmedSatellite()
+		{
+			satelliteShadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
 		}
 		#endregion
+		
 	}
 }

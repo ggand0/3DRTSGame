@@ -10,7 +10,6 @@ D:\Dropbox\Projects\HLSLTest\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAPro
 D:\Dropbox\Projects\HLSLTest\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.pdb
 C:\Users\pentiumx\Documents\Visual Studio 2010\Projects\3DRTSGame\BlenderToXNAProcessor\bin\x86\Debug\BlenderToXNAProcessor.dll
 C:\Users\pentiumx\Documents\Visual Studio 2010\Projects\3DRTSGame\BlenderToXNAProcessor\bin\x86\Debug\BlenderToXNAProcessor.pdb
-C:\Users\pentiumx\Documents\Visual Studio 2010\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\pentiumx\Documents\Visual Studio 2010\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.dll
 C:\Users\pentiumx\Documents\Visual Studio 2010\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.pdb
 C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProcessor\bin\x86\Debug\BlenderToXNAProcessor.dll
@@ -18,3 +17,4 @@ C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProc
 C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.csprojResolveAssemblyReference.cache
 C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.dll
 C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.pdb
+C:\Users\pentiumx\documents\visual studio 2010\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.csprojResolveAssemblyReference.cache

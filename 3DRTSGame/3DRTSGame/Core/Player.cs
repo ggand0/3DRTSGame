@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace _3DRTSGame
 {
@@ -16,6 +17,7 @@ namespace _3DRTSGame
 			Done
 		}
 		private MoveOrderState currentMoveOrderState = MoveOrderState.NotOrdering;
+		private Vector3 currentDestination;
 
 		private static readonly int DEF_MONEY = 1000;
 		public int Cregit { get; set; }
@@ -23,7 +25,9 @@ namespace _3DRTSGame
 
 		private Level level;
 		private UnitPanel unitPanel;
-		private Object currentSelection;
+		//private Object currentSelection;
+		private Satellite currentSelection;
+		private bool adjustingUnitHeight;
 
 
 		/// <summary>
@@ -83,21 +87,43 @@ namespace _3DRTSGame
 		}
 		private void HandleInput()
 		{
-			if (KeyInput.IsOnKeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift)) {
+			if (KeyInput.IsOnKeyDown(Keys.LeftShift)) {
 				if (currentMoveOrderState == MoveOrderState.SettingPosition) {
 					currentMoveOrderState = MoveOrderState.SettingHeight;
 				}
-			} else if (KeyInput.IsOnKeyUp(Microsoft.Xna.Framework.Input.Keys.LeftShift)) {
+				if (currentSelection != null) {
+					adjustingUnitHeight = true;
+				}
+			} else if (KeyInput.IsOnKeyUp(Keys.LeftShift)) {
 				if (currentMoveOrderState == MoveOrderState.SettingHeight) {
 					currentMoveOrderState = MoveOrderState.SettingPosition;
 				}
 			}
 
 
+			if (currentMoveOrderState == MoveOrderState.SettingPosition) {
+				Plane planeXZ = new Plane(Vector3.Up, 0);
+				currentDestination = GetRayPlaneIntersectionPoint(GetPickRay(), planeXZ);
+			}
+			if (adjustingUnitHeight) {
+				// 高ささえ求められれば良いから向きはどうでもいいか
+				Vector3 planeNormal = Vector3.UnitX;
+				Vector3 planePos = new Vector3(currentSelection.Position.X, 0, currentSelection.Position.Z);
+				//Plane planeVertical = new Plane(planeNormal, planePos.Length());
+				Plane planeVertical = new Plane(planeNormal, -planePos.X);
+				float height = GetRayPlaneIntersectionPoint(GetPickRay(), planeVertical).Y;// 交差点の高さが求める高さである
+				currentDestination = currentSelection.Position + new Vector3(0, height, 0);
+			}
 			if (MouseInput.IsOnButtonDownL()) {
 				// 移動指示
 				if (currentMoveOrderState == MoveOrderState.SettingPosition) {
-
+					currentMoveOrderState = MoveOrderState.NotOrdering;
+					currentSelection.StartMove(currentDestination);
+				}
+				// 選択したユニットの高度設定
+				if (adjustingUnitHeight) {
+					currentSelection.StartMove(currentDestination);
+					adjustingUnitHeight = false;
 				}
 
 				if (UnitPanel.IsMouseInside()) {// ボタン選択
@@ -144,6 +170,22 @@ namespace _3DRTSGame
 		public void Update()
 		{
 			HandleInput();
+		}
+		public void Draw()
+		{
+			if (currentSelection != null) {
+				switch (currentMoveOrderState) {
+					case MoveOrderState.SettingPosition:
+						//DebugOverlay.
+						CircleRenderer.Draw(Level.graphicsDevice, level.camera.View, level.camera.Projection,
+							Matrix.CreateTranslation(currentSelection.Position), Color.White, (currentDestination - currentSelection.Position).Length());
+						break;
+				}
+			}
+
+			if (adjustingUnitHeight) {
+				DebugOverlay.Line(currentSelection.Position, currentDestination, Color.White);
+			}
 		}
 
 		public Player(Level level)

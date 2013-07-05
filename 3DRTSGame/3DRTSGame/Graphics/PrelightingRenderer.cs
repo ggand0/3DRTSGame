@@ -63,74 +63,6 @@ namespace _3DRTSGame
 
 
 
-		QuadRenderer quadRenderer;
-		/// <summary>
-		/// Our frustum corners in world space
-		/// </summary>
-		private Vector3[] _cornersWorldSpace = new Vector3[8];
-		/// <summary>
-		/// Our frustum corners in view space
-		/// </summary>
-		private Vector3[] _cornersViewSpace = new Vector3[8];
-		/// <summary>
-		/// Compute the frustum corners for a camera.
-		/// Its used to reconstruct the pixel position using only the depth value.
-		/// Read here for more information
-		/// http://mynameismjp.wordpress.com/2009/03/10/reconstructing-position-from-depth/
-		/// </summary>
-		/// <param name="camera"> Current rendering camera </param>
-		private void ComputeFrustumCorners(ArcBallCamera camera)
-		{
-			camera.Frustum.GetCorners(_cornersWorldSpace);
-			//Matrix matView = camera.EyeTransform; //this is the inverse of our camera transform
-			Matrix matView = camera.View; //this is the inverse of our camera transform
-			Vector3.Transform(_cornersWorldSpace, ref matView, _cornersViewSpace); //put the frustum into view space
-			for (int i = 0; i < 4; i++) //take only the 4 farthest points
-            {
-				_currentFrustumCorners[i] = _cornersViewSpace[i + 4];
-			}
-			Vector3 temp = _currentFrustumCorners[3];
-			_currentFrustumCorners[3] = _currentFrustumCorners[2];
-			_currentFrustumCorners[2] = temp;
-		}
-		/// <summary>
-		/// Our final corners, the 4 farthest points on the view space frustum
-		/// </summary>
-		private Vector3[] _currentFrustumCorners = new Vector3[4];
-		/// <summary>
-		/// This method computes the frustum corners applied to a quad that can be smaller than
-		/// our screen. This is useful because instead of drawing a full-screen quad for each
-		/// point light, we can draw smaller quads that fit the light's bounding sphere in screen-space,
-		/// avoiding unecessary pixel shader operations
-		/// </summary>
-		/// <param name="effect">The effect we want to apply those corners</param>
-		/// <param name="topLeftVertex"> The top left vertex, in screen space [-1..1]</param>
-		/// <param name="bottomRightVertex">The bottom right vertex, in screen space [-1..1]</param>
-		private void ApplyFrustumCorners(Effect effect, Vector2 topLeftVertex, Vector2 bottomRightVertex)
-		{
-			float dx = _currentFrustumCorners[1].X - _currentFrustumCorners[0].X;
-			float dy = _currentFrustumCorners[0].Y - _currentFrustumCorners[2].Y;
-
-			Vector3[] _localFrustumCorners = new Vector3[4];
-			_localFrustumCorners[0] = _currentFrustumCorners[2];
-			_localFrustumCorners[0].X += dx * (topLeftVertex.X * 0.5f + 0.5f);
-			_localFrustumCorners[0].Y += dy * (bottomRightVertex.Y * 0.5f + 0.5f);
-
-			_localFrustumCorners[1] = _currentFrustumCorners[2];
-			_localFrustumCorners[1].X += dx * (bottomRightVertex.X * 0.5f + 0.5f);
-			_localFrustumCorners[1].Y += dy * (bottomRightVertex.Y * 0.5f + 0.5f);
-
-			_localFrustumCorners[2] = _currentFrustumCorners[2];
-			_localFrustumCorners[2].X += dx * (topLeftVertex.X * 0.5f + 0.5f);
-			_localFrustumCorners[2].Y += dy * (topLeftVertex.Y * 0.5f + 0.5f);
-
-			_localFrustumCorners[3] = _currentFrustumCorners[2];
-			_localFrustumCorners[3].X += dx * (bottomRightVertex.X * 0.5f + 0.5f);
-			_localFrustumCorners[3].Y += dy * (topLeftVertex.Y * 0.5f + 0.5f);
-
-			effect.Parameters["FrustumCorners"].SetValue(_localFrustumCorners);
-		}
-
 		private void DrawDepthNormalMap()
 		{
 			// Set the render targets to 'slots' 1 and 2
@@ -417,12 +349,12 @@ namespace _3DRTSGame
 			graphicsDevice.SetRenderTarget(null);
 #endif
 
-			if (JoyStick.IsOnKeyDown(8)) {
+			/*if (JoyStick.IsOnKeyDown(8)) {
 				using (Stream stream = File.OpenWrite("shadowDepth.png")) {
 					shadowDepthTarg.SaveAsPng(stream, shadowDepthTarg.Width, shadowDepthTarg.Height);
 					stream.Position = 0;
 				}
-			}/**/
+			}*/
 		}
 		private void BlurShadow(RenderTarget2D to, RenderTarget2D from, int dir)
 		{
@@ -455,7 +387,7 @@ namespace _3DRTSGame
 			}*/
 		}
 
-		// 外部からLMやSMを、指定のビュー行列を使って作成したい場合に使う
+		// 外部からLMやSMを、指定のビュー行列を使って作成したい場合に使うメソッド群
 		#region For building reflection map
 		// dynamic→voidへ変更。面倒でも参照渡しさせた方が良い。
 		public void drawDepthNormalMap(List<Object> models, RenderTarget2D nt, RenderTarget2D dt/**/
@@ -703,8 +635,6 @@ namespace _3DRTSGame
             shadowBlurEffect = Content.Load<Effect>("GaussianBlur");
             shadowBlurTarg = new RenderTarget2D(GraphicsDevice, shadowMapSize,
             shadowMapSize, false, SurfaceFormat.Color, DepthFormat.Depth24);
-
-            quadRenderer = new QuadRenderer();
         }
 	}
 }

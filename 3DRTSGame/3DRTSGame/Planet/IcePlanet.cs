@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
-	public class IcePlanet : Planet
+	public class IcePlanet : Planet//DamageablePlanet
 	{
 		public IcePlanet(GraphicsDevice graphics, ContentManager content)
 			:this(DEF_POSITION, DEF_STAR_POSITION, graphics, content)
