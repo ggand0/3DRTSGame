@@ -9,7 +9,6 @@ namespace _3DRTSGame
 	public class AsteroidBelt : Drawable
 	{
 		private static int ASTEROID_NUM = 30;//100だとCLoneにしても30秒以上かかる
-		private static Level level;
 
 		public List<Asteroid> Asteroids { get; private set; }
 

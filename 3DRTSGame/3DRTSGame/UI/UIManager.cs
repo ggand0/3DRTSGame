@@ -10,7 +10,7 @@ namespace _3DRTSGame
 {
 	public class UIManager : Drawable
 	{
-		public static SpriteBatch spriteBatch;
+		//public static SpriteBatch spriteBatch;
 		private List<UIObject> interfaces = new List<UIObject>();
 		public static UnitPanel mainPanel = new UnitPanel();// staticにしようと思っていたけど無理
 		private MouseCursor cursor;

@@ -374,7 +374,7 @@ namespace _3DRTSGame
 
 		Vector2 mouseOrgPos, curPos, prevPos;
 		float leftrightRot, updownRot, prevScroll, curScroll;
-		Vector3 Direction;
+		//Vector3 Direction;
 		private void HandleInput()
 		{
 			if (MouseInput.IsOnButtonDownR()) {

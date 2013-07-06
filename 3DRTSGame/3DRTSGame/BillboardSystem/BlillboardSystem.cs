@@ -231,8 +231,11 @@ namespace _3DRTSGame
 			int viewHeight = graphicsDevice.Viewport.Height;
 			/*depthTarget = new RenderTarget2D(graphicsDevice, viewWidth,
 				viewHeight, false, SurfaceFormat.Single, DepthFormat.Depth24);*/
-			depthTarget = new RenderTarget2D(graphicsDevice, viewWidth,
-				viewHeight, false, SurfaceFormat.Vector4, DepthFormat.Depth24);/**/
+			/*depthTarget = new RenderTarget2D(graphicsDevice, viewWidth,
+				viewHeight, false, SurfaceFormat.Vector4, DepthFormat.Depth24);*/
+			// 何故か2回目以降ロードする時にviewWidth = 0になるので直接参照することにした。
+			depthTarget = new RenderTarget2D(graphicsDevice, graphicsDevice.Viewport.Width,
+				graphicsDevice.Viewport.Height, false, SurfaceFormat.Vector4, DepthFormat.Depth24);
 		}
 	}
 }

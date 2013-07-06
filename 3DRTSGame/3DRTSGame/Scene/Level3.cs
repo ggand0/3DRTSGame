@@ -31,7 +31,7 @@ namespace _3DRTSGame
 		Sun sun, sunCircle;
 		public List<Asteroid> Asteroids { get; private set; }
 		public List<Planet> Planets { get; private set; }
-		public List<Satellite> Satellites { get; private set; }
+		//public List<Satellite> Satellites { get; private set; }
 		
 		Random random;
 		List<ExplosionEffect> ex = new List<ExplosionEffect>();

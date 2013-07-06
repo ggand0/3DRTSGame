@@ -34,7 +34,7 @@ namespace _3DRTSGame
 		public Vector3 Colour;
 		//public float Scale;
 		private GraphicsDevice graphicsDevice;
-		private SpriteBatch spriteBatch;
+		//private SpriteBatch spriteBatch;
 		BasicEffect basicEffect;
 		BillboardSystem b1, b2;
 
@@ -613,7 +613,7 @@ namespace _3DRTSGame
 		{
 			//this.Position = position;
 			this.graphicsDevice = graphics;
-			this.spriteBatch = spriteBatch;
+			//spriteBatch = spriteBatch;
 			//SetType(SunType);
 			LoadContent(graphics, content);
 

@@ -9,16 +9,17 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace _3DRTSGame
 {
+	public enum MovingState
+	{
+		Stational,
+		Moving,
+		Revolution
+	}
 	public class Satellite : Object
 	{
 		private static readonly float DEF_REVOLUTION_SPEED = 0.25f;
 		private static readonly float DEF_MOVE_SPEED = 1f;
-		private enum MovingState
-		{
-			Stational,
-			Moving,
-			Revolution
-		}
+		
 		private MovingState currentMovingState = MovingState.Revolution;
 		private Vector3 currentDestination;
 
@@ -69,7 +70,14 @@ namespace _3DRTSGame
 		public void EndMove()
 		{
 			Center = new Vector3(Center.X, currentDestination.Y, Center.Z);
+			revolutionAngle = CalcInitialAngle();
 			currentMovingState = MovingState.Revolution;
+		}
+		public void SetState(MovingState state)
+		{
+			Center = new Vector3(Center.X, Position.Y, Center.Z);
+			revolutionAngle = CalcInitialAngle();
+			currentMovingState = state;
 		}
 		private void UpdateRevolution()
 		{
@@ -127,6 +135,19 @@ namespace _3DRTSGame
 				* Matrix.CreateTranslation(Position);
 		}
 
+		private CircleRenderer circleRenderer;
+		public override void Draw(Matrix View, Matrix Projection, Vector3 CameraPosition)
+		{
+			base.Draw(View, Projection, CameraPosition);
+		
+			if (currentMovingState == MovingState.Moving && !DrawingPrePass) {
+				// static クラスだと面倒＆描画した円がカメラ移動でぶれるので、インスタンスクラスに変更
+				circleRenderer.Draw(Level.graphicsDevice, View, Projection, Matrix.CreateTranslation(currentDestination), Player.UI_CIRCLE_COLOR, Player.UI_CIRCLE_RADIUS);//X:-788.4521 Y:0 Z:-573.3202
+				DebugOverlay.Line(Position, currentDestination, Player.UI_CIRCLE_COLOR);
+			}
+		}
+		
+
 		/// <summary>
 		/// object pooling用に、外部から初期化できるようなメソッド
 		/// </summary>
@@ -145,6 +166,8 @@ namespace _3DRTSGame
 			Revolution = false;
 			this.initialPoint = position;
 			RevolutionClockwise = true;
+
+			circleRenderer = new CircleRenderer(Level.graphicsDevice, Color.White, 50);
 		}
 		public Satellite(bool revolution, Vector3 position, Vector3 center, float scale, string fileName)
 			:base(position, scale, fileName)
@@ -155,6 +178,8 @@ namespace _3DRTSGame
 			this.initialPoint = position;
 			revolutionAngle = CalcInitialAngle();
 			RevolutionClockwise = true;
+
+			circleRenderer = new CircleRenderer(Level.graphicsDevice, Color.White, 50);
 		}
 		#endregion
 	}

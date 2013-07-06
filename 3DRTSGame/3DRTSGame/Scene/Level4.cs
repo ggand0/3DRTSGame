@@ -140,9 +140,11 @@ namespace _3DRTSGame
 			/**/Thread loadingThread0 = new Thread(this.Load);
 			loadingThread0.Priority = ThreadPriority.Highest;
 			loadingThread0.Start();
-            Thread loadingThread1 = new Thread(ObjectPool.Load);
-            loadingThread1.Priority = ThreadPriority.Highest;
-            loadingThread1.Start();
+			if (!ObjectPool.LOADED) {
+				Thread loadingThread1 = new Thread(ObjectPool.Load);
+				loadingThread1.Priority = ThreadPriority.Highest;
+				loadingThread1.Start();
+			}
 		}
 		public override void Load()
 		{
@@ -320,8 +322,9 @@ namespace _3DRTSGame
 			time = 0.0;
 			BGM.Volume = 1.0f;
 			BGM.Play();*/
+			currentState = LevelState.Loading;
 			Initialize();
-			Load();
+			//Load();
 
 			base.Reset();
 
@@ -430,11 +433,17 @@ namespace _3DRTSGame
 						b.Die();
 						p.Damage();
 
-						if (!p.IsAlive) {
+						/*if (!p.IsAlive) {
 							ExplosionEffect e = (ExplosionEffect)bigExplosion.Clone();
 							e.Position = b.Position;
 							e.Run();
 							effectManager.Add(e);
+						}*/
+						if (!p.IsAlive && ObjectPool.BigExplosionPool.Count > 0) {
+							ExplosionEffect effectTmp = ObjectPool.BigExplosionPool.Dequeue();
+							effectTmp.Reset(p.Position);
+							effectTmp.Run();
+							effectManager.Add(effectTmp);
 						}
 
 						// 重い！数が多いのでもっと軽いエフェクトを作ろう

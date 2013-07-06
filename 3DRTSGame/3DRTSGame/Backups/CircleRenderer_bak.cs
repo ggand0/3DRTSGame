@@ -12,39 +12,39 @@ namespace _3DRTSGame
 		static readonly int DEGREE_INCREMENT = 5;
 
 		//List of vertices
-		List<VertexPositionColor> _Vertices;
+		static List<VertexPositionColor> _Vertices;
 
 		//Convert to array to avoid ToArray for every draw
-		VertexPositionColor[] _VertexArray;
+		static VertexPositionColor[] _VertexArray;
 
 		//Color of the vertices
-		Color _VertexColor;
+		static Color _VertexColor;
 
 		static BasicEffect _Effect;
 
 		//Transforms for the circle
-		Matrix _Transforms;
-		Vector3 _Position, _Scale, _Rotation;
+		static Matrix _Transforms;
+		static Vector3 _Position, _Scale, _Rotation;
 
 		//Radius of the circle
-		float _Radius;
+		static float _Radius;
 
-		public Vector3 Position
+		public static Vector3 Position
 		{
 			get { return _Position; }
 			set { _Position = value; Transform(); }
 		}
-		public Vector3 Rotation
+		public static Vector3 Rotation
 		{
 			get { return _Rotation; }
 			set { _Rotation = value; Transform(); }
 		}
-		public Vector3 Scale
+		public static Vector3 Scale
 		{
 			get { return _Scale; }
 			set { _Scale = value; Transform(); }
 		}
-		public Matrix Transforms
+		public static Matrix Transforms
 		{
 			get { return _Transforms; }
 			set { _Transforms = value; }
@@ -64,7 +64,7 @@ namespace _3DRTSGame
 			_VertexArray = _Vertices.ToArray();
 		}/**/
 
-		private void Setup()
+		private static void Setup()
 		{
 			//For each number of points : 360/ DEGREE_INCREMENT
 			for (int i = 0; i <= 360; i += DEGREE_INCREMENT) {
@@ -79,7 +79,7 @@ namespace _3DRTSGame
 		/// <summary>
 		/// Update transform when pos, rot, scale is changed
 		/// </summary>
-		private void Transform()
+		private static void Transform()
 		{
 			_Transforms = Matrix.CreateScale(_Scale) *
 			Matrix.CreateFromYawPitchRoll(_Rotation.Y, _Rotation.X, _Rotation.Z) *
@@ -99,13 +99,8 @@ namespace _3DRTSGame
 			_Vertices = new List<VertexPositionColor>();
 			Setup();
 			_VertexArray = _Vertices.ToArray();
-			_VertexColor = color;*/
-			_Radius = radius;
-			_Transforms = transforms;
-			_Vertices = new List<VertexPositionColor>();// 初期化しないと塗りつぶすことに
-			Setup();
-			
-			_VertexArray = _Vertices.ToArray();
+			_VertexColor = color;
+			_Radius = radius;*/
 
 
 			// Tell the device we are sending Vertexpositioncolor elements

@@ -20,7 +20,6 @@ namespace _3DRTSGame
 	public class Bullet : Drawable
 	{
 		protected static float MAX_DISTANCE = 10000;
-		public static ContentManager content;
 
 		/// <summary>
 		/// 敵弾か味方弾かの情報

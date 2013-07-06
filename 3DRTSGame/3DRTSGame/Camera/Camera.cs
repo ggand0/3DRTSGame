@@ -149,7 +149,7 @@ namespace _3DRTSGame
 		public float Yaw { get; set; }
 		public float Pitch { get; set; }
 		//public Vector3 Position { get; set; }
-		public Vector3 Target { get; private set; }
+		//public Vector3 Target { get; private set; }
 		private Vector3 translation;
 
 		public void Rotate(float YawChange, float PitchChange)

@@ -14,11 +14,11 @@ namespace _3DRTSGame
 		/// <summary>
 		/// メニューのテキストを表示開始する場所。
 		/// </summary>
-		readonly Vector2 TEXT_POSITION;
-		readonly Vector2 TITLE_POSITION;
+		//readonly Vector2 TEXT_POSITION;
+		//readonly Vector2 TITLE_POSITION;
 		readonly Texture2D maskTexture;
-		readonly SoundEffect selectSound;
-		readonly SoundEffect enterSound;
+		//readonly SoundEffect selectSound;
+		//readonly SoundEffect enterSound;
 		string title = "";
 
 

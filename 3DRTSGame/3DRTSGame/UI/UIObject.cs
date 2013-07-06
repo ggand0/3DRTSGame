@@ -6,11 +6,6 @@ namespace _3DRTSGame
 {
 	public class UIObject : Drawable
 	{
-		public static SpriteBatch spriteBatch;
-		public static ContentManager content;
-		public static Game1 game;
-		public static Level level;
-
 		protected Texture2D texture;
 		protected Vector2 UIPosition;
 		protected float scale;
