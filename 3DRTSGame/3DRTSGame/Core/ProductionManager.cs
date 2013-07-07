@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Content;
 namespace _3DRTSGame
 {
 	/// <summary>
-	/// イメージとしてはPlayerがProductionManagerを利用してオブジェクトを買うような構造
+	/// PlayerがProductionManagerを利用してユニットを買うような構造
 	/// </summary>
 	public class ProductionManager
 	{
@@ -18,7 +18,9 @@ namespace _3DRTSGame
 		private Level4 level;
 		private Player player;
 
-		private Type currentSelection;
+		//private Type currentSelection;
+		private string currentSelection;
+		private SatelliteWeapon currrentWeaponTypeSelection;
 		private bool isDragging;
 		public UIManager UIManager { get; private set; }
 		public enum SelectionState
@@ -28,28 +30,20 @@ namespace _3DRTSGame
 			None
 		}
 		private SelectionState state;
-		private Dictionary<Type, Object> uiModels;
+		//private Dictionary<Type, Object> uiModels;
+		private Dictionary<string, Object> uiModels;
 		private Object currentUIModel;
 		private BillboardSystem uiRing;
-		//private Satellite tmpSatellite;
 
 		private Dictionary<string, int> unitCosts;
+		//private string[] unitWeaponTypes;
+		private SatelliteWeapon[] unitWeaponTypes;
 
-		/*private Type GetUnitType()
-		{
-			return null;
-		}*/
-		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)//Nullable<Vector3>
+		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)
 		{
 			float? distance = ray.Intersects(plane);
 			//return distance.HasValue ? ray.Position + ray.Direction * distance.Value : null;
 			return distance.HasValue ? ray.Position + ray.Direction * distance.Value : Vector3.Zero;
-		}
-		private bool CanDeploy()
-		{
-			//Vector2 pos = MouseInput.GetMousePosition();
-			//return pos.Y <= Position
-			return !UnitPanel.IsMouseInside();
 		}
 		private Vector3 Get3DMousePoint()
 		{
@@ -71,38 +65,75 @@ namespace _3DRTSGame
 
 			return GetRayPlaneIntersectionPoint(pickRay, planeGround);
 		}
+		private bool CanDeploy()
+		{
+			//Vector2 pos = MouseInput.GetMousePosition();
+			//return pos.Y <= Position
+			return !UnitPanel.IsMouseInside();
+		}
 		private void HandleInput()
 		{
 			// unit card上で左クリックしたら
-			if (currentSelection != null && MouseInput.IsOnButtonDownL()) {
-				//currentSelection = UIManager.GetUnitType();
+			if (currentSelection != null && currrentWeaponTypeSelection != SatelliteWeapon.None
+				&& MouseInput.IsOnButtonDownL()) {
 				isDragging = true;
-				
-				//object[] args = new object[] { SatelliteWeapon.Missile, level.waterPlanet.Position + new Vector3(400, 50, 0),
-				//waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0" };
+
+
 				// キャストしたらダメな気がするが...モデル表示するだけだからいいか
-				// メチャクチャ重いのでこれもpreloadさせることに
+				// メチャクチャ重いのでこれもpre-loadさせることにした
 				//object[] args = new object[] { Vector3.Zero, 10, "Models\\DeepSpace" };
 				//currentUIModel = (Object)Activator.CreateInstance(currentSelection, args);
-				currentUIModel = uiModels[currentSelection];
 
+				//currentUIModel = uiModels[currentSelection];
+				currentUIModel = uiModels[currentSelection];
 			}
 			if (isDragging) {// && !UnitPanel.IsMouseInside()) {
 				currentUIModel.Position = Get3DMousePoint();
 				currentUIModel.World = Matrix.CreateScale(currentUIModel.Scale) * Matrix.CreateTranslation(currentUIModel.Position);
 				//uiModel.Update(gameTime);
 			}
-			if (isDragging && MouseInput.IsOnButtonUpL() && CanDeploy()) {
+
+			//if (isDragging && !MouseInput.BUTTONL() && !CanDeploy()) {
+			if (isDragging && !MouseInput.IsOnButtonDownL() && !MouseInput.BUTTONL() && !CanDeploy()) {
+			//if (isDragging && MouseInput.IsOnButtonUpL() && !CanDeploy()) {
+				isDragging = false;
+			//} else if (isDragging && !MouseInput.BUTTONL() && CanDeploy()) {
+			} else if (isDragging && MouseInput.IsOnButtonUpL() && CanDeploy()) {
 				isDragging = false;
 
 				// 3D空間上の位置をGet
 				Vector3 intersectionPoint = currentUIModel.Position;//Get3DMousePoint();
 
+				// ObjectPoolからインスタンスを持ってきて、選択されているユニットタイプに応じて初期化
 				//level.Models.Add(new ArmedSatellite(intersectionPoint, 10, "Models\\DeepSpace"));
 				//level.Models[level.Models.Count - 1].RenderBoudingSphere = false;
-				Satellite tmpSatellite = ObjectPool.SatellitePool.Dequeue();
-				//tmpSatellite.Position = intersectionPoint;
-				tmpSatellite.Initialize(intersectionPoint, level.TargetPlanets[0].Position);// いずれ任意の惑星に。
+				Satellite tmpSatellite = null;// = ObjectPool.SatellitePool.Dequeue();
+
+				// いずれ任意の惑星に。
+				//tmpSatellite.Initialize(intersectionPoint, level.TargetPlanets[0].Position);
+				/*if (tmpSatellite is ArmedSatellite) {
+					(tmpSatellite as ArmedSatellite).Initialize(currentUIModel.Model, intersectionPoint, level.TargetPlanets[0].Position);
+					(tmpSatellite as ArmedSatellite).Initialize(currrentWeaponTypeSelection);
+				}*/
+				switch (currentSelection) {
+					case "NormalSatellite":
+						tmpSatellite = ObjectPool.SatellitePool.Dequeue();
+						tmpSatellite = tmpSatellite as ArmedSatellite;
+						(tmpSatellite as ArmedSatellite).Initialize(currentUIModel.Model, intersectionPoint, level.TargetPlanets[0].Position);
+						(tmpSatellite as ArmedSatellite).Initialize(currrentWeaponTypeSelection);
+						break;
+					case "LargeSatellite":
+						tmpSatellite = ObjectPool.SatellitePool.Dequeue();
+						tmpSatellite = tmpSatellite as ArmedSatellite;
+						(tmpSatellite as ArmedSatellite).Initialize(currentUIModel.Model, intersectionPoint, level.TargetPlanets[0].Position);
+						(tmpSatellite as ArmedSatellite).Initialize(currrentWeaponTypeSelection);
+						break;
+					case "SpaceStation":
+						//tmpSatellite = tmpSatellite as SpaceStation;
+						tmpSatellite = new SpaceStation(intersectionPoint, 100, "Models\\spacestation4");
+						break;
+				}
+
 				level.Models.Add(tmpSatellite);
 				level.Satellites.Add(tmpSatellite);
 
@@ -111,9 +142,11 @@ namespace _3DRTSGame
 		}
 		public void Update(GameTime gameTime)
 		{
-			currentSelection = UIManager.GetUnitType();
-			if (currentSelection != null) {
-				string d = "ok";
+			if (!isDragging && UnitPanel.IsMouseInside()) {
+				// この２つを構造体にまとめてもいいな
+				currentSelection = UIManager.GetUnitType();
+				// 何も選択されていないときは、type=null, weaponType=SatelliteWeapon.Noneが返される
+				currrentWeaponTypeSelection = UIManager.GetUnitWeaponType();
 			}
 
 			HandleInput();
@@ -136,10 +169,20 @@ namespace _3DRTSGame
 			this.player = level.player;
 
 			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
-						new Vector2(512), new Vector3[] {Vector3.Zero });//currentUIModel.Position
-			uiModels = new Dictionary<Type, Object>();
+						new Vector2(512), new Vector3[] {Vector3.Zero });
+			/*uiModels = new Dictionary<Type, Object>();
 			uiModels.Add(typeof(ArmedSatellite), new ArmedSatellite(Vector3.Zero, 10, "Models\\DeepSpace"));
+			uiModels.Add(typeof(ArmedSatellite), new ArmedSatellite(Vector3.Zero, 10, "Models\\ISS"));*/
+			uiModels = new Dictionary<string, Object>();
+			uiModels.Add("NormalSatellite", new ArmedSatellite(Vector3.Zero, 10, "Models\\DeepSpace"));
+			uiModels.Add("LargeSatellite", new ArmedSatellite(Vector3.Zero, 10, "Models\\ISS"));
+			uiModels.Add("SpaceStation", new SpaceStation(Vector3.Zero, 100, "Models\\spacestation4"));
 
+			unitCosts = new Dictionary<string, int>();
+			unitCosts.Add("ArmedSatellite", 100);
+			unitCosts.Add("SpaceStation", 500);
+
+			unitWeaponTypes = new SatelliteWeapon[] { SatelliteWeapon.LaserBolt, SatelliteWeapon.Missile, SatelliteWeapon.LaserBolt, SatelliteWeapon.LaserBolt };
 		}
 		// 使ってない
 		public ProductionManager(Level4 level, UIManager uiManager)

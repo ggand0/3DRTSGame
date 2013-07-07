@@ -16,9 +16,13 @@ namespace _3DRTSGame
 		private MouseCursor cursor;
 
 
-		public static Type GetUnitType()
+		public static string GetUnitType()
 		{
 			return mainPanel.GetUnitType();
+		}
+		public static SatelliteWeapon GetUnitWeaponType()
+		{
+			return mainPanel.GetUnitWeaponType();
 		}
 
 		public override void Update(GameTime gameTime)

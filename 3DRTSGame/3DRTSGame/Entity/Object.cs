@@ -324,19 +324,27 @@ namespace _3DRTSGame
 			foreach (ModelMesh mesh in Model.Meshes)
 				foreach (ModelMeshPart part in mesh.MeshParts) {
 					Effect toSet = effect;
-					// Copy the effect if necessary
-					if (CopyEffect)
-						toSet = effect.Clone();
-					MeshTag tag = ((MeshTag)part.Tag);
-					// If this ModelMeshPart has a texture, set it to the effect
-					if (/*tag != null && */tag.Texture != null) {// tag自体がnull
-						SetEffectParameter(toSet, "BasicTexture", tag.Texture);
-						SetEffectParameter(toSet, "TextureEnabled", true);
-					} else
-						SetEffectParameter(toSet, "TextureEnabled", false);
-					// Set our remaining parameters to the effect
-					SetEffectParameter(toSet, "DiffuseColor", tag.Color);
-					SetEffectParameter(toSet, "SpecularPower", tag.SpecularPower);
+
+					if (!(effect is BasicEffect)) {
+						// Copy the effect if necessary
+						if (CopyEffect) {
+							toSet = effect.Clone();
+						}
+						MeshTag tag = ((MeshTag)part.Tag);
+						// If this ModelMeshPart has a texture, set it to the effect
+						if (/*tag != null && */tag.Texture != null) {// tag自体がnull
+							SetEffectParameter(toSet, "BasicTexture", tag.Texture);
+							SetEffectParameter(toSet, "TextureEnabled", true);
+						} else {
+							SetEffectParameter(toSet, "TextureEnabled", false);
+						}
+
+						// Set our remaining parameters to the effect
+
+						SetEffectParameter(toSet, "DiffuseColor", tag.Color);
+						SetEffectParameter(toSet, "SpecularPower", tag.SpecularPower);
+					}
+					
 					part.Effect = toSet;
 				}
 		}
@@ -469,10 +477,10 @@ namespace _3DRTSGame
 		{
 		}
 		public Object(Vector3 position)
-			: this(1, position)
+			: this(1, position, true)
 		{
 		}
-		public Object(float scale, Vector3 position)
+		public Object(float scale, Vector3 position, bool setEffect)
 			: base()
 		{
 			this.Position = position;
@@ -488,7 +496,7 @@ namespace _3DRTSGame
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
 
-			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+			if (setEffect && !(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
 			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
 		}
 
@@ -498,10 +506,10 @@ namespace _3DRTSGame
 		{
 		}
 		public Object(Vector3 position, string fileName)
-			: this(position, 1, fileName)
+			: this(position, 1, fileName, true)
 		{
 		}
-		public Object(Vector3 position, float scale, string fileName)
+		public Object(Vector3 position, float scale, string fileName, bool setEffect)
 			:base()
 		{
 			this.Position = position;
@@ -516,7 +524,7 @@ namespace _3DRTSGame
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
 
-			if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+			if (setEffect && !(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
 			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
 		}
 		static Object()

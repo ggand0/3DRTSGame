@@ -11,12 +11,15 @@ namespace _3DRTSGame
 {
 	public enum SatelliteWeapon
 	{
-		Laser,
-		Missile
+		None,
+		LaserBolt,
+		Missile,
+		LaserBeam
 	}
 	public class ArmedSatellite : Satellite
 	{
 		private static Effect satelliteShadowEffect;
+		private static readonly float MISSILE_SPEED = 10.0f;
 		private SoundEffect shootSound;
 		private List<SoundEffectInstance> currentSounds = new List<SoundEffectInstance>();
 		private EnergyShieldEffect shieldEffect;
@@ -114,10 +117,16 @@ namespace _3DRTSGame
 					}
 					break;*/
 				case 3:
-					//if (visibleEnemies.Count > 0) {
-						Vector3 dir = visibleEnemies[r.Next(0, visibleEnemies.Count)].Position;//Vector3.Normalize(new Vector3(3, 2, 1));
-						level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, Position, dir, 1,
-							content.Load<Texture2D>("Textures\\Mercury\\Laser"), new Vector2(10, 5), 0));/**/
+					Drawable tmp0 = SearchTargetObj(1);
+					if (tmp0 != null) {
+						//Vector3 dir = visibleEnemies[r.Next(0, visibleEnemies.Count)].Position;
+						Vector3 dir = Vector3.Normalize(tmp0.Position - Position);
+						/*level.Bullets.Add(new LaserBillboardBullet(IFF.Foe, Level.graphicsDevice, content, Position
+						, Position + Direction * 200, Direction, 50, content.Load<Texture2D>("Textures\\Mercury\\Laser"), Color.Red, BlendState.AlphaBlend, new Vector2(200f, 100), 0));*/
+						level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, Position, Position+dir * 80,dir, 40,
+							content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.Additive, new Vector2(10, 20), 0));//"Textures\\Mercury\\Laser" "Textures\\Lines\\laser0"
+					}
+
 					break;
 				case 4:
 					//if (visibleEnemies.Count > 0) {
@@ -197,25 +206,19 @@ namespace _3DRTSGame
 			base.Update(gameTime);//RotationMatrix = Matrix.CreateRotationX((float)Math.PI);
 
 			CheckEnemies();
-			/*if (!canShoot && count > chargeTime) {
-				canShoot = true;
-				count = 0;
-			}*/
+
 			if (!canShoot && count > chargeTime) {
 				canShoot = true;
-				//count = 0;
 			}
-
-			//if (canShoot && JoyStick.IsOnKeyDown(2) || count % shootRate == 0 && IsInRange()) {
 			if (canShoot && IsInRange()) {
-				/**/if (Weapon == SatelliteWeapon.Missile) {
+				if (Weapon == SatelliteWeapon.Missile) {
 					Shoot(5);
-				} else {
+				} else if (Weapon == SatelliteWeapon.LaserBolt) {
+					Shoot(3);
+				} else if (Weapon == SatelliteWeapon.LaserBeam) {
 					Shoot(4);
 				}
 
-				//shootSound.Play();
-				//shootSoundInstance.Play();
 				if (!Level.mute) {
 				    SoundEffectInstance ls = shootSound.CreateInstance();
 				    ls.Volume = 0.05f;
@@ -272,12 +275,19 @@ namespace _3DRTSGame
 
 		/// <summary>
 		/// object poolingの関係上コンストラクタに書けない処理をここに。
+		/// ...の予定だったが、spawnする時の武器チェンジ等に使うことにした。
 		/// </summary>
-		public void Initialize()
+		public void Initialize(SatelliteWeapon weaponType)
 		{
-			shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
-			level.transparentEffects.Add(shieldEffect);
-
+			//shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
+			//level.transparentEffects.Add(shieldEffect);
+			Weapon = weaponType;
+		}
+		public void Initialize(Model model, Vector3 position, Vector3 center)
+		{
+			base.Initialize(position, center);
+			Model = model;
+			SetModelEffect(satelliteShadowEffect, false);
 		}
 		#region Constructors
 		public ArmedSatellite(Vector3 position, float scale, string fileName)
@@ -291,7 +301,7 @@ namespace _3DRTSGame
 		{
 		}
 		public ArmedSatellite(Vector3 position, Vector3 center, float scale, string fileName, string SEPath)
-			: this(SatelliteWeapon.Laser, position, center, scale, fileName, SEPath)
+			: this(SatelliteWeapon.LaserBolt, position, center, scale, fileName, SEPath)
 		{
 		}
 		public ArmedSatellite(SatelliteWeapon weaponType, Vector3 position, Vector3 center, float scale, string fileName, string SEPath)
@@ -299,7 +309,15 @@ namespace _3DRTSGame
 		{
 			ShieldEnabled = true;
 			this.Weapon = weaponType;
-			chargeTime = weaponType == SatelliteWeapon.Laser ? random.Next(10, 70) : random.Next(60, 120);
+
+			if (weaponType == SatelliteWeapon.LaserBolt) {
+				chargeTime = random.Next(8, 15);
+			} else if (weaponType == SatelliteWeapon.LaserBeam) {
+				chargeTime = random.Next(10, 70);
+			} else if (weaponType == SatelliteWeapon.Missile) {
+				chargeTime = random.Next(60, 120);;
+			}
+			//chargeTime = weaponType == SatelliteWeapon.LaserBolt ? random.Next(10, 70) : random.Next(60, 120);
 			shootSound = content.Load<SoundEffect>(SEPath);
 			shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
 			level.transparentEffects.Add(shieldEffect);
@@ -313,7 +331,7 @@ namespace _3DRTSGame
 
 
             // 仮に作成しておく
-            missileOrg = new Missile(IFF.Friend, this, null, 5.0f, Vector3.Zero, Position, 4, "Models\\AGM65Missile");
+			missileOrg = new Missile(IFF.Friend, this, null, MISSILE_SPEED, Vector3.Zero, Position, 4, "Models\\AGM65Missile");//AGM65Missile AIM9LMissile
 			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
 						new Vector2(512), new Vector3[] { Vector3.Zero });//currentUIModel.Position
 			SetModelEffect(satelliteShadowEffect, false);

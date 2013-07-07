@@ -94,13 +94,19 @@ namespace _3DRTSGame
 			} else {
 				onButtonDownL = false;
 			}
-
 			if (prev.LeftButton == ButtonState.Pressed && cur.LeftButton == ButtonState.Released) {
 				onButtonDownL = false;
 				onButtonUpL = true;
 			} else {
 				onButtonUpL = false;
 			}
+			if (prev.LeftButton == ButtonState.Pressed && cur.LeftButton == ButtonState.Pressed) {
+				ButtonL = true;
+				//ButtonTime[i]++;													// 押されている時間を１フレーム分更新。
+			} else {
+				ButtonL = false;
+			}
+
 
 
 			if (prev.RightButton == ButtonState.Released && cur.RightButton == ButtonState.Pressed) {

@@ -10,7 +10,9 @@ namespace _3DRTSGame
 {
 	public class UnitCard : UIObject
 	{
-		public Type Type { get; private set; }
+		//public Type Type { get; private set; }
+		public string Type { get; private set; }
+		public SatelliteWeapon WeaponType { get; private set; }
 
 		public bool IsSelected()
 		{
@@ -30,9 +32,14 @@ namespace _3DRTSGame
 			spriteBatch.Draw(texture, UIPosition, null, Color.White, 0, Vector2.Zero, new Vector2(scale), SpriteEffects.None, 0);
 		}
 
-		public UnitCard(Type uniType, Texture2D texture, Vector2 position, float scale)
+		public UnitCard(string uniType, Texture2D texture, Vector2 position, float scale)
+			:this(uniType, SatelliteWeapon.LaserBolt, texture, position, scale)
+		{
+		}
+		public UnitCard(string uniType, SatelliteWeapon weaponType, Texture2D texture, Vector2 position, float scale)
 		{
 			this.Type = uniType;
+			this.WeaponType = weaponType;
 			this.texture = texture;
 			this.UIPosition = position;
 			this.scale = scale;

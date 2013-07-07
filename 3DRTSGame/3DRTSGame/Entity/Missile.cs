@@ -19,6 +19,7 @@ namespace _3DRTSGame
 		public Object Renderer { get; private set; }
 		public Vector3 Velocity { get; private set; }
 
+		private static BasicEffect basicEffect;
 		private Matrix _world;
 		private Vector3 upPosition;
 		//private float Scale;
@@ -136,11 +137,12 @@ namespace _3DRTSGame
 
 		public override void Draw(Camera camera)
 		{
+			Object.SetEffectParameter(lightingEffect, "CenterToCamera", level.camera.Direction);
 			Renderer.Draw(camera.View, camera.Projection, camera.Position);
 			billboardStrip.Draw(camera.View, camera.Projection, camera.Up, camera.Right, camera.Position);
 		}
 
-
+		static Effect lightingEffect;
 		// Constructors
 		public Missile(Object user, float speed)
 			: this(IFF.Friend, user, null, speed, user.Direction, user.Position, 1, "Models\\pea_proj")
@@ -164,10 +166,23 @@ namespace _3DRTSGame
 			Position = position;
 			upPosition = position + Vector3.Up;
 
+			
 			positions = new List<Vector3>();
-			Renderer = new Object(position, scale, filePath);
+
+			if (lightingEffect == null) {
+				lightingEffect = content.Load<Effect>("Lights\\MissileLightingEffect");
+				Object.SetEffectParameter(lightingEffect, "DoRimLighting", true);
+				Object.SetEffectParameter(lightingEffect, "RimColor", Color.Blue.ToVector4());
+				Object.SetEffectParameter(lightingEffect, "CenterToCamera", level.camera.Direction);
+			}
+			Renderer = new Object(position, scale, filePath, false);// effectを設定すると「textureCoordinate0がありません」エラー
+			Renderer.SetModelEffect(lightingEffect, true);
 			billboardStrip = new BillboardStrip(Level.graphicsDevice, content,
 				content.Load<Texture2D>("Textures\\Lines\\smoke"), new Vector2(10, 30), positions, true);
+		}
+		static Missile()
+		{
+			basicEffect = new BasicEffect(Level.graphicsDevice);
 		}
 	}
 }

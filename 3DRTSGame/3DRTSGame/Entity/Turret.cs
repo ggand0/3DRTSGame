@@ -192,7 +192,7 @@ namespace _3DRTSGame
 
 		#region Constructors
 		public Turret(Vector3 position, float scale)
-			: base(scale, position)
+			: base(scale, position, false)
 		{
 			visibleEnemies = new List<Object>();
 			chargeTime = 60;
@@ -200,7 +200,7 @@ namespace _3DRTSGame
 			shootSound = content.Load<SoundEffect>("SoundEffects\\laser2");
 		}
 		public Turret(Vector3 position, float scale, string fileName)
-			: base(position, scale, fileName)
+			: base(position, scale, fileName, false)
 		{
 		}
 		#endregion

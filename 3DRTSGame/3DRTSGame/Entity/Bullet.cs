@@ -28,10 +28,7 @@ namespace _3DRTSGame
 		public float Speed { get; private set; }
 		public Vector3 Direction { get; protected set; }
 		public Vector3 StartPosition { get; protected set; }
-
-		
 		protected float distanceTravelled;
-		private int count;
 
 		public override void Update(GameTime gameTime)
 		{

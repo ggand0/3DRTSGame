@@ -155,7 +155,7 @@ namespace _3DRTSGame
 		{
 		}
 		public Asteroid(Vector3 position, Vector3 destination, float scale, float speed, string fileName, bool rimLighting)
-			: base(position, scale, fileName)
+			: base(position, scale, fileName, false)
 		{
 			this.Destination = destination;
 			this.RimLighting = rimLighting;

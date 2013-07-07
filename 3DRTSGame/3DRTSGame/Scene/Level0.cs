@@ -59,8 +59,8 @@ namespace _3DRTSGame
 			Target.Scale = 20;
 			//Target = new Object(new Vector3(0, 0, 0), "Models\\tank");
 			//Target.Scale = 0.1f;
-			Ground = new Object(new Vector3(0, -50, 0), 0.05f, "Models\\ground");
-			Teapot = new Object(new Vector3(-100, 0, 0), "Models\\UtahTeapotDef");
+			Ground = new Object(new Vector3(0, -50, 0), 0.05f, "Models\\ground", true);
+			Teapot = new Object(new Vector3(-100, 0, 0), 10f, "Models\\UtahTeapotDef", true);
 
 			Target.Direction = Vector3.UnitX;
 			Teapot.Scale = 10;

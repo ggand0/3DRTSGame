@@ -120,7 +120,7 @@ namespace _3DRTSGame
 			/*Ground = new Object(new Vector3(0, -500, 0), 1f, "Models\\ground");//-200
 			Ground.RenderBoudingSphere = false;
 			Models.Add(Ground);*/
-			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube");
+			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube", true);
 
 			
 

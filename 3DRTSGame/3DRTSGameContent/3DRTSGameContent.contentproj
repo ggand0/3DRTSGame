@@ -215,11 +215,6 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="Models\AGM-65-Maverick-Air-to-Ground-Tactical-Missile.fbx">
-      <Name>AGM-65-Maverick-Air-to-Ground-Tactical-Missile</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
     <Compile Include="Models\AGM65Missile.fbx">
       <Name>AGM65Missile</Name>
       <Importer>FbxImporter</Importer>
@@ -368,6 +363,17 @@
       <Name>WaterMeshRotated</Name>
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\AIM9LMissile.fbx">
+      <Name>AIM9LMissile</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <ProcessorParameters_RotationY>-90</ProcessorParameters_RotationY>
+    </Compile>
+    <Compile Include="Lights\MissileLightingEffect.fx">
+      <Name>MissileLightingEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
     </Compile>
     <None Include="Planets\Clouds\bak\FluidFlow.fx">
       <Name>FluidFlow</Name>

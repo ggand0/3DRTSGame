@@ -21,6 +21,9 @@ namespace _3DRTSGame
 		private Vector3 currentVector;
 
 		private static readonly int DEF_MONEY = 1000;
+		public static readonly Color UI_CIRCLE_COLOR = Color.LightGreen;
+		public static readonly float UI_CIRCLE_RADIUS = 50;
+
 		public int Cregit { get; set; }
 		public List<Object> Units { get; private set; }
 
@@ -128,10 +131,17 @@ namespace _3DRTSGame
 				currentDestination = GetRayPlaneIntersectionPoint(GetPickRay(), planeXZ);
 			} else if (currentMoveOrderState == MoveOrderState.SettingHeight) {
 				// 高ささえ求められれば良いから向きはどうでもいいか
-				Vector3 planeNormal = Vector3.UnitX;
-				Vector3 planePos = new Vector3(currentSelection.Position.X, 0, currentSelection.Position.Z);
+				Vector3 planePos = new Vector3(currentSelection.Position.X, level.camera.Position.Y, currentSelection.Position.Z);
+				Vector3 planePos0 = new Vector3(currentSelection.Position.X, 0, currentSelection.Position.Z);
+
+				//Vector3 planeNormal = Vector3.UnitX;
+				Vector3 planeNormal = Vector3.Normalize(planePos - level.camera.Position);// 同じ高さでのカメラ方向を向く法線になるはず
+				float distance = Vector3.Dot((Vector3.Zero - planePos0), planeNormal);
+
 				//Plane planeVertical = new Plane(planeNormal, planePos.Length());
-				Plane planeVertical = new Plane(planeNormal, -planePos.X);
+				//Plane planeVertical = new Plane(planeNormal, -planePos.X);
+				Plane planeVertical = new Plane(planeNormal, -distance);
+
 				float height = GetRayPlaneIntersectionPoint(GetPickRay(), planeVertical).Y;// 交差点の高さが求める高さである
 				currentDestination = currentSelection.Position + currentVector + new Vector3(0, height, 0);
 			}
@@ -196,8 +206,7 @@ namespace _3DRTSGame
 			HandleInput();
 		}
 
-		public static readonly Color UI_CIRCLE_COLOR = Color.LightGreen;
-		public static readonly float UI_CIRCLE_RADIUS = 50;
+		
 		public void Draw()
 		{
 			if (currentSelection != null) {

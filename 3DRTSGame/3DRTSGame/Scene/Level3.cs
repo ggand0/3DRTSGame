@@ -74,9 +74,9 @@ namespace _3DRTSGame
 			base.Initialize();
 			// Entities
 			Models = new List<Object>();
-			Ground = new Object(new Vector3(0, -200, 0), 1f, "Models\\ground");
+			Ground = new Object(new Vector3(0, -200, 0), 1f, "Models\\ground", true);
 			Models.Add(Ground);
-			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube");
+			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube", true);
 			//Models.Add(Target);
 
 

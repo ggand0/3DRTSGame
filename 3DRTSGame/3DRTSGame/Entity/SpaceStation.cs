@@ -36,7 +36,8 @@ namespace _3DRTSGame
 
 		#region Constructors
 		public SpaceStation(Vector3 position, float scale, string fileName)
-			: base(position, scale, fileName)
+			//: base(position, scale, fileName)
+			:this(false, position, Vector3.Zero, scale, fileName)
 		{
 			Rotate = false;
 			Revolution = false;

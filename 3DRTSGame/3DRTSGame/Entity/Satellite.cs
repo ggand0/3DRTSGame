@@ -158,19 +158,21 @@ namespace _3DRTSGame
 			this.Center = new Vector3(center.X, position.Y, center.Z);
 			revolutionAngle = CalcInitialAngle();
 		}
+		
 		#region Constructors
 		public Satellite(Vector3 position, float scale, string fileName)
-			: base(position)
+			//: base(position)
+			:this(false, position, Vector3.Zero, scale, fileName)
 		{
-			Rotate = false;
+			/*Rotate = false;
 			Revolution = false;
 			this.initialPoint = position;
 			RevolutionClockwise = true;
 
-			circleRenderer = new CircleRenderer(Level.graphicsDevice, Color.White, 50);
+			circleRenderer = new CircleRenderer(Level.graphicsDevice, Color.White, 50);*/
 		}
 		public Satellite(bool revolution, Vector3 position, Vector3 center, float scale, string fileName)
-			:base(position, scale, fileName)
+			:base(position, scale, fileName, true)
 		{
 			this.Revolution = revolution;
 			//this.Center = center;

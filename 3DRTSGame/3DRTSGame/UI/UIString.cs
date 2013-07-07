@@ -18,6 +18,7 @@ namespace _3DRTSGame
 			base.Draw(gameTime);
 
 			spriteBatch.DrawString(game.menuFont, "Credit " + credit.ToString(), TEXT_POSITION, Color.White);
+			spriteBatch.DrawString(game.menuFont, "BUTTONL " + MouseInput.BUTTONL().ToString(), TEXT_POSITION + new Vector2(0, 30), Color.White);
 		}
 
 		public UIString()

@@ -29,6 +29,7 @@ Content\Lights\RimLightingEffect.xnb
 Content\Lights\RimLightingEffectV2.xnb
 Content\Lights\SimpleEffect.xnb
 Content\Lights\SpotLightEffect.xnb
+Content\Lights\MissileLightingEffect.xnb
 Content\Planets\ColorMap.xnb
 Content\Planets\ExtractHDREffect.xnb
 Content\Planets\GasGiant.xnb
@@ -68,7 +69,6 @@ Content\Fonts\menuFont.xnb
 Content\Fonts\Pump_Demi_Bold.xnb
 Content\Fonts\Pump_Demi_Bold2.xnb
 Content\Fonts\titleFont.xnb
-Content\Models\AGM-65-Maverick-Air-to-Ground-Tactical-Missile.xnb
 Content\Models\AGM65Missile.xnb
 Content\Models\cube.xnb
 Content\Models\Dawn.xnb
@@ -93,6 +93,7 @@ Content\Models\UtahTeapot.xnb
 Content\Models\UtahTeapotDef.xnb
 Content\Models\WaterMesh.xnb
 Content\Models\WaterMeshRotated.xnb
+Content\Models\AIM9LMissile.xnb
 Content\Models\Asteroid.xnb
 Content\Models\Ground.xnb
 Content\Models\pea_proj.xnb

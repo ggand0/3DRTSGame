@@ -486,7 +486,7 @@ namespace _3DRTSGame
 			currentWayPoint = wayPoints0[0];
 		}
 		public Fighter(Vector3 position, Vector3 target, float scale, string filePath)
-			:base(position, scale, filePath)
+			: base(position, scale, filePath, true)
 		{
 			this.StartPosition = position;
 			this.Target = target;
