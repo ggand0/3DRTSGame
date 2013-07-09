@@ -290,6 +290,7 @@ namespace _3DRTSGame
 			EnergyRingEffect.game = game;
 			//discoidEffect = new EnergyRingEffect(content, graphicsDevice, new Vector3(0, 0, 0), new Vector2(300));
 			EnergyShieldEffect.game = game;
+			smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
 			/*//shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
 			//explosionTest = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, true, "Xml\\Particle\\particleExplosion0.xml", true);
 			smallExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
@@ -322,12 +323,38 @@ namespace _3DRTSGame
 			time = 0.0;
 			BGM.Volume = 1.0f;
 			BGM.Play();*/
-			currentState = LevelState.Loading;
-			Initialize();
-			//Load();
 
+			currentState = LevelState.Loading;
+			//Initialize();
 			base.Reset();
 
+			player = new Player(this);
+			Models = new List<Object>();
+			Enemies = new List<Object>();
+			Fighters = new List<Fighter>();
+			Satellites = new List<_3DRTSGame.Satellite>();
+			Planets = new List<Planet>();
+			TargetPlanets = new List<DamageablePlanet>();
+			Bullets = new List<Bullet>();
+			enemyManager = new EnemyManager(this);
+
+			WaterPlanet waterPlanet = new WaterPlanet(new Vector3(-100, 100, -100), LightPosition, graphicsDevice, content);
+			IcePlanet icePlanet = new IcePlanet(new Vector3(-100, 100, -800), LightPosition, graphicsDevice, content);
+			GasGiant gasGiant = new GasGiant(new Vector3(-100, 100, -2500), LightPosition, graphicsDevice, content);
+			RockPlanet rockPlanet = new RockPlanet(graphicsDevice, content);
+			MoltenPlanet moltenPlanet = new MoltenPlanet(graphicsDevice, content);
+			//Planets.Add(waterPlanet);
+			TargetPlanets.Add(waterPlanet);
+			Planets.Add(icePlanet);
+			//TargetPlanets.Add(icePlanet);
+			Planets.Add(gasGiant);
+			foreach (Planet p in Planets) {
+				Models.Add(p);
+			}
+			foreach (DamageablePlanet p in TargetPlanets) {
+				Models.Add(p);
+			}
+			currentState = LevelState.Ready;
 		}
 		protected override bool IsClear()
 		{
@@ -606,6 +633,7 @@ namespace _3DRTSGame
 
 
 				// Draw objects
+				enemyManager.Draw(gameTime, camera);// Asteroidの軌道などの描画
 				asteroidBelt.Draw(gameTime);
 				foreach (Object o in Models) {
 					if (o.IsAlive && camera.BoundingVolumeIsInView(o.transformedBoundingSphere)) {
@@ -633,6 +661,7 @@ namespace _3DRTSGame
 				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitY * 1000, 1, Color.Green);
 				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitZ * 1000, 1, Color.Blue);
 				DebugOverlay.Singleton.Draw(camera.Projection, camera.View);
+				
 
 				// Draw effects
 				effectManager.Draw(gameTime, camera);

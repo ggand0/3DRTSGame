@@ -278,9 +278,10 @@ namespace _3DRTSGame
 
 			// Bounding Sphereを更新：World行列の更新後に行うこと。
 			if (Model != null) {
-				transformedBoundingSphere = new BoundingSphere(
+				/*transformedBoundingSphere = new BoundingSphere(
 					Vector3.Transform(Model.Meshes[0].BoundingSphere.Center, _world)
-					, Model.Meshes[0].BoundingSphere.Radius * _world.Forward.Length());
+					, Model.Meshes[0].BoundingSphere.Radius * _world.Forward.Length());*/
+				transformedBoundingSphere = new BoundingSphere(Position, Model.Meshes[0].BoundingSphere.Radius * Scale);
 			} else {
 				transformedBoundingSphere = new BoundingSphere(
 					Position

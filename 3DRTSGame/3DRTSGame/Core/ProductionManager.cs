@@ -13,15 +13,9 @@ namespace _3DRTSGame
 	/// </summary>
 	public class ProductionManager
 	{
+		#region Fields&Properties
 		private static float DEF_SPAWN_HEIGHT = 0;
 
-		private Level4 level;
-		private Player player;
-
-		//private Type currentSelection;
-		private string currentSelection;
-		private SatelliteWeapon currrentWeaponTypeSelection;
-		private bool isDragging;
 		public UIManager UIManager { get; private set; }
 		public enum SelectionState
 		{
@@ -29,15 +23,19 @@ namespace _3DRTSGame
 			GivingPosition,
 			None
 		}
+
+		private Level4 level;
+		private Player player;
+		private string currentSelection;
+		private SatelliteWeapon currrentWeaponTypeSelection;
+		private bool isDragging;
 		private SelectionState state;
-		//private Dictionary<Type, Object> uiModels;
 		private Dictionary<string, Object> uiModels;
 		private Object currentUIModel;
 		private BillboardSystem uiRing;
-
 		private Dictionary<string, int> unitCosts;
-		//private string[] unitWeaponTypes;
 		private SatelliteWeapon[] unitWeaponTypes;
+#endregion
 
 		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)
 		{
@@ -130,7 +128,9 @@ namespace _3DRTSGame
 						break;
 					case "SpaceStation":
 						//tmpSatellite = tmpSatellite as SpaceStation;
-						tmpSatellite = new SpaceStation(intersectionPoint, 100, "Models\\spacestation4");
+						// 後でcloneに......
+						//tmpSatellite = new SpaceStation(intersectionPoint, 100, "Models\\spacestation4");
+						tmpSatellite = ObjectPool.SpaceStationPool.Dequeue();
 						break;
 				}
 
@@ -138,6 +138,10 @@ namespace _3DRTSGame
 				level.Satellites.Add(tmpSatellite);
 
 				player.UseMoney(tmpSatellite);
+
+				// 連続クリックで連続spawnしないように初期化しておく
+				currentSelection = null;
+				currrentWeaponTypeSelection = SatelliteWeapon.None;
 			}
 		}
 		public void Update(GameTime gameTime)
@@ -157,7 +161,6 @@ namespace _3DRTSGame
 				Camera c = level.camera;
 				currentUIModel.Draw(c.View, c.Projection, c.Position);
 
-				//uiRing.Position = uiModel.Position;
 				uiRing.SetPosition(currentUIModel.Position);
 				uiRing.Draw(c.View, c.Projection, Vector3.UnitX, Vector3.UnitZ);
 			}
@@ -183,19 +186,6 @@ namespace _3DRTSGame
 			unitCosts.Add("SpaceStation", 500);
 
 			unitWeaponTypes = new SatelliteWeapon[] { SatelliteWeapon.LaserBolt, SatelliteWeapon.Missile, SatelliteWeapon.LaserBolt, SatelliteWeapon.LaserBolt };
-		}
-		// 使ってない
-		public ProductionManager(Level4 level, UIManager uiManager)
-		{
-			this.level = level;
-			this.player = level.player;
-			this.UIManager = uiManager;
-			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
-				Vector2.One, new Vector3[] { currentUIModel.Position });
-
-			unitCosts = new Dictionary<string, int>();
-			unitCosts.Add("ArmedSatellite", 100);
-			unitCosts.Add("SpaceStation", 500);
 		}
 	}
 }

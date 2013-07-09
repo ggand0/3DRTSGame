@@ -20,7 +20,7 @@ namespace _3DRTSGame
 		private static readonly float DEF_REVOLUTION_SPEED = 0.25f;
 		private static readonly float DEF_MOVE_SPEED = 1f;
 		
-		private MovingState currentMovingState = MovingState.Revolution;
+		protected MovingState currentMovingState = MovingState.Revolution;
 		private Vector3 currentDestination;
 
 		public bool Rotate { get; protected set; }

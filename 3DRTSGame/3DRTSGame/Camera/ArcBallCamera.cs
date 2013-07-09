@@ -433,7 +433,8 @@ namespace _3DRTSGame
 			_zoom -= (curScroll - prevScroll);
 			prevScroll = curScroll;
 
-			//
+
+			// 今カメラが向いている方向を前として移動するパターン(JoyStick)
 			/*float stickSensitivity = 0.2f;
 			//  スティックが倒されていればDirectionを再計算する
 			if (JoyStick.Vector.Length() > stickSensitivity) {
@@ -441,19 +442,49 @@ namespace _3DRTSGame
 				float speed = JoyStick.Vector.Length() * 30;
 				analogAngle += MathHelper.ToRadians(-90);
                 
-				Vector3 tmpVelocity = Vector3.Zero;
+				Vector3 velocity = Vector3.Zero;
 				Direction = Target - Position;
-				Direction = new Vector3(tmpDirection.X, 0, tmpDirection.Z);
-				RotationMatrix = Matrix.CreateRotationY((float)analogAngle);
-				// 面白い動き : //RotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(JoyStick.Vector.Y)) * Matrix.CreateRotationX(MathHelper.ToRadians(-JoyStick.Vector.X));
-				tmpDirection = Vector3.TransformNormal(tmpDirection, RotationMatrix);
-				tmpDirection = Vector3.Normalize(tmpDirection);// プロパティなので代入しないと反映されないことに注意
-				tmpVelocity = new Vector3(tmpDirection.X * speed, tmpVelocity.Y, tmpDirection.Z * speed);
+				Direction = new Vector3(Direction.X, 0, Direction.Z);
+				Matrix RotationMatrix = Matrix.CreateRotationY((float)analogAngle);
+				Direction = Vector3.TransformNormal(Direction, RotationMatrix);
+				Direction = Vector3.Normalize(Direction);// プロパティなので代入しないと反映されないことに注意
+				velocity = new Vector3(Direction.X * speed, velocity.Y, Direction.Z * speed);
 
-				tmpCameraPos += tmpVelocity;
+				target += velocity;
 			}*/
+			// 今カメラが向いている方向を前として移動するパターン(KeyBoard)
+			if (KeyInput.KEY(Keys.W) || KeyInput.KEY(Keys.S) || KeyInput.KEY(Keys.A) || KeyInput.KEY(Keys.D)) {
+				double analogAngle = Math.Atan2(JoyStick.Vector.Y, JoyStick.Vector.X);
+				if (KeyInput.KEY(Keys.W)) {
+					analogAngle = 0;
+				} else if (KeyInput.KEY(Keys.S)) {
+					analogAngle = 180;
+				}
+				if (KeyInput.KEY(Keys.A)) {
+					analogAngle = 90;
+				} else if (KeyInput.KEY(Keys.D)) {
+					analogAngle = -90;
+				}
+				analogAngle = (double)MathHelper.ToRadians((float)analogAngle);
 
-			float speed = 10;
+
+				//float speed = JoyStick.Vector.Length() * 30;
+				float speed = 20;
+				//analogAngle += MathHelper.ToRadians(-90);
+
+				Vector3 velocity = Vector3.Zero;
+				Direction = Target - Position;
+				Direction = new Vector3(Direction.X, 0, Direction.Z);
+				Matrix RotationMatrix = Matrix.CreateRotationY((float)analogAngle);
+				Direction = Vector3.TransformNormal(Direction, RotationMatrix);
+				Direction = Vector3.Normalize(Direction);// プロパティなので代入しないと反映されないことに注意
+				velocity = new Vector3(Direction.X * speed, velocity.Y, Direction.Z * speed);
+				target += velocity;
+			}
+
+
+			// 固定方向を前として移動するパターン（+X軸方向など）
+			/*float speed = 10;
 			if (JoyStick.stickDirection == _3DRTSGame.Direction.LEFT || KeyInput.KEY(Keys.A)) {
 				target += new Vector3(-speed, 0, 0);
 			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.RIGHT || KeyInput.KEY(Keys.D)) {
@@ -463,7 +494,7 @@ namespace _3DRTSGame
 				target += new Vector3(0, 0, speed);
 			} else if (JoyStick.stickDirection == _3DRTSGame.Direction.DOWN || KeyInput.KEY(Keys.S)) {
 				target += new Vector3(0, 0, -speed);
-			}/**/
+			}*/
 
 		}
 		/// <summary>

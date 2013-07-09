@@ -28,6 +28,9 @@ namespace _3DRTSGame
 		//public override bool IsHitWith(Drawable d)
 		private static readonly float DEF_REVOLUTION_SPEED = 0.05f;//0.0005f;
 		private float revolutionAngle, revolutionSpeed;
+		private int movePattern = 1;
+		private string movePatternSubType;
+
 
 		private Matrix BuildRotationMatrix()
 		{
@@ -37,17 +40,26 @@ namespace _3DRTSGame
 
 			return Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
 		}
-		private float CalcInitialAngle()
+		private float CalcInitialAngle(int movePattern, string subType)
 		{
-			float radius = (Position - Destination).Length();
-			Vector3 velocity = new Vector3((float)Math.Cos(revolutionAngle), 0,
-					(float)Math.Sin(revolutionAngle));
-			Vector3 def = Destination + velocity * radius;
-			Vector3 v1 = Vector3.Normalize(Destination - def);
-			Vector3 v2 = Vector3.Normalize(Destination - Position);
+			switch (movePattern) {
+				default:
+					/*float radius = (Position - Destination).Length();
+					Vector3 velocity = new Vector3((float)Math.Cos(revolutionAngle), 0,
+							(float)Math.Sin(revolutionAngle));
+					Vector3 def = Destination + velocity * radius;
+					Vector3 v1 = Vector3.Normalize(Destination - def);
+					Vector3 v2 = Vector3.Normalize(Destination - Position);*/
 
-			//return (float)Math.Acos(Vector3.Dot(v1, v2));
-			return MathHelper.ToRadians(1440);
+					return MathHelper.ToRadians(1440);
+				case 1:
+					switch (subType) {
+						default:
+							return MathHelper.ToRadians(1440);
+						case "1":
+							return MathHelper.ToRadians(1440);
+					}
+			}
 		}
 		protected override void UpdateWorldMatrix()
 		{
@@ -57,22 +69,37 @@ namespace _3DRTSGame
 		protected virtual void Move(int pattern)
 		{
 			switch (pattern) {
-				default :
+				default:
 					Rotation += rotationSpeed;
 					Velocity = (Vector3.Normalize(Destination - Position)) * Speed;
 					Position += Velocity;
 					break;
 				case 1:
-					float a = 0.15f, b = 0.5f;
+					Vector2 pos = Vector2.Zero;
+					switch (movePatternSubType) {
+						default:
+							float a = 0.15f, b = 0.5f;
+							revolutionSpeed = 1f;//DEF_REVOLUTION_SPEED;
+							revolutionAngle -= MathHelper.ToRadians(revolutionSpeed);
 
-					revolutionSpeed = 1f;//DEF_REVOLUTION_SPEED;
-					revolutionAngle -= MathHelper.ToRadians(revolutionSpeed);
-					Velocity = new Vector3(a * (float)Math.Exp(b * revolutionAngle) * (float)Math.Cos(revolutionAngle), 0,
-						a * (float)Math.Exp(b * revolutionAngle) * (float)Math.Sin(revolutionAngle));
-					float radius = (Position - Destination).Length();
-					Position = Destination + Velocity;
-					//Position += Velocity * 100;
-					//Position += Velocity;
+							pos = Utility.CalcLogarithmicSpiral(a, b, revolutionAngle);
+							/*Velocity = new Vector3(a * (float)Math.Exp(b * revolutionAngle) * (float)Math.Cos(revolutionAngle), 0,
+								a * (float)Math.Exp(b * revolutionAngle) * (float)Math.Sin(revolutionAngle));*/
+							Velocity = new Vector3(pos.X, 0, pos.Y);
+
+							//float radius = (Position - Destination).Length();
+							Position = Destination + Velocity;
+							break;
+						case "1":
+							float a1 = 0.15f, b1 = 0.5f;
+							revolutionSpeed = 1f;//DEF_REVOLUTION_SPEED;
+							revolutionAngle -= MathHelper.ToRadians(revolutionSpeed);
+							pos = Utility.CalcLogarithmicSpiral(a1, b1, revolutionAngle, Matrix.CreateRotationZ(MathHelper.ToRadians(90)));
+
+							Velocity = new Vector3(pos.X, 0, pos.Y);
+							Position = Destination + Velocity;
+							break;
+					}
 					break;
 			}
 		}
@@ -110,7 +137,7 @@ namespace _3DRTSGame
 				Vector3 tmp = Center + velocity * radius;
 				Position = tmp;
 			*/
-			if (!Stational) Move(1);
+			if (!Stational) Move(movePattern);
 
 			UpdateWorldMatrix();
 			transformedBoundingSphere = new BoundingSphere(
@@ -142,9 +169,11 @@ namespace _3DRTSGame
 
 
 		#region Constructors
-		public void Initialize()
+		public void Initialize(int movePattern, string subType)
 		{
-			revolutionAngle = CalcInitialAngle();
+			this.movePattern = movePattern;
+			this.movePatternSubType = subType;
+			revolutionAngle = CalcInitialAngle(movePattern, movePatternSubType);
 		}
 		public Asteroid(Vector3 position, float scale, string fileName)
 			:this(position, Vector3.Zero, scale, 1, fileName)
@@ -179,7 +208,7 @@ namespace _3DRTSGame
 			SetModelEffect(lightingEffect, true);
 			//SetModelEffect(lightingEffect, false);
 
-			revolutionAngle = CalcInitialAngle();
+			revolutionAngle = CalcInitialAngle(1, "0");
 			RotationMatrix = BuildRotationMatrix();
 			MaxHitPoint = 15;
 			HitPoint = MaxHitPoint;

@@ -11,7 +11,7 @@ namespace _3DRTSGame
 	public class Level : Scene
 	{
 		public static GraphicsDevice graphicsDevice;
-		public static bool mute = true;
+		//public static bool mute = true;
 		public static readonly Vector3 PlayfieldSize = new Vector3(100000);
 		private static readonly Vector3 initialCameraPosition = new Vector3(0.0f, 50.0f, 5000.0f);
 
@@ -34,8 +34,8 @@ namespace _3DRTSGame
 
 		// Members for RTS game (used in Level3, 4)
 		public List<Bullet> Bullets { get; protected set; }
-		public List<Object> Enemies { get; private set; }
-		public List<Satellite> Satellites { get; private set; }
+		public List<Object> Enemies { get; protected set; }
+		public List<Satellite> Satellites { get; protected set; }
 		public List<EnergyShieldEffect> transparentEffects { get; set; }
 
 		/*public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }

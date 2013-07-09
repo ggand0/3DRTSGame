@@ -18,8 +18,13 @@ namespace _3DRTSGame
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
+			// Scaleを使用してBSの半径を求めると何故か実態の大きさに見合わない半径5000が設定されてしまうのでやむを得ず具体値を入れて調整した
+			transformedBoundingSphere = new BoundingSphere(Position, Model.Meshes[0].BoundingSphere.Radius * 10);
 
 			foreach (Turret t in Turrets) {
+				if (currentMovingState == MovingState.Moving) {
+					t.Position = Position;
+				}
 				t.Update(gameTime);
 			}
 		}

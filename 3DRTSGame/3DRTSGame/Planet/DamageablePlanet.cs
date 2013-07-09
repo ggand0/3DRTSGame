@@ -14,7 +14,7 @@ namespace _3DRTSGame
 	/// </summary>
 	public class DamageablePlanet : Planet, IDamageable
 	{
-		protected static readonly int DEF_HIT_POINT = 500;
+		protected static readonly int DEF_HIT_POINT = 500;//500;
 
 		private Texture2D lifeBar, lifeBarBack;
 		public int HitPoint { get; private set; }

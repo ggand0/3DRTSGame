@@ -113,14 +113,14 @@ namespace _3DRTSGame
 			//メニュー選択
 			if (KeyInput.IsOnKeyDown(Keys.Up) && 0 < menuIndex) {
 				menuIndex--;
-				selectSound.CreateInstance().Play();
+				if (!Game1.mute) selectSound.CreateInstance().Play();
 			} else if (KeyInput.IsOnKeyDown(Keys.Down) && menuIndex < menu.Length - 1) {
 				menuIndex++;
-				selectSound.CreateInstance().Play();
+				if (!Game1.mute) selectSound.CreateInstance().Play();
 			}
 			//メニュー決定・実行
 			if (KeyInput.IsOnKeyUp(Keys.Enter)) {
-				enterSound.CreateInstance().Play();
+				if (!Game1.mute) enterSound.CreateInstance().Play();
 				//ownerLevel.BGM.Volume = 1.0f;
 				this.isEndScene = true;
 				MENU_ACTIONS[(int)selectedMenu](this);

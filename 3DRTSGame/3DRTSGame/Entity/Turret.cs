@@ -166,7 +166,7 @@ namespace _3DRTSGame
 				//shootSound.Play();
 				//shootSoundInstance.Play();
 
-				if (!Level.mute && shootSound != null) {
+				if (!Game1.mute && shootSound != null) {
 					SoundEffectInstance ls = shootSound.CreateInstance();
 					ls.Volume = 0.05f;
 					ls.Play();

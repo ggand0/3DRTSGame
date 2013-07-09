@@ -24,6 +24,28 @@ namespace _3DRTSGame
 			float angle = (float)Math.Acos(Vector3.Dot(v1, v2));
 			return def.Z > Position.Z ? -angle : angle;// 角度の大きさしか分からないのでこれで調整
 		}
+		public static Vector2 CalcLogarithmicSpiral(float a, float b, float theta)
+		{
+			/*//float aa = 0.15f, b = 0.5f, angle = MathHelper.ToRadians(1440);
+			Vector2 pos = new Vector2(a * (float)Math.Exp(b * theta) * (float)Math.Cos(theta), 
+					a * (float)Math.Exp(b * theta) * (float)Math.Sin(theta));
+			return pos;*/
+			return Utility.CalcLogarithmicSpiral(a, b, theta, Matrix.Identity);
+		}
+		public static Vector2 CalcLogarithmicSpiral(float a, float b, float theta, Matrix transform)
+		{
+			//float aa = 0.15f, b = 0.5f, angle = MathHelper.ToRadians(1440);
+			Vector2 pos = new Vector2(a * (float)Math.Exp(b * theta) * (float)Math.Cos(theta),
+					a * (float)Math.Exp(b * theta) * (float)Math.Sin(theta));
+
+			return Vector2.Transform(pos, transform);
+			//return transform * pos;
+		}
+		public static Matrix RotationMatrix(float theta)
+		{
+			throw new NotImplementedException();
+			//return Matrix.Identity;
+		}
 
 		public static float NextDouble(Random r, double min, double max)
 		{

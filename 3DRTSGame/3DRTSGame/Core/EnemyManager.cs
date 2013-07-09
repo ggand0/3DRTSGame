@@ -11,11 +11,20 @@ namespace _3DRTSGame
 	public struct EnemyInfo
 	{
 		public Type EnemyType { get; set; }
+		/// <summary>
+		/// 何らかの属性を格納するのに使用。たとえばAsteroidの飛来軌道パターンなど。
+		/// </summary>
+		public string EnemySubType { get; set; }
 		public float SpawnProbability { get; set; }
 
 		public EnemyInfo(Type type, float prob)
+			: this(type, "", prob)
+		{
+		}
+		public EnemyInfo(Type type, string subType, float prob)
 			: this()
 		{
+			EnemySubType = subType;
 			EnemyType = type;
 			SpawnProbability = prob;
 		}
@@ -78,15 +87,16 @@ namespace _3DRTSGame
 
 
         #region Methods
-        public static float NextDouble(Random r, double min, double max)
+		#region old methods
+		/*public static float NextDouble(Random r, double min, double max)
 		{
-			return (float)(min + r.NextDouble() * (max - min));
-		}
+			return (float)(min + r.Utility.NextDouble() * (max - min));
+		}*/
 		private void AddAsteroids(int asteroidNum, float radius)
 		{
 			for (int i = 0; i < asteroidNum; i++) {
 				//random = new Random();
-				level.Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius))
+				level.Asteroids.Add(new Asteroid(new Vector3(Utility.NextDouble(random, -radius, radius), 0, Utility.NextDouble(random, -radius, radius))
 					, level.sun.Position, 0.05f, 10, "Models\\Asteroid"));
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				//Asteroids[i].SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
@@ -96,8 +106,8 @@ namespace _3DRTSGame
 		{
 			if (level.Enemies.Count < ASTEROID_MAX_SPAWN_NUM) {// = 15 -5
 				float radius = 3000;
-				Asteroid a = new Asteroid(new Vector3(NextDouble(random, -radius, radius)
-					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, 5, "Models\\Asteroid");
+				Asteroid a = new Asteroid(new Vector3(Utility.NextDouble(random, -radius, radius)
+					, 0, Utility.NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, 5, "Models\\Asteroid");
 				//Asteroids[i].Scale = 0.02f;//0.1f;
 				//a.SetModelEffect(shadowEffect, true);					// set effect to each modelmeshpart
 				a.IsActive = true;
@@ -110,7 +120,7 @@ namespace _3DRTSGame
 		{
 			if (level.Enemies.Count < ASTEROID_MAX_SPAWN_NUM) {// = 15 -5
 				float radius = 3000;
-				Fighter f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
+				Fighter f = new Fighter(new Vector3(Utility.NextDouble(random, -radius, radius), Utility.NextDouble(random, -radius, radius), Utility.NextDouble(random, -radius, radius))
 					, level.Planets[0].Position, 20f, "Models\\fighter0");
 				f.IsActive = true;
 				f.RenderBoudingSphere = false;
@@ -118,44 +128,62 @@ namespace _3DRTSGame
 				level.Models.Add(f);
 			}
 		}
+		#endregion
 
 		Asteroid a; Fighter f;
-		private void SpawnEnemies(Type enemyType)
+		/// <summary>
+		/// AsteroidのSpawn時の対数螺旋軌道を決定する
+		/// </summary>
+		/// <param name="pattern"></param>
+		/// <returns></returns>
+		private Vector2 CalcLogarithmicSpiral(int pattern)
+		{
+			switch (pattern) {
+				default:
+					return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+				case 1:
+					return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+				case 2:
+					return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+			}
+		}
+		private void SpawnEnemies(EnemyInfo enemyData)//Type enemyType
 		{
 			// 乱数が入らなかったらDictionaryで予めargumentsを計算してスマートにインスタンス生成が出来るのだが、
 			// 乱数入りなので仕方なく関数内で条件分岐させることに。さらにswitch
 			float radius = 3000;
-			/*if (enemyType == typeof(Asteroid)) {
-				a = new Asteroid(new Vector3(NextDouble(random, -radius, radius)
-					, 0, NextDouble(random, -radius, radius)), level.sun.Position, 0.05f, "Models\\Asteroid");
-				a.RenderBoudingSphere = false;
-				level.Models.Add(a);
-				level.Enemies.Add(a);
-			} else if (enemyType == typeof(Fighter)) {
-				//f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
-					//, level.Planets[0].Position, 20f, "Models\\fighter0");
-				f = new Fighter(new Vector3(NextDouble(random, -radius, radius), NextDouble(random, -radius, radius), NextDouble(random, -radius, radius))
-					, level.TargetPlanets[0].Position, 20f, "Models\\fighter0");
-				f.RenderBoudingSphere = false;
-				level.Models.Add(f);
-				level.Enemies.Add(f);
-			}*/
-            if (enemyType == typeof(Asteroid)) {
-                /*enemiesOrg["Asteroid"].Position = new Vector3(NextDouble(random, -radius, radius)
-                    , 0, NextDouble(random, -radius, radius));*/
 
-				float aa = 0.15f, b = 0.5f, angle = MathHelper.ToRadians(1440);
+            if (enemyData.EnemyType == typeof(Asteroid)) {
+                /*enemiesOrg["Asteroid"].Position = new Vector3(Utility.NextDouble(random, -radius, radius)
+                    , 0, Utility.NextDouble(random, -radius, radius));*/
+
+				/*float aa = 0.15f, b = 0.5f, angle = MathHelper.ToRadians(1440);
 				enemiesOrg["Asteroid"].Position = level.TargetPlanets[0].Position +
 					new Vector3(aa * (float)Math.Exp(b * angle) * (float)Math.Cos(angle), 0,
-						aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));
-                enemiesOrg["Asteroid"].RenderBoudingSphere = false;
+						aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));*/
+
+				Vector2 spiralPos = Vector2.Zero;
+				switch (enemyData.EnemySubType) {
+					default:
+						spiralPos = Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+						break;
+					case "1":
+						spiralPos = Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440), Matrix.CreateRotationY(MathHelper.ToRadians(90)));
+						break;
+				}
+				
+				enemiesOrg["Asteroid"].Position = level.TargetPlanets[0].Position + new Vector3(spiralPos.X, 0, spiralPos.Y);
+                //enemiesOrg["Asteroid"].RenderBoudingSphere = false;
 
                 //a = (Asteroid)enemiesOrg["Asteroid"].Clone();
 				if (ObjectPool.AsteroidPool.Count > 0) {
+					// いくつかのプロパティに変更を加えたいので、一時的にメンバ変数に格納する
 					a = ObjectPool.AsteroidPool.Dequeue();
-					a.Position = level.TargetPlanets[0].Position +
+
+					/*a.Position = level.TargetPlanets[0].Position +
 						new Vector3(aa * (float)Math.Exp(b * angle) * (float)Math.Cos(angle), 0,
-							aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));
+							aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));*/
+					a.Position = new Vector3(spiralPos.X, 0, spiralPos.Y);
 					a.Destination = level.TargetPlanets[0].Position;
 					a.Scale = 0.05f;
 
@@ -163,7 +191,7 @@ namespace _3DRTSGame
 					a.IsActive = true;
 					a.IsAlive = true;
 					// angleのせいかも
-					a.Initialize();
+					a.Initialize(1, enemyData.EnemySubType);
 				} else {
 					a = (Asteroid)enemiesOrg["Asteroid"].Clone();
 				}
@@ -171,10 +199,10 @@ namespace _3DRTSGame
                 level.Models.Add(a);
                 level.Enemies.Add(a);
 				level.Asteroids.Add(a);
-            } else if (enemyType == typeof(Fighter)) {
-                enemiesOrg["Fighter"].Position = new Vector3(NextDouble(random, -radius, radius),
-                    NextDouble(random, -radius, radius), NextDouble(random, -radius, radius));
-                enemiesOrg["Fighter"].RenderBoudingSphere = false;
+			} else if (enemyData.EnemyType == typeof(Fighter)) {
+                enemiesOrg["Fighter"].Position = new Vector3(Utility.NextDouble(random, -radius, radius),
+                    Utility.NextDouble(random, -radius, radius), Utility.NextDouble(random, -radius, radius));
+                //enemiesOrg["Fighter"].RenderBoudingSphere = false;
 
                 Fighter f = (Fighter)enemiesOrg["Fighter"].Clone();
                 f.Target = level.TargetPlanets[0].Position;
@@ -217,7 +245,8 @@ namespace _3DRTSGame
 								break;
 							}*/
 							if (prob + sum < i.SpawnProbability) {
-								SpawnEnemies(i.EnemyType);
+								//SpawnEnemies(i.EnemyType);
+								SpawnEnemies(i);
 								break;
 							} else {
 								//sum += i.SpawnProbability;
@@ -239,12 +268,30 @@ namespace _3DRTSGame
 				}
 			}
 		}
+
+
+		private SpiralRenderer spiralRenderer, spiralRenderer1, spiralRenderer2;
+		/// <summary>
+		/// Asteoidsの飛来軌道の描画など
+		/// </summary>
+		/// <param name="gameTime"></param>
+		public void Draw(GameTime gameTime, Camera camera)
+		{
+			if (spiralRenderer == null) {
+				spiralRenderer = new SpiralRenderer(Level.graphicsDevice, new Color(Color.Orange.ToVector4() + new Color(0.2f, 0,0,0).ToVector4()) * 0.5f, 0, 1440, level.TargetPlanets[0].Position);
+				//spiralRenderer1 = new SpiralRenderer(Level.graphicsDevice, Color.MediumPurple * 0.5f, 0, 1440, level.TargetPlanets[0].Position, Matrix.CreateRotationZ(MathHelper.ToRadians(90)));
+				spiralRenderer1 = new SpiralRenderer(Level.graphicsDevice, Color.MediumPurple * 0.5f, 0, 1440, level.TargetPlanets[0].Position, Matrix.CreateRotationZ(MathHelper.ToRadians(90)));
+			}
+			spiralRenderer.Draw(Level.graphicsDevice, camera.View, camera.Projection, Matrix.Identity, Color.Orange);
+			spiralRenderer1.Draw(Level.graphicsDevice, camera.View, camera.Projection, Matrix.Identity, Color.Orange);
+		}
         #endregion
 
         private void Initialize()
 		{
 			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 1f) }, 0, 1, 4, 3000, 60));
+			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 1f) }, 0, 1, 4, 3000, 60));
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), "0", 1/3f), new EnemyInfo(typeof(Asteroid), "1", 1/3f) , new EnemyInfo(typeof(Asteroid), "2", 1/3f) }, 0, 1, 4, 3000, 60));
 			
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Fighter), 1f) }, 0, 10, 1, 3000, 30));
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 5, 4, 3000, 30));
@@ -258,6 +305,8 @@ namespace _3DRTSGame
 		{
 			this.level = level;
 			Initialize();
+
+			//spiralRenderer = new SpiralRenderer(Level.graphicsDevice, Color.Orange, 0, 1440, level.TargetPlanets[0].Position);
 		}
 	}
 }

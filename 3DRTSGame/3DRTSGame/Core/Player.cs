@@ -90,6 +90,16 @@ namespace _3DRTSGame
 				case "move":
 					currentMoveOrderState = MoveOrderState.SettingPosition;
 					break;
+				case "laser":
+					if (currentSelection is ArmedSatellite) {
+						(currentSelection as ArmedSatellite).Initialize(SatelliteWeapon.LaserBolt);
+					}
+					break;
+				case "missile":
+					if (currentSelection is ArmedSatellite) {
+						(currentSelection as ArmedSatellite).Initialize(SatelliteWeapon.Missile);
+					}
+					break;
 			}
 		}
 		private void HandleInput()

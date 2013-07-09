@@ -19,12 +19,14 @@ namespace _3DRTSGame
 		private static readonly int MID_EXPLOSION_EFFECT_NUM = 50;
 		private static readonly int BIG_EXPLOSION_EFFECT_NUM = 10;
 		private static readonly int MAX_SATELLITE_NUM = 10;
+		private static readonly int MAX_SPACESTATION_NUM = 3;
 
 		public static Queue<Asteroid> AsteroidPool { get; private set; }
 		public static Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
 		public static Queue<ExplosionEffect> MidExplosionPool { get; private set; }
 		public static Queue<ExplosionEffect> BigExplosionPool { get; private set; }
 		public static Queue<Satellite> SatellitePool { get; private set; }
+		public static Queue<Satellite> SpaceStationPool { get; private set; }
 
 		public static ContentManager content;
 		public static GraphicsDevice graphicsDevice;
@@ -56,6 +58,10 @@ namespace _3DRTSGame
 			for (int i = 0; i < MAX_SATELLITE_NUM; i++) {//
 				//SatellitePool.Enqueue((Satellite)Satellite.Clone());
 				SatellitePool.Enqueue(new ArmedSatellite(new Vector3(300, 50, 300), Vector3.Zero, 5, "Models\\Dawn", "SoundEffects\\laser1"));
+			}
+			SpaceStationPool = new Queue<Satellite>();
+			for (int i = 0; i < MAX_SPACESTATION_NUM; i++) {
+				SpaceStationPool.Enqueue(new SpaceStation(false, new Vector3(300, 50, 300), Vector3.Zero, 100, "Models\\spacestation4"));
 			}
 
 			LOADED = true;

@@ -19,6 +19,7 @@ namespace _3DRTSGame
 	/// </summary>
 	public class Game1 : Microsoft.Xna.Framework.Game
 	{
+		public static bool mute = true;
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
 		private Scene currentScene;
