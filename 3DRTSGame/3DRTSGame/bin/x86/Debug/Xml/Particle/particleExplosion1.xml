@@ -17,7 +17,7 @@
     <Item Type="_3DRTSGame.ExplosionParticleEmitter">
       <Name>mist/smoke</Name>
       <TexturePath use = "argument" type = "Texture2D">Textures\Particle\smoke</TexturePath>
-      <ParticleNum use = "argument" type = "int">100</ParticleNum>
+      <ParticleNum use = "argument" type = "int">50</ParticleNum>
       <Scale use = "argument" type = "Vector2">200</Scale>
       <Lifespane use = "argument" type = "float">3</Lifespane>
       <FadeInTime use = "argument" type = "float">0</FadeInTime>
@@ -27,7 +27,7 @@
     <Item Type="_3DRTSGame.ExplosionParticleEmitter">
       <Name>explosion</Name>
       <TexturePath use = "argument" type = "Texture2D">Textures\Particle\explosion</TexturePath>
-      <ParticleNum use = "argument" type = "int">200</ParticleNum>
+      <ParticleNum use = "argument" type = "int">50</ParticleNum>
       <Scale use = "argument" type = "Vector2">100</Scale>
       <Lifespane use = "argument" type = "float">3</Lifespane>
       <FadeInTime use = "argument" type = "float">0</FadeInTime>
@@ -37,7 +37,7 @@
     <Item Type = "_3DRTSGame.ExplosionParticleEmitter">
       <Name>flying spark</Name>
       <TexturePath use = "argument" type = "Texture2D">Textures\Mercury\Beam2</TexturePath>
-      <ParticleNum use = "argument" type = "int">80</ParticleNum>
+      <ParticleNum use = "argument" type = "int">30</ParticleNum>
       <Scale use = "argument" type = "Vector2">70</Scale>
       <Lifespane use = "argument" type = "float">3</Lifespane>
       <FadeInTime use = "argument" type = "float">0</FadeInTime>
@@ -48,7 +48,7 @@
     <Item Type = "_3DRTSGame.ExplosionParticleEmitter">
       <Name>spark</Name>
       <TexturePath use = "argument" type = "Texture2D">Textures\Mercury\FlowerBurst</TexturePath>
-      <ParticleNum use = "argument" type = "int">60</ParticleNum>
+      <ParticleNum use = "argument" type = "int">30</ParticleNum>
       <Scale use = "argument" type = "Vector2">50</Scale>
       <Lifespane use = "argument" type = "float">3</Lifespane>
       <FadeInTime use = "argument" type = "float">0</FadeInTime>
@@ -65,7 +65,7 @@
       <Movementuse use = "argument" type = "int">0</Movementuse>
       <Speed use = "argument" type = "float">10</Speed>
     </Item>
-    <Name>Big Explosion</Name>
+    <Name>Mid Explosion</Name>
     <Author>pentiumx</Author>
     <Description>description of basic explosion particles</Description>
   </Asset>

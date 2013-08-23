@@ -423,10 +423,12 @@ namespace _3DRTSGame
 				if (zoomMode == zoomState.Length) zoomMode = 0;
 			}
 			_zoom = zoomState[zoomMode];*/
-			if (JoyStick.KEY(7)) {
+
+            // ズームイン・アウトの入力：ノートPCでジェスチャーが効かなかった時用に、矢印キーの上下も対応させておく
+			if (JoyStick.KEY(7) || JoyStick.stickDirection == _3DRTSGame.Direction.UP) {
 				_zoom += 20;
 			}
-			if (JoyStick.KEY(5)) {
+            if (JoyStick.KEY(5) || JoyStick.stickDirection == _3DRTSGame.Direction.DOWN) {
 				_zoom -= 20;
 			}
 			curScroll = Mouse.GetState().ScrollWheelValue;

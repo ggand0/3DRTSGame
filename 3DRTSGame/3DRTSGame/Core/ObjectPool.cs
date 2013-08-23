@@ -32,25 +32,35 @@ namespace _3DRTSGame
 		public static GraphicsDevice graphicsDevice;
 		private static ExplosionEffect smallExplosion, midExplosion, bigExplosion;
 
-		public static void Load()
+		//public static void Load(GraphicsProfile graphicsProfile)
+        public static void Load(object graphicsProfile)
 		{
-			//Thread.Sleep(1000);
-
+            GraphicsProfile graphics = (GraphicsProfile)graphicsProfile;
 			AsteroidPool = new Queue<Asteroid>();
 			for (int i = 0; i < ASTEROID_POOL_NUM; i++) {
 				// どうせ使うときに値変えるので適当に設定
 				AsteroidPool.Enqueue(new Asteroid(Vector3.Zero, 1f, "Models\\Asteroid"));
 			}
 			// staticに出来ないorz
-			smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
-			for (int i = 0; i < SMALL_EXPLOSION_EFFECT_NUM; i++) {
+
+            if (graphics == GraphicsProfile.Light) {
+                smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosionSmall.xml", false);
+			    midExplosion = new ExplosionEffect(content, graphicsDevice, "mid", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
+                bigExplosion = new ExplosionEffect(content, graphicsDevice, "big", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
+            } else {
+                smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
+                midExplosion = new ExplosionEffect(content, graphicsDevice, "mid", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
+                bigExplosion = new ExplosionEffect(content, graphicsDevice, "big", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
+            }
+			
+
+            for (int i = 0; i < SMALL_EXPLOSION_EFFECT_NUM; i++) {
 				SmallExplosionPool.Enqueue((ExplosionEffect)smallExplosion.Clone());
 			}
-			midExplosion = new ExplosionEffect(content, graphicsDevice, "mid", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
 			for (int i = 0; i < MID_EXPLOSION_EFFECT_NUM; i++) {
 				MidExplosionPool.Enqueue((ExplosionEffect)midExplosion.Clone());
 			}
-			bigExplosion = new ExplosionEffect(content, graphicsDevice, "big", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
+			
 			for (int i = 0; i < BIG_EXPLOSION_EFFECT_NUM; i++) {
 				BigExplosionPool.Enqueue((ExplosionEffect)bigExplosion.Clone());
 			}

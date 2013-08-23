@@ -16,18 +16,24 @@ namespace _3DRTSGame
 		/// </summary>
 		public string EnemySubType { get; set; }
 		public float SpawnProbability { get; set; }
+        public int SpawnNum { get; set; }
 
 		public EnemyInfo(Type type, float prob)
 			: this(type, "", prob)
 		{
 		}
 		public EnemyInfo(Type type, string subType, float prob)
-			: this()
+			: this(type, subType, prob, 1)
 		{
-			EnemySubType = subType;
-			EnemyType = type;
-			SpawnProbability = prob;
 		}
+        public EnemyInfo(Type type, string subType, float prob, int num)
+            : this()
+        {
+            EnemySubType = subType;
+            EnemyType = type;
+            SpawnProbability = prob;
+            SpawnNum = num;
+        }
 	}
 	public struct EnemyWave
 	{
@@ -66,6 +72,10 @@ namespace _3DRTSGame
 		private static readonly int ASTEROID_MAX_SPAWN_NUM = 15;
 		private static readonly int FIGHTER_MAX_SPAWN_NUM = 8;
 		private static readonly int INTERVAL_SEC = 10;
+        /// <summary>
+        /// 対数螺旋ルートにおける初期角度(大きい程指数的に遠い位置)
+        /// </summary>
+        public static readonly int INI_THETA = 1440;
 
 		private Level4 level;
 		private Random random = new Random();
@@ -140,17 +150,22 @@ namespace _3DRTSGame
 		{
 			switch (pattern) {
 				default:
-					return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+					return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(INI_THETA));
 				case 1:
-					return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+                    return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(INI_THETA));
 				case 2:
-					return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+                    return Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(INI_THETA));
 			}
 		}
-		private void SpawnEnemies(EnemyInfo enemyData)//Type enemyType
+        /// <summary>
+        /// EnemyInfoからspawnさせる敵の型を決定し、色々と初期化してLevelのリストに追加する。
+        /// </summary>
+        /// <param name="enemyData">敵の型などの情報</param>
+        /// <param name="index">何体目の敵か</param>
+		private void SpawnEnemies(EnemyInfo enemyData, int index)
 		{
 			// 乱数が入らなかったらDictionaryで予めargumentsを計算してスマートにインスタンス生成が出来るのだが、
-			// 乱数入りなので仕方なく関数内で条件分岐させることに。さらにswitch
+			// 乱数入りなので仕方なく関数内で条件分岐させることに。さらにswitchも使用できない
 			float radius = 3000;
 
             if (enemyData.EnemyType == typeof(Asteroid)) {
@@ -163,18 +178,21 @@ namespace _3DRTSGame
 						aa * (float)Math.Exp(b * angle) * (float)Math.Sin(angle));*/
 
 				Vector2 spiralPos = Vector2.Zero;
-				switch (enemyData.EnemySubType) {
+                // 対数螺旋ルートで移動させる場合ここに乱数でルート選択するコードを挿入する必要がある
+                // 現在はEnemySubTypeで場合分けしている
+				/*switch (enemyData.EnemySubType) {
 					default:
-						spiralPos = Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440));
+                        spiralPos = Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(INI_THETA));
 						break;
 					case "1":
-						spiralPos = Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(1440), Matrix.CreateRotationY(MathHelper.ToRadians(90)));
+                        spiralPos = Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(INI_THETA), Matrix.CreateRotationY(MathHelper.ToRadians(90)));
 						break;
-				}
-				
+				}*/
+                float unitRadian = MathHelper.ToRadians(360 / (float)enemyData.SpawnNum);
+                spiralPos = Utility.CalcLogarithmicSpiral(0.15f, 0.5f, MathHelper.ToRadians(INI_THETA), Matrix.CreateRotationY(unitRadian * index));
+
 				enemiesOrg["Asteroid"].Position = level.TargetPlanets[0].Position + new Vector3(spiralPos.X, 0, spiralPos.Y);
                 //enemiesOrg["Asteroid"].RenderBoudingSphere = false;
-
                 //a = (Asteroid)enemiesOrg["Asteroid"].Clone();
 				if (ObjectPool.AsteroidPool.Count > 0) {
 					// いくつかのプロパティに変更を加えたいので、一時的にメンバ変数に格納する
@@ -272,15 +290,15 @@ namespace _3DRTSGame
 
 		private SpiralRenderer spiralRenderer, spiralRenderer1, spiralRenderer2;
 		/// <summary>
-		/// Asteoidsの飛来軌道の描画など
+		/// Asteoidsの飛来軌道の描画を行う
 		/// </summary>
 		/// <param name="gameTime"></param>
 		public void Draw(GameTime gameTime, Camera camera)
 		{
 			if (spiralRenderer == null) {
-				spiralRenderer = new SpiralRenderer(Level.graphicsDevice, new Color(Color.Orange.ToVector4() + new Color(0.2f, 0,0,0).ToVector4()) * 0.5f, 0, 1440, level.TargetPlanets[0].Position);
+                spiralRenderer = new SpiralRenderer(Level.graphicsDevice, new Color(Color.Orange.ToVector4() + new Color(0.2f, 0, 0, 0).ToVector4()) * 0.5f, 0, INI_THETA, level.TargetPlanets[0].Position);
 				//spiralRenderer1 = new SpiralRenderer(Level.graphicsDevice, Color.MediumPurple * 0.5f, 0, 1440, level.TargetPlanets[0].Position, Matrix.CreateRotationZ(MathHelper.ToRadians(90)));
-				spiralRenderer1 = new SpiralRenderer(Level.graphicsDevice, Color.MediumPurple * 0.5f, 0, 1440, level.TargetPlanets[0].Position, Matrix.CreateRotationZ(MathHelper.ToRadians(90)));
+                spiralRenderer1 = new SpiralRenderer(Level.graphicsDevice, Color.MediumPurple * 0.5f, 0, INI_THETA, level.TargetPlanets[0].Position, Matrix.CreateRotationZ(MathHelper.ToRadians(90)));
 			}
 			spiralRenderer.Draw(Level.graphicsDevice, camera.View, camera.Projection, Matrix.Identity, Color.Orange);
 			spiralRenderer1.Draw(Level.graphicsDevice, camera.View, camera.Projection, Matrix.Identity, Color.Orange);
@@ -291,8 +309,8 @@ namespace _3DRTSGame
 		{
 			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
 			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 1f) }, 0, 1, 4, 3000, 60));
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), "0", 1/3f), new EnemyInfo(typeof(Asteroid), "1", 1/3f) , new EnemyInfo(typeof(Asteroid), "2", 1/3f) }, 0, 1, 4, 3000, 60));
-			
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), "0", 1/3f), new EnemyInfo(typeof(Asteroid), "1", 1/3f)
+                , new EnemyInfo(typeof(Asteroid), "2", 1/3f) }, 0, 1, 4, 3000, 60));
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Fighter), 1f) }, 0, 10, 1, 3000, 30));
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 5, 4, 3000, 30));
 			state = WaveState.Start;

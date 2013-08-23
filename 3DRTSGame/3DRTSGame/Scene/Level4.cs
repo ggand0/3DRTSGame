@@ -11,6 +11,12 @@ using System.Threading;
 
 namespace _3DRTSGame
 {
+    public enum GraphicsProfile
+    {
+        Light,
+        Heavy
+    }
+
 	public class Level4 : Level
 	{
 		private enum LevelState
@@ -18,8 +24,11 @@ namespace _3DRTSGame
 			Loading,
 			Ready
 		}
+        
+
 		private LevelState currentState;
 		private bool loaded;
+        private GraphicsProfile graphicsProfile;
 
 		public Object Target { get; private set; }
 		public Object Ground { get; private set; }
@@ -104,48 +113,82 @@ namespace _3DRTSGame
 				//Asteroids[i].SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
 			}
 		}
-		protected override void Initialize()
-		{
-			insertLoadingScreen = true;
+        private void LoadSettings()
+        {
+            FileStream fs = new FileStream("Save\\graphics.txt", FileMode.Open);
+            StreamReader sr = new StreamReader(fs, Encoding.GetEncoding(932));
 
-			base.Initialize();
-			player = new Player(this);
-			enemyManager = new EnemyManager(this);
-			//productionManager = new ProductionManager(this); // Skyロード後に初期化する
-			uiManager = new UIManager();
-			
+            string set;
+            string[] val;
+            while ((set = sr.ReadLine()) != null) {
+                val = set.Split(' ');// 空白で区切る
+                if (val[0] == "profile") graphicsProfile = (GraphicsProfile)Enum.Parse(typeof(GraphicsProfile), val[2]);
+            }
 
-			// Entities
-			Models = new List<Object>();
-			/*Ground = new Object(new Vector3(0, -500, 0), 1f, "Models\\ground");//-200
-			Ground.RenderBoudingSphere = false;
-			Models.Add(Ground);*/
-			Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube", true);
+            fs.Close();
+            sr.Close();
+        }
+        protected override void Initialize()
+        {
+            insertLoadingScreen = true;
 
-			
+            // グラフィックの設定をロードする
+            Thread loadingThread0 = new Thread(this.LoadSettings);
+            loadingThread0.Priority = ThreadPriority.Highest;
+            loadingThread0.Start();
+            
 
-			// Initializes camera
-			camera = new ArcBallCamera(Vector3.Zero);
-			ParticleEmitter.camera = camera;
 
-			// Set up the reference grid
-			grid = new GridRenderer();
-			grid.GridColor = Color.DarkSeaGreen * 0.3f;//Color.LimeGreen;
+            base.Initialize();
+            player = new Player(this);
+            enemyManager = new EnemyManager(this);
+            //productionManager = new ProductionManager(this); // Skyロード後に初期化する
+            uiManager = new UIManager();
+
+
+            // Entities
+            Models = new List<Object>();
+            /*Ground = new Object(new Vector3(0, -500, 0), 1f, "Models\\ground");//-200
+            Ground.RenderBoudingSphere = false;
+            Models.Add(Ground);*/
+            Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube", true);
+
+
+
+            // Initializes camera
+            camera = new ArcBallCamera(Vector3.Zero);
+            ParticleEmitter.camera = camera;
+
+            // Set up the reference grid
+            grid = new GridRenderer();
+            grid.GridColor = Color.DarkSeaGreen * 0.3f;//Color.LimeGreen;
             grid.GridScale = 300f;//100f;
-            grid.GridSize = 64;;//32;
-			// Set the grid to draw on the x/z plane around the origin
-			grid.WorldMatrix = Matrix.Identity;
+            grid.GridSize = 64; ;//32;
+            // Set the grid to draw on the x/z plane around the origin
+            grid.WorldMatrix = Matrix.Identity;
 
 
-			/**/Thread loadingThread0 = new Thread(this.Load);
-			loadingThread0.Priority = ThreadPriority.Highest;
-			loadingThread0.Start();
-			if (!ObjectPool.LOADED) {
-				Thread loadingThread1 = new Thread(ObjectPool.Load);
-				loadingThread1.Priority = ThreadPriority.Highest;
-				loadingThread1.Start();
-			}
-		}
+            // CPUのコア数を取得
+            int coreNum = Environment.ProcessorCount;//4@i5
+
+            /*uint numberOfProcessors = 0u;
+            System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_ComputerSystem");
+            foreach (System.Management.ManagementObject mo in mc.GetInstances()) {
+                // Vistaでなく，WinXPなどでは，NumberOfProcessors のみのサポートのため，
+                // 値が2 となっても，CPUでなのか，CPUでcore 2なのかは不明となる。
+                numberOfProcessors = Convert.ToUInt32(mo.GetPropertyValue("NumberOfProcessors"));
+            }*/
+
+            loadingThread0.Join();// これでloadSettingsの処理が終わるまで待ってくれるはず
+            loadingThread0 = new Thread(this.Load);
+            loadingThread0.Priority = ThreadPriority.Highest;
+            loadingThread0.Start();
+            if (!ObjectPool.LOADED) {
+                Thread loadingThread1 = new Thread(new ParameterizedThreadStart(ObjectPool.Load));
+                loadingThread1.Priority = ThreadPriority.Highest;
+                loadingThread1.Start(graphicsProfile);
+            }
+        }
 		public override void Load()
 		{
 			base.Load();
