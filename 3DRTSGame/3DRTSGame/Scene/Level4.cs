@@ -24,9 +24,9 @@ namespace _3DRTSGame
 			Loading,
 			Ready
 		}
-        
 
 		private LevelState currentState;
+        private Texture2D loadingScreen;
 		private bool loaded;
         private GraphicsProfile graphicsProfile;
 
@@ -34,6 +34,7 @@ namespace _3DRTSGame
 		public Object Ground { get; private set; }
 		public Object Teapot { get; private set; }
 		public ArmedSatellite Satellite { get; private set; }
+        public Sun sun { get; private set; }
 
 		private PrelightingRenderer renderer;
 		private GridRenderer grid;
@@ -43,28 +44,14 @@ namespace _3DRTSGame
 		private Star star;
 		private Sun sunCircle;
 		private Effect shadowEffect;
-		public Sun sun { get; private set; }
-		public List<Asteroid> Asteroids { get; private set; }
-		public List<Planet> Planets { get; private set; }
-		public List<DamageablePlanet> TargetPlanets { get; private set; }
-		public List<Fighter> Fighters { get; private set; }
-
         private Random random;
-        private List<ExplosionEffect> ex = new List<ExplosionEffect>();
-		private int count;
         private Matrix RotationMatrix = Matrix.Identity;
 		private EnemyManager enemyManager;
 		private UIManager uiManager;
 		private ProductionManager productionManager;
-
-		/*private static readonly int ASTEROID_POOL_NUM = 30;
-		public Queue<Asteroid> AsteroidPool { get; private set; }
-		private static readonly int SMALL_EXPLOSION_EFFECT_NUM = 50;
-		private static readonly int MID_EXPLOSION_EFFECT_NUM = 50;
-		private static readonly int BIG_EXPLOSION_EFFECT_NUM = 10;
-		private static readonly int MAX_SATELLITE_NUM = 10;*/
 		private ExplosionEffect effectTmp;
 		private AsteroidBelt asteroidBelt;
+        private int count;
 
 
         /// <summary>
@@ -75,33 +62,6 @@ namespace _3DRTSGame
 			return (float)(min + r.NextDouble() * (max - min));
 		}
 
-		// ObjectPoolクラスへ移行
-		/*private void LoadObjectPool()
-		{
-			AsteroidPool = new Queue<Asteroid>();
-			for (int i = 0; i < ASTEROID_POOL_NUM; i++) {
-				// どうせ使うときに値変えるので適当に設定
-				AsteroidPool.Enqueue(new Asteroid(Vector3.Zero, 1f, "Models\\Asteroid"));
-			}
-
-			smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
-			for (int i = 0; i < SMALL_EXPLOSION_EFFECT_NUM; i++) {
-				SmallExplosionPool.Enqueue((ExplosionEffect)smallExplosion.Clone());
-			}
-			midExplosion = new ExplosionEffect(content, graphicsDevice, "mid", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
-			for (int i = 0; i < MID_EXPLOSION_EFFECT_NUM; i++) {
-				MidExplosionPool.Enqueue((ExplosionEffect)midExplosion.Clone());
-			}
-			bigExplosion = new ExplosionEffect(content, graphicsDevice, "big", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
-			for (int i = 0; i < BIG_EXPLOSION_EFFECT_NUM; i++) {
-				BigExplosionPool.Enqueue((ExplosionEffect)bigExplosion.Clone());
-			}
-			//Satellite = new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\Dawn", "SoundEffects\\laser1");
-			for (int i = 0; i < MAX_SATELLITE_NUM; i++) {//
-				//SatellitePool.Enqueue((Satellite)Satellite.Clone());
-				SatellitePool.Enqueue(new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\Dawn", "SoundEffects\\laser1"));
-			}
-		}*/
 		private void AddAsteroids(int asteroidNum, float radius)
 		{
 			Asteroids = new List<Asteroid>();
@@ -136,26 +96,19 @@ namespace _3DRTSGame
             Thread loadingThread0 = new Thread(this.LoadSettings);
             loadingThread0.Priority = ThreadPriority.Highest;
             loadingThread0.Start();
-            
-
 
             base.Initialize();
             player = new Player(this);
             enemyManager = new EnemyManager(this);
-            //productionManager = new ProductionManager(this); // Skyロード後に初期化する
             uiManager = new UIManager();
 
 
-            // Entities
-            Models = new List<Object>();
-            /*Ground = new Object(new Vector3(0, -500, 0), 1f, "Models\\ground");//-200
-            Ground.RenderBoudingSphere = false;
-            Models.Add(Ground);*/
-            Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube", true);
+            // Entities(for debug)
+            //Ground = new Object(new Vector3(0, -500, 0), 1f, "Models\\ground");//-200
+            //Models.Add(Ground);
+            //Target = new Object(new Vector3(0, 20, 0), 20, "Models\\cube", true);
 
-
-
-            // Initializes camera
+            // Initializes the camera
             camera = new ArcBallCamera(Vector3.Zero);
             ParticleEmitter.camera = camera;
 
@@ -170,7 +123,6 @@ namespace _3DRTSGame
 
             // CPUのコア数を取得
             int coreNum = Environment.ProcessorCount;//4@i5
-
             /*uint numberOfProcessors = 0u;
             System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_ComputerSystem");
             foreach (System.Management.ManagementObject mo in mc.GetInstances()) {
@@ -197,7 +149,7 @@ namespace _3DRTSGame
 			grid.LoadGraphicsContent(graphicsDevice);
 
 			Sky = new SkySphere(content, graphicsDevice, content.Load<TextureCube>("Textures\\SkyBox\\space4"), 100);// set 11 for debug
-			productionManager = new ProductionManager(this);
+			productionManager = new ProductionManager(this);// Skyロード後に生成しないとエラー
 
 			// Initialize Satellites
 			// object poolにインスタンスは作成してあるが、levelのリストへエフェクトを追加するなどの処理が終ってないのでここで済ます。
@@ -210,29 +162,18 @@ namespace _3DRTSGame
 			// Load stars
 			star = new Star(new Vector3(-500, 100, 500), graphicsDevice, content, StarType.G);
 			//LightPosition = star.Position;
-
 			sun = new Sun(new Vector3(-2000, 500, 2000), graphicsDevice, content, spriteBatch);
 			sunCircle = new Sun(LightPosition, graphicsDevice, content, spriteBatch);
-
 			asteroidBelt = new AsteroidBelt(this, Vector3.Zero);
 
-			// Set up object pool
-			//LoadObjectPool();
-			//ObjectPool.Load();
 
 			// Load planets
-			Planets = new List<Planet>();
-			TargetPlanets = new List<DamageablePlanet>();
-			//WaterPlanet waterPlanet = new WaterPlanet(new Vector3(-1000, 0, -1000), -LightPosition, device, content);
+			//WaterPlanet waterPlanet = new WaterPlanet(new Vector3(-1000, 0, -1000), -LightPosition, graphicsDevice, content);
 			WaterPlanet waterPlanet = new WaterPlanet(new Vector3(-100, 100, -100), LightPosition, graphicsDevice, content);
 			IcePlanet icePlanet = new IcePlanet(new Vector3(-100, 100, -800), LightPosition, graphicsDevice, content);
 			GasGiant gasGiant = new GasGiant(new Vector3(-100, 100, -2500), LightPosition, graphicsDevice, content);
 			RockPlanet rockPlanet = new RockPlanet(graphicsDevice, content);
-			MoltenPlanet moltenPlanet = new MoltenPlanet(graphicsDevice, content);
-
-			//planet = moltenPlanet;
-			//planet = gasGiant;
-			//planet = icePlanet;
+            MoltenPlanet moltenPlanet = new MoltenPlanet(graphicsDevice, content);
 			planet = waterPlanet;
 			//Planets.Add(waterPlanet);
 			TargetPlanets.Add(waterPlanet);
@@ -242,17 +183,12 @@ namespace _3DRTSGame
 
 			// Load asteroids
 			random = new Random();
-			Asteroids = new List<Asteroid>();
-			//AddAsteroids(5, 2000);
-			/*foreach (Asteroid o in Asteroids) {
-				Models.Add(o);
-			}*/
 			foreach (Object o in Asteroids) {
 				Enemies.Add(o);
 			}
 
 
-			// Load satellites
+			// Load satellites(for debug)
 			/*//Satellite = new ArmedSatellite(new Vector3(300, 50, 300), star.Position, 5, "Models\\ISS", "SoundEffects\\laser1");
 			Satellite = new ArmedSatellite(new Vector3(300, 50, 300), sun.Position, 5, "Models\\ISS", "SoundEffects\\laser0");
 			Models.Add(Satellite);
@@ -262,21 +198,22 @@ namespace _3DRTSGame
 			Models.Add(new ArmedSatellite(SatelliteWeapon.Missile, waterPlanet.Position + new Vector3(400, 50, 0),
 				waterPlanet.Position, 10f, "Models\\Dawn", "SoundEffects\\missile0"));// deepspace,10 / rosetta,10
 			*/
-
-			
 			//Models.Add(new ArmedSatellite(waterPlanet.Position + new Vector3(400, 50, 0), waterPlanet.Position, 0.01f, "Models\\TDRS", "SoundEffects\\laser0"));
+
 
 			// Load fighters
 			//Models.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Enemies.Add(Models[Models.Count - 1]);
-			Fighters = new List<Fighter>();
-			Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Fighters.Add(new Fighter(new Vector3(100, 1000, 100), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Fighters.Add(new Fighter(new Vector3(-100, -1000, -100), waterPlanet.Position, 20f, "Models\\fighter0"));// 同軸上だと正しく移動しないので注意
 			//Fighters.Add(new Fighter(new Vector3(-2000, 50, -1000), waterPlanet.Position, 20f, "Models\\fighter0"));
+            Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			foreach (Fighter f in Fighters) {
 				Enemies.Add(f);
 			}
+
+
+            // Add all enemies to the base list
 			foreach (Object o in Enemies) {
 				Models.Add(o);
 			}
@@ -314,6 +251,7 @@ namespace _3DRTSGame
 			}
 
 
+            // Initialize lighting and shadowing renderer
 			renderer = new PrelightingRenderer(graphicsDevice, content, false);
 			renderer.Models = Models;
 			renderer.Camera = camera;
@@ -329,32 +267,24 @@ namespace _3DRTSGame
 			LightPosition = renderer.Lights[0].Position;
 
 
-			// Special effects
-			EnergyRingEffect.game = game;
-			//discoidEffect = new EnergyRingEffect(content, graphicsDevice, new Vector3(0, 0, 0), new Vector2(300));
-			EnergyShieldEffect.game = game;
-			smallExplosion = new ExplosionEffect(content, graphicsDevice, "small", new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
-			/*//shieldEffect = new EnergyShieldEffect(content, graphicsDevice, Satellite.Position, new Vector2(300), 250);
-			//explosionTest = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, true, "Xml\\Particle\\particleExplosion0.xml", true);
-			smallExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", false);
-			//smallExplosion = new ExplosionEffect(content, device, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion0.xml", true);
-			bigExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion1.xml", false);
-			midExplosion = new ExplosionEffect(content, graphicsDevice, new Vector3(0, 50, 0), Vector2.One, false, "Xml\\Particle\\particleExplosion2.xml", false);
-			//lb = new LaserBillboard(graphicsDevice, content, content.Load<Texture2D>("Textures\\Laser2"), new Vector2(300, 50), new Vector3(0, 50, 0), new Vector3(100, 60, -100));*/
-
+            // Wait another thread(ここもThread.Joinで処理できる？)
             while (true) {
                 if (ObjectPool.LOADED) break;
             }
 			loaded = true;
 		}
 
-		// 戻り値をNullable<Vector3>にしようと思ったけどできない
+
+		// 戻り値をNullable<Vector3>にしようと思ったけどできなかった
 		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)
 		{
 			float? distance = ray.Intersects(plane);
 			//return distance.HasValue ? ray.Position + ray.Direction * distance.Value : null;
 			return distance.HasValue ? ray.Position + ray.Direction * distance.Value : Vector3.Zero;
 		}
+        /// <summary>
+        /// LevelをRestartする時に呼ぶ
+        /// </summary>
 		public override void Reset()
 		{
 			/*player = new Player(this);
@@ -600,14 +530,12 @@ namespace _3DRTSGame
 				foreach (Object o in Models) {
 					if (o.IsAlive) o.Update(gameTime);
 				}
-				if (Models.Count > 100) {
-					//throw new Exception("そろそろModelsのDelete処理を書くこと");
-				}
 				foreach (Bullet b in Bullets) {
 					if (b.IsAlive) b.Update(gameTime);
 				}
-
-				if (planet.IsAlive) planet.Update(gameTime);
+                if (planet.IsAlive) {
+                    planet.Update(gameTime);
+                }
 
 				Collide();
 
@@ -620,7 +548,7 @@ namespace _3DRTSGame
 		{
 
 		}
-		Texture2D loadingScreen;
+		
 		public override void Draw(GameTime gameTime)
 		{
 			if (currentState == LevelState.Loading) {
@@ -708,10 +636,10 @@ namespace _3DRTSGame
 
 				// Draw effects
 				effectManager.Draw(gameTime, camera);
-
 				foreach (EnergyShieldEffect ese in transparentEffects) {
 					ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
 				}
+
 
 				// Draw UIs
 				productionManager.Draw(gameTime);

@@ -26,12 +26,10 @@ namespace _3DRTSGame
 	}
 	public abstract class Planet : Object
 	{
-		//public static Game1 game;
-		//public static Level level;
+        protected static Vector3 DEF_POSITION = new Vector3(-300, 0, -200);
+        protected static Vector3 DEF_STAR_POSITION = Vector3.Zero;
 
-		//protected Model model, sphere;
 		protected Model sphere;
-		//protected int Scale;
 
 		public int Seed { get; private set; }
 		public PlanetType Type { get; protected set; }
@@ -71,11 +69,8 @@ namespace _3DRTSGame
 		protected float rotationSpeed = MathHelper.ToRadians(1);
 		protected bool revolution;
 		protected float revolutionSpeed = MathHelper.ToRadians(1);
-		protected static Vector3 DEF_POSITION = new Vector3(-300, 0, -200);
-		protected static Vector3 DEF_STAR_POSITION = Vector3.Zero;
-		//public Vector3 Position { get; protected set; }
+		
 		public Vector3 StarPosition { get; protected set; }
-		//public bool IsActive { get; set; }
 		public float revolutionAngle { get; set; }
 		private BasicEffect basicEffect;
 		private Effect simpleEffect;

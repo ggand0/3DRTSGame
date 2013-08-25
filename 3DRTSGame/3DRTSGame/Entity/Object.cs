@@ -488,9 +488,7 @@ namespace _3DRTSGame
 			this.Scale = scale;
 
 			Material = new _3DRTSGame.Material();
-			//random = new Random();
-			//IsActive = true;
-			RenderBoudingSphere = false;
+			RenderBoudingSphere = false;            // 基本falseにしておく
 			RotationMatrix = Matrix.Identity;
 			Load();
 			_boundingSphereRenderer = new BoundingSphereRenderer(game);

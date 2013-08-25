@@ -32,16 +32,16 @@ namespace _3DRTSGame
 			//= new Vector3(-200, 500, 200);
 
 
-		// Members for RTS game (used in Level3, 4)
+		// Members for RTS game (mainly used in Level3, 4)
 		public List<Bullet> Bullets { get; protected set; }
 		public List<Object> Enemies { get; protected set; }
 		public List<Satellite> Satellites { get; protected set; }
+        public List<Asteroid> Asteroids { get; protected set; }
+        public List<Planet> Planets { get; protected set; }
+        public List<DamageablePlanet> TargetPlanets { get; protected set; }
+        public List<Fighter> Fighters { get; protected set; }
 		public List<EnergyShieldEffect> transparentEffects { get; set; }
 
-		/*public Queue<ExplosionEffect> SmallExplosionPool { get; private set; }
-		public Queue<ExplosionEffect> MidExplosionPool { get; private set; }
-		public Queue<ExplosionEffect> BigExplosionPool { get; private set; }
-		public Queue<Satellite> SatellitePool { get; private set; }*/
 
 		/// <summary>
 		/// GraphicsDeviceのStateをデフォルトの状態に戻す。
@@ -66,16 +66,19 @@ namespace _3DRTSGame
 			Models = new List<Object>();
 			effectManager = new EffectManager();
 			//Bullets = new List<Drawable>();
+            Models = new List<Object>();
 			Bullets = new List<Bullet>();
 			Enemies = new List<Object>();
+            Planets = new List<Planet>();
+            TargetPlanets = new List<DamageablePlanet>();
+            Asteroids = new List<Asteroid>();
+            Fighters = new List<Fighter>();
 			transparentEffects = new List<EnergyShieldEffect>();
-			/*SmallExplosionPool = new Queue<ExplosionEffect>();
-			MidExplosionPool = new Queue<ExplosionEffect>();
-			BigExplosionPool = new Queue<ExplosionEffect>();
-			SatellitePool = new Queue<Satellite>();*/
 			Satellites = new List<Satellite>();
-			
 
+
+            EnergyRingEffect.game = game;
+            EnergyShieldEffect.game = game;
 			EnergyShieldEffect.level = this;
 			BoundingSphereRenderer.level = this;
 			//Object.level = this;
