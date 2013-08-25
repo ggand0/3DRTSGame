@@ -362,9 +362,9 @@ namespace _3DRTSGame
 			/*_world = Matrix.CreateWorld(Position, Direction, Vector3.Up);
 			_world *= Matrix.CreateScale(Scale);*/
 		}
-		public void Damage()
+		public void Damage(int damage)
 		{
-			HitPoint--;
+			HitPoint -= damage;
 
 			if (HitPoint <= 0) {
 				Die();

@@ -20,8 +20,8 @@ namespace _3DRTSGame
 	{
 		#region Fields&Properties
 		private static Effect satelliteShadowEffect;
-		private static readonly float MISSILE_SPEED = 10.0f;
-		private static readonly float LASER_BOLT_SPEED = 50.0f;
+		private static readonly float MISSILE_SPEED = 30.0f;
+		private static readonly float LASER_BOLT_SPEED = 60.0f;
 
 		private SoundEffect shootSound;
 		private List<SoundEffectInstance> currentSounds = new List<SoundEffectInstance>();
@@ -114,7 +114,7 @@ namespace _3DRTSGame
 						Vector3 dir = Vector3.Normalize(tmp0.Position - Position);
 						/*level.Bullets.Add(new LaserBillboardBullet(IFF.Foe, Level.graphicsDevice, content, Position
 						, Position + Direction * 200, Direction, 50, content.Load<Texture2D>("Textures\\Mercury\\Laser"), Color.Red, BlendState.AlphaBlend, new Vector2(200f, 100), 0));*/
-						level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, Position, Position+dir * 80,dir, 40,
+						level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, Position, Position + dir * 80, dir, LASER_BOLT_SPEED,
 							content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.Additive, new Vector2(10, 20), 0));//"Textures\\Mercury\\Laser" "Textures\\Lines\\laser0"
 					}
 

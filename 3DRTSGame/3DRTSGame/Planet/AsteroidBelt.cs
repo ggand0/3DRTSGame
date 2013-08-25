@@ -27,10 +27,7 @@ namespace _3DRTSGame
             Asteroid a = new Asteroid(Vector3.Zero, Vector3.Zero, 0.05f, 0, "Models\\Asteroid", true);
 			for (int i = 0; i < ASTEROID_NUM; i++) {
 				Vector3 pos = RandomRingPosition(Position, 3000, 3500);
-                a.Position = pos;
-				//Asteroids.Add(new Asteroid(pos, 0.05f, "Models\\Asteroid"));
-
-				//Asteroids.Add(new Asteroid(pos, Vector3.Zero, 0.05f, 0, "Models\\Asteroid", true));
+				a.Initialize(pos);
                 Asteroids.Add((Asteroid)a.Clone());
 			}
 			foreach (Asteroid aa in Asteroids) {

@@ -66,9 +66,9 @@ namespace _3DRTSGame
 			}
 		}
 
-		public void Damage()
+		public void Damage(int damage)
 		{
-			HitPoint--;
+			HitPoint -= damage;
 
 			if (HitPoint <= 0) {
 				Die();

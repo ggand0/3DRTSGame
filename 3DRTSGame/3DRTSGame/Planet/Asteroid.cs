@@ -12,13 +12,14 @@ namespace _3DRTSGame
 	public class Asteroid : Object, IDamageable
 	{
 		//protected static readonly int DEF_HIT_POINT = 30;
+		//public static readonly int DEF_ATTACK_VALUE = 1;
 
 		public Vector3 Destination { get; set; }
 		public float Speed { get; private set; }
 		/// <summary>
 		/// (Yaw, Pitch, Roll)
 		/// </summary>
-		public Vector3 Rotation { get; protected set; }
+		//public Vector3 Rotation { get; protected set; }
 		public bool Stational { get; set; }
 		public bool RimLighting { get; set; }
 
@@ -29,9 +30,14 @@ namespace _3DRTSGame
 		private static readonly float DEF_REVOLUTION_SPEED = 0.05f;//0.0005f;
 		private float revolutionAngle, revolutionSpeed;
 		private int movePattern = 1;
-		private string movePatternSubType;
+		private int moveRouteIndex;
+		//private string movePatternSubType;
 
 
+		/// <summary>
+		/// ランダムな回転をかけた行列を返す
+		/// </summary>
+		/// <returns></returns>
 		private Matrix BuildRotationMatrix()
 		{
 			float yaw = Utility.NextDouble(random, 0, 360);
@@ -40,7 +46,7 @@ namespace _3DRTSGame
 
 			return Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
 		}
-		private float CalcInitialAngle(int movePattern, string subType)
+		private float CalcInitialAngle(int movePattern)//, string subType)
 		{
 			switch (movePattern) {
 				default:
@@ -51,14 +57,15 @@ namespace _3DRTSGame
 					Vector3 v1 = Vector3.Normalize(Destination - def);
 					Vector3 v2 = Vector3.Normalize(Destination - Position);*/
 
-					return MathHelper.ToRadians(1440);
+					return MathHelper.ToRadians(EnemyManager.INI_THETA);
 				case 1:
-					switch (subType) {
+					/*switch (subType) {
 						default:
-							return MathHelper.ToRadians(1440);
+							return MathHelper.ToRadians(EnemyManager.INI_THETA);
 						case "1":
-							return MathHelper.ToRadians(1440);
-					}
+							return MathHelper.ToRadians(EnemyManager.INI_THETA);
+					}*/
+					return MathHelper.ToRadians(EnemyManager.INI_THETA);
 			}
 		}
 		protected override void UpdateWorldMatrix()
@@ -70,36 +77,40 @@ namespace _3DRTSGame
 		{
 			switch (pattern) {
 				default:
-					Rotation += rotationSpeed;
+					//Rotation += rotationSpeed;
 					Velocity = (Vector3.Normalize(Destination - Position)) * Speed;
 					Position += Velocity;
 					break;
 				case 1:
 					Vector2 pos = Vector2.Zero;
-					switch (movePatternSubType) {
+					/*switch (movePatternSubType) {// ここも変えなきゃ...!
 						default:
 							float a = 0.15f, b = 0.5f;
 							revolutionSpeed = 1f;//DEF_REVOLUTION_SPEED;
 							revolutionAngle -= MathHelper.ToRadians(revolutionSpeed);
 
 							pos = Utility.CalcLogarithmicSpiral(a, b, revolutionAngle);
-							/*Velocity = new Vector3(a * (float)Math.Exp(b * revolutionAngle) * (float)Math.Cos(revolutionAngle), 0,
-								a * (float)Math.Exp(b * revolutionAngle) * (float)Math.Sin(revolutionAngle));*/
 							Velocity = new Vector3(pos.X, 0, pos.Y);
-
-							//float radius = (Position - Destination).Length();
 							Position = Destination + Velocity;
 							break;
 						case "1":
 							float a1 = 0.15f, b1 = 0.5f;
-							revolutionSpeed = 1f;//DEF_REVOLUTION_SPEED;
+							revolutionSpeed = 1f;
 							revolutionAngle -= MathHelper.ToRadians(revolutionSpeed);
 							pos = Utility.CalcLogarithmicSpiral(a1, b1, revolutionAngle, Matrix.CreateRotationZ(MathHelper.ToRadians(90)));
 
 							Velocity = new Vector3(pos.X, 0, pos.Y);
 							Position = Destination + Velocity;
 							break;
-					}
+					}*/
+					float a = 0.15f, b = 0.5f;
+					float unitRadian = MathHelper.ToRadians(360 / (float)EnemyManager.MAX_ASTEROID_ROUTE_NUM);
+					revolutionSpeed = 1f;//DEF_REVOLUTION_SPEED;
+					revolutionAngle -= MathHelper.ToRadians(revolutionSpeed);
+
+					pos = Utility.CalcLogarithmicSpiral(a, b, revolutionAngle, Matrix.CreateRotationZ(unitRadian * moveRouteIndex));
+					Velocity = new Vector3(pos.X, 0, pos.Y);
+					Position = Destination + Velocity;
 					break;
 			}
 		}
@@ -119,14 +130,15 @@ namespace _3DRTSGame
 
             return cloned;
         }
-		public void Damage()
+		public void Damage(int damage)
 		{
-			HitPoint--;
+			HitPoint -= damage;
 
 			if (HitPoint <= 0) {
 				Die();
 			}
 		}
+		
 		public override void Update(GameTime gameTime)
 		{
 			/*revolutionSpeed = DEF_REVOLUTION_SPEED;
@@ -169,12 +181,39 @@ namespace _3DRTSGame
 
 
 		#region Constructors
-		public void Initialize(int movePattern, string subType)
+		/// <summary>
+		/// インスタンス生成後にオブジェクトをリセットしたい時に呼ぶ
+		/// </summary>
+		public void Initialize()
+		{
+			RotationMatrix = BuildRotationMatrix();
+		}
+		/// <summary>
+		/// インスタンス生成後にオブジェクトをリセットしたい時に呼ぶ。引数で与えた位置にPositionを初期化する
+		/// </summary>
+		public void Initialize(Vector3 position)
+		{
+			Position = position;
+			RotationMatrix = BuildRotationMatrix();
+		}
+		public void Initialize(int movePattern, int moveRouteIndex)
 		{
 			this.movePattern = movePattern;
-			this.movePatternSubType = subType;
-			revolutionAngle = CalcInitialAngle(movePattern, movePatternSubType);
+			this.moveRouteIndex = moveRouteIndex;
+			revolutionAngle = CalcInitialAngle(movePattern);
 		}
+		public void Initialize(Vector3 position, Vector3 destination, float speed, float scale, int movePattern, int moveRouteIndex)
+		{
+			this.Position = position;
+			this.Speed = speed;
+			this.Destination = destination;
+			this.Scale = scale;
+
+			this.movePattern = movePattern;
+			this.moveRouteIndex = moveRouteIndex;
+			revolutionAngle = CalcInitialAngle(movePattern);
+		}
+
 		public Asteroid(Vector3 position, float scale, string fileName)
 			:this(position, Vector3.Zero, scale, 1, fileName)
 		{
@@ -208,7 +247,7 @@ namespace _3DRTSGame
 			SetModelEffect(lightingEffect, true);
 			//SetModelEffect(lightingEffect, false);
 
-			revolutionAngle = CalcInitialAngle(1, "0");
+			revolutionAngle = CalcInitialAngle(1);
 			RotationMatrix = BuildRotationMatrix();
 			MaxHitPoint = 15;
 			HitPoint = MaxHitPoint;

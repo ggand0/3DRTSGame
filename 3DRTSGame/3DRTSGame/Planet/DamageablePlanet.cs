@@ -116,9 +116,9 @@ namespace _3DRTSGame
 				graphicsDevice.DepthStencilState = DepthStencilState.Default;
 			}
 		}
-		public void Damage()
+		public void Damage(int damage)
 		{
-			HitPoint--;
+			HitPoint -= damage;
 			if (HitPoint <= 0) {
 				Die();
 			}

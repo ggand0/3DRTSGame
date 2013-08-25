@@ -28,7 +28,9 @@ namespace _3DRTSGame
 		public float Speed { get; private set; }
 		public Vector3 Direction { get; protected set; }
 		public Vector3 StartPosition { get; protected set; }
+		public static Dictionary<Type, int> DamageValue { get; protected set; }
 		protected float distanceTravelled;
+
 
 		public override void Update(GameTime gameTime)
 		{
@@ -45,6 +47,13 @@ namespace _3DRTSGame
 			this.StartPosition = position;
 			this.Direction = direction;
 			this.Speed = speed;
+		}
+		static Bullet()
+		{
+			// ダメージ表の初期化
+			DamageValue = new Dictionary<Type, int>();
+			DamageValue.Add(typeof(LaserBillboardBullet), 5);
+			DamageValue.Add(typeof(Missile), 10);
 		}
 	}
 }

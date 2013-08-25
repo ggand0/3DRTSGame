@@ -13,6 +13,7 @@ namespace _3DRTSGame
 		//bool[] DamageType { get; set; }
 		//bool IsDamaged { get; set; }
 
-		void Damage();
+		//void Damage();
+		void Damage(int damage);
 	}
 }
