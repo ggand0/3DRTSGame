@@ -27,7 +27,6 @@ namespace _3DRTSGame
 			Ready
 		}
 
-
 		private LevelState currentState;
         private Texture2D loadingScreen;
 		private bool loaded;
@@ -161,7 +160,7 @@ namespace _3DRTSGame
 					(s as ArmedSatellite).Initialize();
 				}
 			}*/
-
+b.GetType()
 			// Load stars
 			star = new Star(new Vector3(-500, 100, 500), graphicsDevice, content, StarType.G);
 			//LightPosition = star.Position;
