@@ -27,6 +27,7 @@ namespace _3DRTSGame
 			Ready
 		}
 
+
 		private LevelState currentState;
         private Texture2D loadingScreen;
 		private bool loaded;
@@ -171,6 +172,7 @@ namespace _3DRTSGame
 
 			// Load planets
 			//WaterPlanet waterPlanet = new WaterPlanet(new Vector3(-1000, 0, -1000), -LightPosition, graphicsDevice, content);
+			WaterPlanet waterPlanet = new WaterPlanet(MAIN_PLANET_LOCATION, LightPosition, graphicsDevice, content);
 			WaterPlanet waterPlanet = new WaterPlanet(MAIN_PLANET_LOCATION, LightPosition, graphicsDevice, content);
 			IcePlanet icePlanet = new IcePlanet(new Vector3(-100, 100, -800), LightPosition, graphicsDevice, content);
 			GasGiant gasGiant = new GasGiant(new Vector3(-100, 100, -2500), LightPosition, graphicsDevice, content);
