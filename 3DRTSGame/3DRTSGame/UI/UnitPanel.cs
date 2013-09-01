@@ -61,7 +61,7 @@ namespace _3DRTSGame
 		}
 		public static bool IsMouseInside()
 		{
-			Vector2 pos = MouseInput.GetMousePosition();
+			Vector2 pos = MouseInput.GetCurrentMousePosition();
 			return pos.Y >= new Vector2(0, Game1.Height - Thickness).Y;
 		}
 		public override void Update(GameTime gameTime)

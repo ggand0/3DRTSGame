@@ -18,3 +18,13 @@ C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProc
 C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.dll
 C:\Users\剛大\Documents\Visual Studio 2010\Projects\3drtsgame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.pdb
 C:\Users\pentiumx\documents\visual studio 2010\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.csprojResolveAssemblyReference.cache
+D:\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\bin\x86\Debug\BlenderToXNAProcessor.dll
+D:\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\bin\x86\Debug\BlenderToXNAProcessor.pdb
+D:\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.csprojResolveAssemblyReference.cache
+D:\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.dll
+D:\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.pdb
+C:\Users\pentiumx\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\bin\x86\Debug\BlenderToXNAProcessor.dll
+C:\Users\pentiumx\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\bin\x86\Debug\BlenderToXNAProcessor.pdb
+C:\Users\pentiumx\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.csprojResolveAssemblyReference.cache
+C:\Users\pentiumx\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.dll
+C:\Users\pentiumx\Dropbox\Projects\3DRTSGame\BlenderToXNAProcessor\obj\x86\Debug\BlenderToXNAProcessor.pdb

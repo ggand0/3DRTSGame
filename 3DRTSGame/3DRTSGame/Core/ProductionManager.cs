@@ -13,7 +13,7 @@ namespace _3DRTSGame
 	/// </summary>
 	public class ProductionManager
 	{
-		#region Fields&Properties
+		#region Fields & Properties
 		private static float DEF_SPAWN_HEIGHT = 0;
 
 		public UIManager UIManager { get; private set; }
@@ -37,36 +37,45 @@ namespace _3DRTSGame
 		private SatelliteWeapon[] unitWeaponTypes;
 #endregion
 
+        /// <summary>
+        /// レイと平面の交差点を計算して返すメソッド。
+        /// </summary>
+        /// <param name="ray"></param>
+        /// <param name="plane"></param>
+        /// <returns>rayとplaneの交点。無い場合はゼロベクトルを返す。</returns>
 		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)
 		{
 			float? distance = ray.Intersects(plane);
-			//return distance.HasValue ? ray.Position + ray.Direction * distance.Value : null;
 			return distance.HasValue ? ray.Position + ray.Direction * distance.Value : Vector3.Zero;
 		}
+        /// <summary>
+        /// マウスとデフォルト平面との交点を取得する。
+        /// </summary>
+        /// <returns></returns>
 		private Vector3 Get3DMousePoint()
 		{
-			Vector2 mousePos = MouseInput.GetMousePosition();
+			Vector2 mousePos = MouseInput.GetCurrentMousePosition();
 
 			// rayとplaneのintersection pointを計算する
 			Vector3 nearsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 0f);
 			Vector3 farsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 1f);
-
 			Matrix world = Matrix.CreateTranslation(0, 0, 0);
 			Vector3 nearPoint = Level.graphicsDevice.Viewport.Unproject(nearsource, level.camera.Projection, level.camera.View, world);
 			Vector3 farPoint = Level.graphicsDevice.Viewport.Unproject(farsource, level.camera.Projection, level.camera.View, world);
+
 			// Create a ray from the near clip plane to the far clip plane.
-			Vector3 direction = farPoint - nearPoint;
-			direction.Normalize();
+			Vector3 direction = Vector3.Normalize(farPoint - nearPoint);
 			Ray pickRay = new Ray(nearPoint, direction);
-			//Plane planeXZ = new Plane(Vector3.Up, 0);
 			Plane planeGround = new Plane(Vector3.Up, -DEF_SPAWN_HEIGHT);
 
 			return GetRayPlaneIntersectionPoint(pickRay, planeGround);
 		}
+        /// <summary>
+        /// マウスの位置がUIパネルの外にあるならデプロイ可能と判断する
+        /// </summary>
+        /// <returns>ユニットを配置可能かどうかを返す</returns>
 		private bool CanDeploy()
 		{
-			//Vector2 pos = MouseInput.GetMousePosition();
-			//return pos.Y <= Position
 			return !UnitPanel.IsMouseInside();
 		}
 		private void HandleInput()
@@ -117,6 +126,7 @@ namespace _3DRTSGame
 					case "NormalSatellite":
 						tmpSatellite = ObjectPool.SatellitePool.Dequeue();
 						tmpSatellite = tmpSatellite as ArmedSatellite;
+                        // とりあえず最初の惑星の中心を回らせているだけで、将来的には選択している惑星を対象とするようにする
 						(tmpSatellite as ArmedSatellite).Initialize(currentUIModel.Model, intersectionPoint, level.TargetPlanets[0].Position);
 						(tmpSatellite as ArmedSatellite).Initialize(currrentWeaponTypeSelection);
 						break;
@@ -177,7 +187,7 @@ namespace _3DRTSGame
 			uiModels.Add(typeof(ArmedSatellite), new ArmedSatellite(Vector3.Zero, 10, "Models\\DeepSpace"));
 			uiModels.Add(typeof(ArmedSatellite), new ArmedSatellite(Vector3.Zero, 10, "Models\\ISS"));*/
 			uiModels = new Dictionary<string, Object>();
-			uiModels.Add("NormalSatellite", new ArmedSatellite(Vector3.Zero, 10, "Models\\DeepSpace"));
+            uiModels.Add("NormalSatellite", new ArmedSatellite(Vector3.Zero, 10, "Models\\DeepSpace"));
 			uiModels.Add("LargeSatellite", new ArmedSatellite(Vector3.Zero, 10, "Models\\ISS"));
 			uiModels.Add("SpaceStation", new SpaceStation(Vector3.Zero, 100, "Models\\spacestation4"));
 

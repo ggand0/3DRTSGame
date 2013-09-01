@@ -26,6 +26,7 @@ namespace _3DRTSGame
 		public List<Object> Models { get; protected set; }
 		//public List<IRenderable>  { get; protected set; }
 		public SkySphere Sky { get; protected set; }
+		public PlanetarySystem PlanetarySystem { get; protected set; }
 
 		public Vector3 LightPosition
 			= new Vector3(-2000, 0, 2000);
@@ -65,7 +66,6 @@ namespace _3DRTSGame
 		{
 			Models = new List<Object>();
 			effectManager = new EffectManager();
-			//Bullets = new List<Drawable>();
             Models = new List<Object>();
 			Bullets = new List<Bullet>();
 			Enemies = new List<Object>();

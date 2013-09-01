@@ -13,7 +13,7 @@ namespace _3DRTSGame
 
 		public bool IsSelected()
 		{
-			Vector2 pos = MouseInput.GetMousePosition();
+			Vector2 pos = MouseInput.GetCurrentMousePosition();
 			float offset = 1;
 
 			return pos.X >= UIPosition.X + offset && pos.X <= UIPosition.X + texture.Width * scale - offset

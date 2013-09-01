@@ -377,12 +377,12 @@ namespace _3DRTSGame
 		private void HandleInput()
 		{
 			if (MouseInput.IsOnButtonDownR()) {
-				mouseOrgPos = MouseInput.GetMousePosition();
+				mouseOrgPos = MouseInput.GetCurrentMousePosition();
 				leftrightRot = updownRot = 0;
 			}
 			if (MouseInput.BUTTONR()) {
 				float rotationSpeed = 0.1f;//5
-				Vector2 mousePos = MouseInput.GetMousePosition();
+				Vector2 mousePos = MouseInput.GetCurrentMousePosition();
 				
 
 				// rayとplaneのintersection pointを計算する
@@ -396,7 +396,7 @@ namespace _3DRTSGame
 				Vector3 direction = farPoint - nearPoint;
 				direction.Normalize();
 
-				curPos = MouseInput.GetMousePosition();
+				curPos = MouseInput.GetCurrentMousePosition();
 				float xDifference = curPos.X - mouseOrgPos.X;
 				float yDifference = curPos.Y - mouseOrgPos.Y;
 				//leftrightRot -= rotationSpeed * xDifference;// * amount

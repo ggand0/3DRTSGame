@@ -38,7 +38,8 @@ namespace _3DRTSGame
 		public ArmedSatellite Satellite { get; private set; }
         public Sun sun { get; private set; }
 
-		private PrelightingRenderer renderer;
+		//private PrelightingRenderer renderer;
+        public PrelightingRenderer renderer { get; private set; }
 		private GridRenderer grid;
 		private EnergyRingEffect discoidEffect;
 		private ExplosionEffect explosionTest, smallExplosion, bigExplosion, midExplosion;
@@ -46,7 +47,6 @@ namespace _3DRTSGame
 		private Star star;
 		private Sun sunCircle;
 		private Effect shadowEffect;
-        private Random random;
         private Matrix RotationMatrix = Matrix.Identity;
 		private EnemyManager enemyManager;
 		private UIManager uiManager;
@@ -56,25 +56,6 @@ namespace _3DRTSGame
         private int count;
 
 
-        /// <summary>
-        /// Utility専用クラスにまとめるべき
-        /// </summary>
-		public static float NextDouble(Random r, double min, double max)
-		{
-			return (float)(min + r.NextDouble() * (max - min));
-		}
-
-		private void AddAsteroids(int asteroidNum, float radius)
-		{
-			Asteroids = new List<Asteroid>();
-			for (int i = 0; i < asteroidNum; i++) {
-				//random = new Random();
-				Asteroids.Add(new Asteroid(new Vector3(NextDouble(random, -radius, radius), 0, NextDouble(random, -radius, radius)),
-					star.Position, 0.05f, 10, "Models\\Asteroid"));
-				//Asteroids[i].Scale = 0.02f;//0.1f;
-				//Asteroids[i].SetModelEffect(lightingEffect, true);					// set effect to each modelmeshpart
-			}
-		}
         private void LoadSettings()
         {
             FileStream fs = new FileStream("Save\\graphics.txt", FileMode.Open);
@@ -124,7 +105,7 @@ namespace _3DRTSGame
 
 
             // CPUのコア数を取得
-            int coreNum = Environment.ProcessorCount;//4@i5
+            int coreNum = Environment.ProcessorCount;// i5では4つ
             /*uint numberOfProcessors = 0u;
             System.Management.ManagementClass mc = new System.Management.ManagementClass("Win32_ComputerSystem");
             foreach (System.Management.ManagementObject mo in mc.GetInstances()) {
@@ -150,42 +131,34 @@ namespace _3DRTSGame
 			// Set up the reference grid and sample camera
 			grid.LoadGraphicsContent(graphicsDevice);
 
+			// Initialize skysphere and productionManager
 			Sky = new SkySphere(content, graphicsDevice, content.Load<TextureCube>("Textures\\SkyBox\\space4"), 100);// set 11 for debug
 			productionManager = new ProductionManager(this);// Skyロード後に生成しないとエラー
 
-			// Initialize Satellites
-			// object poolにインスタンスは作成してあるが、levelのリストへエフェクトを追加するなどの処理が終ってないのでここで済ます。
-			/*foreach (Satellite s in ObjectPool.SatellitePool) {
-				if (s is ArmedSatellite) {
-					(s as ArmedSatellite).Initialize();
-				}
-			}*/
-b.GetType()
+
 			// Load stars
 			star = new Star(new Vector3(-500, 100, 500), graphicsDevice, content, StarType.G);
-			//LightPosition = star.Position;
 			sun = new Sun(new Vector3(-2000, 500, 2000), graphicsDevice, content, spriteBatch);
 			sunCircle = new Sun(LightPosition, graphicsDevice, content, spriteBatch);
-			asteroidBelt = new AsteroidBelt(this, Vector3.Zero);
-
+			asteroidBelt = new AsteroidBelt(this, LightPosition, 4500, 5000);
 
 			// Load planets
-			//WaterPlanet waterPlanet = new WaterPlanet(new Vector3(-1000, 0, -1000), -LightPosition, graphicsDevice, content);
-			WaterPlanet waterPlanet = new WaterPlanet(MAIN_PLANET_LOCATION, LightPosition, graphicsDevice, content);
 			WaterPlanet waterPlanet = new WaterPlanet(MAIN_PLANET_LOCATION, LightPosition, graphicsDevice, content);
 			IcePlanet icePlanet = new IcePlanet(new Vector3(-100, 100, -800), LightPosition, graphicsDevice, content);
 			GasGiant gasGiant = new GasGiant(new Vector3(-100, 100, -2500), LightPosition, graphicsDevice, content);
 			RockPlanet rockPlanet = new RockPlanet(graphicsDevice, content);
             MoltenPlanet moltenPlanet = new MoltenPlanet(graphicsDevice, content);
 			planet = waterPlanet;
-			//Planets.Add(waterPlanet);
-			TargetPlanets.Add(waterPlanet);
+			/*TargetPlanets.Add(waterPlanet);
 			Planets.Add(icePlanet);
-			//TargetPlanets.Add(icePlanet);
-			Planets.Add(gasGiant);
+			Planets.Add(gasGiant);*/
 
-			// Load asteroids
-			random = new Random();
+			// Load planetary system of this level
+			DamageablePlanet[] dp = new DamageablePlanet[] { waterPlanet };
+			Planet[] bgp = new Planet[] { icePlanet };
+			PlanetarySystem = new PlanetarySystem(new Sun[] { sunCircle }, dp, bgp, new Drawable[] { asteroidBelt });
+
+			// Load asteroids(for debug)
 			foreach (Object o in Asteroids) {
 				Enemies.Add(o);
 			}
@@ -204,7 +177,7 @@ b.GetType()
 			//Models.Add(new ArmedSatellite(waterPlanet.Position + new Vector3(400, 50, 0), waterPlanet.Position, 0.01f, "Models\\TDRS", "SoundEffects\\laser0"));
 
 
-			// Load fighters
+			// Load fighters(for debug)
 			//Models.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Enemies.Add(Models[Models.Count - 1]);
 			Fighters = new List<Fighter>();
@@ -244,7 +217,9 @@ b.GetType()
 					//o.SetModelEffect(Object.shadowEffect, false);
 				}
 			}*/
-			foreach (Planet p in Planets) {
+
+			// Add planets to base list
+			/*foreach (Planet p in Planets) {
 				p.RenderBoudingSphere = false;
 				//p.SetModelEffect(shadowEffect, true);
 				Models.Add(p);
@@ -253,7 +228,7 @@ b.GetType()
 				p.RenderBoudingSphere = false;
 				//p.SetModelEffect(shadowEffect, true);
 				Models.Add(p);
-			}
+			}*/
 
 
             // Initialize lighting and shadowing renderer
@@ -279,8 +254,12 @@ b.GetType()
 			loaded = true;
 		}
 
-
-		// 戻り値をNullable<Vector3>にしようと思ったけどできなかった
+		/// <summary>
+		/// 戻り値をNullable<Vector3>にしようと思ったけどできなかった
+		/// </summary>
+		/// <param name="ray"></param>
+		/// <param name="plane"></param>
+		/// <returns></returns>
 		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)
 		{
 			float? distance = ray.Intersects(plane);
@@ -321,17 +300,19 @@ b.GetType()
 			GasGiant gasGiant = new GasGiant(new Vector3(-100, 100, -2500), LightPosition, graphicsDevice, content);
 			RockPlanet rockPlanet = new RockPlanet(graphicsDevice, content);
 			MoltenPlanet moltenPlanet = new MoltenPlanet(graphicsDevice, content);
-			//Planets.Add(waterPlanet);
-			TargetPlanets.Add(waterPlanet);
+			DamageablePlanet[] dp = new DamageablePlanet[] { waterPlanet };
+			Planet[] bgp = new Planet[] { icePlanet };
+			PlanetarySystem = new PlanetarySystem(new Sun[] { sunCircle }, dp, bgp, new Drawable[] { asteroidBelt });
+
+			/*TargetPlanets.Add(waterPlanet);
 			Planets.Add(icePlanet);
-			//TargetPlanets.Add(icePlanet);
 			Planets.Add(gasGiant);
 			foreach (Planet p in Planets) {
 				Models.Add(p);
 			}
 			foreach (DamageablePlanet p in TargetPlanets) {
 				Models.Add(p);
-			}
+			}*/
 			currentState = LevelState.Ready;
 		}
 		protected override bool IsClear()
@@ -349,11 +330,9 @@ b.GetType()
 			// AsteroidとTargetPlanets
 			foreach (DamageablePlanet p in TargetPlanets) {
 				foreach (Asteroid a in Asteroids) {
-				
 					if (a.IsActive && p.IsActive && a.IsHitWith(p)) {
-						//a.Damage();
 						a.Die();
-						p.Damage(Enemy.DEF_ATTACK_VALUE);
+						p.Damage(Object.DEF_ATTACK_VALUE);
 
 						if (ObjectPool.MidExplosionPool.Count > 0) {
 							ExplosionEffect effectTmp = ObjectPool.MidExplosionPool.Dequeue();
@@ -373,7 +352,7 @@ b.GetType()
 					if (f.IsActive && p.IsActive && p.IsHitWith(f)) {
 						//a.Damage();
 						f.Die();
-						p.Damage(Enemy.DEF_ATTACK_VALUE);
+						p.Damage(Object.DEF_ATTACK_VALUE);
 
 						if (ObjectPool.SmallExplosionPool.Count > 0) {
 							ExplosionEffect effectTmp = ObjectPool.SmallExplosionPool.Dequeue();
@@ -390,7 +369,8 @@ b.GetType()
 				foreach (Object o in Enemies) {
 					if (o is Asteroid && b.IsActive && o.IsActive && b.IsHitWith(o)) {
 						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
-						(o as Asteroid).Damage(Bullet.DamageValue[b.GetType()]);
+						//(o as Asteroid).Damage(Bullet.DamageValue[b.GetType()]);
+                        (o as Asteroid).Damage(Bullet.DamageValueFriend[b.GetType()]);
 						
 						if (!o.IsActive) {
 							player.AddMoney(o);
@@ -411,7 +391,7 @@ b.GetType()
 
 					if (o is Fighter && o.IsActive && b.IsActive && b.Identification == IFF.Friend && b.IsHitWith(o)) {
 						if (!(b is LaserBillboardBullet && (b as LaserBillboardBullet).Mode == 1)) b.Die();
-						(o as Fighter).Damage(Bullet.DamageValue[b.GetType()]);
+						(o as Fighter).Damage(Bullet.DamageValueFriend[b.GetType()]);
 
 						if (!o.IsActive) {
 							player.AddMoney(o);
@@ -436,7 +416,7 @@ b.GetType()
 					if (b.Identification == IFF.Foe && b.IsHitWith(p)) {
 						//b.IsActive = false;
 						b.Die();
-						p.Damage(Bullet.DamageValue[b.GetType()]);
+						p.Damage(Bullet.DamageValueFoe[b.GetType()]);
 
 						/*if (!p.IsAlive) {
 							ExplosionEffect e = (ExplosionEffect)bigExplosion.Clone();
@@ -527,20 +507,22 @@ b.GetType()
 				LightPosition = renderer.Lights[0].Position;
 
 				Sky.Update(gameTime);
-				sun.Update(gameTime);
-				sunCircle.Position = renderer.Lights[0].Position;
-				sunCircle.Update(gameTime);
+				//sun.Update(gameTime);
 
-				asteroidBelt.Update(gameTime);
+				//sunCircle.Position = renderer.Lights[0].Position;
+				//sunCircle.Update(gameTime);
+				PlanetarySystem.Update(gameTime);
+
+				//asteroidBelt.Update(gameTime);
 				foreach (Object o in Models) {
 					if (o.IsAlive) o.Update(gameTime);
 				}
 				foreach (Bullet b in Bullets) {
 					if (b.IsAlive) b.Update(gameTime);
 				}
-                if (planet.IsAlive) {
+                /*if (planet.IsAlive) {
                     planet.Update(gameTime);
-                }
+                }*/
 
 				Collide();
 
@@ -601,7 +583,7 @@ b.GetType()
 				ResetGraphicDevice();
 				//sun.Draw(true, camera.View, camera.Projection, maskLayer);
 				ResetGraphicDevice();
-				sunCircle.Draw(false, camera.View, camera.Projection);
+				//sunCircle.Draw(false, camera.View, camera.Projection);
 				//planet.Draw(camera.View, Matrix.CreateScale(200) * Matrix.CreateTranslation(new Vector3(-300, 0, -200)), camera.Projection, camera.Position);
 				//planet.Draw(new Vector3(-300, 0, -200), camera.View, camera.Projection, camera.Position);
 				//if (planet.IsActive) planet.Draw(camera.View, camera.Projection, camera.Position);
@@ -610,7 +592,8 @@ b.GetType()
 
 				// Draw objects
 				enemyManager.Draw(gameTime, camera);// Asteroidの軌道などの描画
-				asteroidBelt.Draw(gameTime);
+				//asteroidBelt.Draw(gameTime);
+				PlanetarySystem.Draw(gameTime, camera);
 				foreach (Object o in Models) {
 					if (o.IsAlive && camera.BoundingVolumeIsInView(o.transformedBoundingSphere)) {
 						if (o is ArmedSatellite) {

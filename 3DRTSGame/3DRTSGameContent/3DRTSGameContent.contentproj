@@ -375,6 +375,11 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
+    <Compile Include="Models\capital.fbx">
+      <Name>capital</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
     <None Include="Planets\Clouds\bak\FluidFlow.fx">
       <Name>FluidFlow</Name>
       <Importer>EffectImporter</Importer>

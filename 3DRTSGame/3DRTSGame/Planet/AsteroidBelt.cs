@@ -10,7 +10,9 @@ namespace _3DRTSGame
 	{
 		private static int ASTEROID_NUM = 30;//100だとCLoneにしても30秒以上かかる
 
+        private int minRadius, maxRadius;
 		public List<Asteroid> Asteroids { get; private set; }
+        
 
 		private Vector3 RandomRingPosition(Vector3 center, float min, float max)
 		{
@@ -19,14 +21,14 @@ namespace _3DRTSGame
 			float x = r * (float)Math.Cos(MathHelper.ToRadians(theta));
 			float y = r * (float)Math.Sin(MathHelper.ToRadians(theta));
 
-			return new Vector3(x, 0, y);
+			return center + new Vector3(x, 0, y);
 		}
 		private void Load()
 		{
 			Asteroids = new List<Asteroid>();
             Asteroid a = new Asteroid(Vector3.Zero, Vector3.Zero, 0.05f, 0, "Models\\Asteroid", true);
 			for (int i = 0; i < ASTEROID_NUM; i++) {
-				Vector3 pos = RandomRingPosition(Position, 3000, 3500);
+				Vector3 pos = RandomRingPosition(Position, minRadius, maxRadius);
 				a.Initialize(pos);
                 Asteroids.Add((Asteroid)a.Clone());
 			}
@@ -53,10 +55,17 @@ namespace _3DRTSGame
 		}
 
 		public AsteroidBelt(Level level, Vector3 position)
+            :this(level, position, 3000, 3500)
 		{
-			AsteroidBelt.level = level;
-			this.Position = position;
-			Load();
 		}
+        public AsteroidBelt(Level level, Vector3 position, int minRadius, int maxRadius)
+        {
+            AsteroidBelt.level = level;
+
+            this.Position = position;
+            this.minRadius = minRadius;
+            this.maxRadius = maxRadius;
+            Load();
+        }
 	}
 }

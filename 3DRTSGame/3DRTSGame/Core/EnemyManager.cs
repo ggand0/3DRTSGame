@@ -88,7 +88,7 @@ namespace _3DRTSGame
 			if (level.Enemies.Count < ASTEROID_MAX_SPAWN_NUM) {// = 15 -5
 				float radius = 3000;
 				Fighter f = new Fighter(new Vector3(Utility.NextDouble(random, -radius, radius), Utility.NextDouble(random, -radius, radius), Utility.NextDouble(random, -radius, radius))
-					, level.Planets[0].Position, 20f, "Models\\fighter0");
+					, level.TargetPlanets[0].Position, 20f, "Models\\fighter0");
 				f.IsActive = true;
 				f.RenderBoudingSphere = false;
 				level.Enemies.Add(f);
@@ -182,7 +182,7 @@ namespace _3DRTSGame
                 //enemiesOrg["Fighter"].RenderBoudingSphere = false;
 
                 Fighter f = (Fighter)enemiesOrg["Fighter"].Clone();
-                f.Target = level.TargetPlanets[0].Position;
+				f.Target = level.TargetPlanets[0].Position;
 
                 level.Models.Add(f);
                 level.Enemies.Add(f);
@@ -233,7 +233,7 @@ namespace _3DRTSGame
 					}
 				}
 			} else if (state == WaveState.Interval) {
-				if (count - start > 10 * INTERVAL_SEC && level.Enemies.Count == 0) {// 敵全滅かつ10秒経過で次のwaveへ
+                if (count - start > 10 * INTERVAL_SEC && level.Enemies.Count == 0 || count - start > 30 * INTERVAL_SEC) {// 敵全滅かつ10秒経過、もしくは（バグなども顧慮して）ある程度時間がたったら次のwaveへ
 					WaveCount++;
 
 					if (WaveCount == waves.Count) {// wavesのカウントに達していたらクリア

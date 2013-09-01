@@ -16,12 +16,18 @@ namespace _3DRTSGame
 		Revolution
 	}
 	public class Satellite : Object
-	{
-		private static readonly float DEF_REVOLUTION_SPEED = 0.25f;
+    {
+        #region Fields & Properties
+        private static readonly float DEF_REVOLUTION_SPEED = 0.25f;
+		private static readonly float DEF_ROTATION_SPEED = 0.25f;
 		private static readonly float DEF_MOVE_SPEED = 1f;
-		
-		protected MovingState currentMovingState = MovingState.Revolution;
+
+        private float rotationSpeed, revolutionSpeed, revolutionAngle;
+        private Vector3 initialPoint;
+        private CircleRenderer circleRenderer;
 		private Vector3 currentDestination;
+        protected MovingState currentMovingState = MovingState.Revolution;
+        protected BillboardSystem uiRing;
 
 		public bool Rotate { get; protected set; }
 		//public bool Revolution { get; protected set; }
@@ -32,15 +38,14 @@ namespace _3DRTSGame
 		public float Radius { get; protected set; }
 		public float Roll { get; protected set; }
 		public float Pitch { get; protected set; }
-		private float rotationSpeed, revolutionSpeed, revolutionAngle;
-		protected BillboardSystem uiRing;
-
+		
+		
 		// プレイヤーから操作できるプロパティ：
 		public bool RevolutionClockwise { get; set; }
 		public bool Revolution { get; set; }
+        #endregion
 
-		private Vector3 initialPoint;
-		private float CalcInitialAngle()
+        private float CalcInitialAngle()
 		{
 			float radius = (Position - Center).Length();
 			Vector3 velocity = new Vector3((float)Math.Cos(revolutionAngle), 0,
@@ -82,7 +87,8 @@ namespace _3DRTSGame
 		private void UpdateRevolution()
 		{
 			if (Rotate) {
-				Roll += rotationSpeed;
+				Roll += MathHelper.ToRadians(rotationSpeed);
+				RotationMatrix = Matrix.CreateRotationX(Roll);
 			}
 			if (Revolution) {
 				revolutionSpeed = DEF_REVOLUTION_SPEED;//1
@@ -135,7 +141,7 @@ namespace _3DRTSGame
 				* Matrix.CreateTranslation(Position);
 		}
 
-		private CircleRenderer circleRenderer;
+		
 		public override void Draw(Matrix View, Matrix Projection, Vector3 CameraPosition)
 		{
 			base.Draw(View, Projection, CameraPosition);
@@ -181,6 +187,7 @@ namespace _3DRTSGame
 			revolutionAngle = CalcInitialAngle();
 			RevolutionClockwise = true;
 
+			rotationSpeed = DEF_ROTATION_SPEED;
 			circleRenderer = new CircleRenderer(Level.graphicsDevice, Color.White, 50);
 		}
 		#endregion

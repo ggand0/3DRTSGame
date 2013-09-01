@@ -28,7 +28,9 @@ namespace _3DRTSGame
 		public float Speed { get; private set; }
 		public Vector3 Direction { get; protected set; }
 		public Vector3 StartPosition { get; protected set; }
-		public static Dictionary<Type, int> DamageValue { get; protected set; }
+		//public static Dictionary<Type, int> DamageValue { get; protected set; }
+        public static Dictionary<Type, int> DamageValueFriend { get; protected set; }
+        public static Dictionary<Type, int> DamageValueFoe { get; protected set; }
 		protected float distanceTravelled;
 
 
@@ -51,9 +53,18 @@ namespace _3DRTSGame
 		static Bullet()
 		{
 			// ダメージ表の初期化
-			DamageValue = new Dictionary<Type, int>();
-			DamageValue.Add(typeof(LaserBillboardBullet), 5);
-			DamageValue.Add(typeof(Missile), 10);
+			DamageValueFriend = new Dictionary<Type, int>();
+			DamageValueFriend.Add(typeof(LaserBillboardBullet), 5);
+            DamageValueFriend.Add(typeof(Missile), 10);/**/
+
+            DamageValueFoe = new Dictionary<Type, int>();
+            DamageValueFoe.Add(typeof(LaserBillboardBullet), 1);
+            DamageValueFoe.Add(typeof(Missile), 5);
+
+            /*DamageValue = new Dictionary<string, int>();
+            DamageValue.Add("FriendlyLaserBolt", 5);
+            DamageValue.Add("FoeLaserBolt", 1);
+            DamageValue.Add("Missile", 10);*/
 		}
 	}
 }

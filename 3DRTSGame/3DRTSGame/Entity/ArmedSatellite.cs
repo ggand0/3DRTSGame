@@ -128,7 +128,7 @@ namespace _3DRTSGame
 					if (tmp != null) {// 敵がいたなら
 						Vector3 dir1 = Vector3.Normalize(tmp.Position - Position);
 						level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, this, tmp, dir1, 1,
-							content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.AlphaBlend, new Vector2(50, 100), 1));/**/ //new Vector2(50, 30)
+							content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.AlphaBlend, new Vector2(50, 100), 1));
 						/*level.Bullets.Add(new LaserBillboardBullet(IFF.Friend, Level.graphicsDevice, content, Position, tmp, dir1, 1,
 								content.Load<Texture2D>("Textures\\Lines\\laser0"), Color.White, BlendState.AlphaBlend, new Vector2(50, 100), 1));*/
 					}
@@ -182,10 +182,12 @@ namespace _3DRTSGame
 		}
 		private void SetEffectParameters()
 		{
-			SetEffectParameter(shadowEffect, "DoRimLighting", true);
-			SetEffectParameter(shadowEffect, "RimColor", Color.Blue.ToVector4());
-			//SetEffectParameter(shadowEffect, "CameraDirection", level.camera.Direction);/**/
-			SetEffectParameter(shadowEffect, "CameraPosition", level.camera.Position);
+			SetEffectParameter(satelliteShadowEffect, "DoRimLighting", true);
+			//SetEffectParameter(satelliteShadowEffect, "RimColor", (Color.DodgerBlue * 0.8f).ToVector4());
+            SetEffectParameter(satelliteShadowEffect, "RimColor", (Color.Green * 0.8f).ToVector4());
+            SetEffectParameter(satelliteShadowEffect, "RimIntensity", 0.3f);// 0.01f
+			//SetEffectParameter(satelliteShadowEffect, "CameraDirection", level.camera.Direction);/**/
+			SetEffectParameter(satelliteShadowEffect, "CameraPosition", level.camera.Position);
 		}
 
 		public override void Update(GameTime gameTime)
@@ -265,7 +267,12 @@ namespace _3DRTSGame
 		{
 			base.Initialize(position, center);
 			Model = model;
-			SetModelEffect(satelliteShadowEffect, false);
+
+            this.Scale = 8;// 500;
+			//RotationMatrix = Matrix.CreateRotationX(MathHelper.ToRadians(60));
+            SetEffectParameters();
+			//SetModelEffect(satelliteShadowEffect, false);
+            SetModelEffect(satelliteShadowEffect, true);
 		}
 		#region Constructors
 		public ArmedSatellite(Vector3 position, float scale, string fileName)
@@ -284,6 +291,7 @@ namespace _3DRTSGame
 			: base(true, position, center, scale, fileName)
 		{
 			ShieldEnabled = true;
+			//Rotate = true;
 			this.Weapon = weaponType;
 
 			if (weaponType == SatelliteWeapon.LaserBolt) {
@@ -310,12 +318,14 @@ namespace _3DRTSGame
 			missileOrg = new Missile(IFF.Friend, this, null, MISSILE_SPEED, Vector3.Zero, Position, 4, "Models\\AGM65Missile");//AGM65Missile AIM9LMissile
 			uiRing = new BillboardSystem(Level.graphicsDevice, Level.content, Level.content.Load<Texture2D>("Textures\\UI\\GlowRing2"),
 						new Vector2(512), new Vector3[] { Vector3.Zero });//currentUIModel.Position
-			SetModelEffect(satelliteShadowEffect, false);
+			//SetModelEffect(satelliteShadowEffect, false);// 実行中にパラメータ値を変更したいので、参照をセットする
+            //SetModelEffect(satelliteShadowEffect, true);
 		}
 
 		static ArmedSatellite()
 		{
 			satelliteShadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
+            SetEffectParameter(shadowEffect, "DoRimLighting", false);
 		}
 		#endregion
 		

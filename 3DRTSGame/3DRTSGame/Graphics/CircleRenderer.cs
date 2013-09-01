@@ -100,6 +100,16 @@ namespace _3DRTSGame
 			Setup();
 			_VertexArray = _Vertices.ToArray();
 			_VertexColor = color;*/
+
+            // もし引数の色が設定された色と異なっていたら（色の変更を検出したら）設定しなおす
+            if (color != _VertexColor) {
+                //foreach (VertexPositionColor v in _Vertices) {
+                for (int i = 0; i < _Vertices.Count; i++) {
+                    _Vertices[i] = new VertexPositionColor(_Vertices[i].Position, color);
+                }
+                _VertexColor = color;
+            }
+
 			_Radius = radius;
 			_Transforms = transforms;
 			_Vertices = new List<VertexPositionColor>();// 初期化しないと塗りつぶすことに

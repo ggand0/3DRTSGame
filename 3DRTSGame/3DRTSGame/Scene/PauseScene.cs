@@ -18,6 +18,7 @@ namespace _3DRTSGame
 			drawBackGround = false;
 			menuString = new string[] {
 				"Resume",
+                //"Reset the level"
 			};
 			buttonNum = menuString.Length;
 			button = new Button[buttonNum];
@@ -33,10 +34,12 @@ namespace _3DRTSGame
 
 		protected override void HandleInput()
 		{
-			if (JoyStick.IsOnKeyDown(3) || JoyStick.IsOnKeyDown(8)) {
-				isEndScene = true;
-				//if (!game.isMuted) cancel.Play(SoundControl.volumeAll, 0f, 0f);
-			}
+            //foreach (Button b in button) {
+                if (JoyStick.IsOnKeyDown(3) || JoyStick.IsOnKeyDown(8)) {
+                    isEndScene = true;
+                    //if (!game.isMuted) cancel.Play(SoundControl.volumeAll, 0f, 0f);
+                }
+            
 		}
 		public override void Update(GameTime gameTime)
 		{

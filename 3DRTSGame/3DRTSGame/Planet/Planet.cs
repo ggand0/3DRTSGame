@@ -26,10 +26,35 @@ namespace _3DRTSGame
 	}
 	public abstract class Planet : Object
 	{
-        protected static Vector3 DEF_POSITION = new Vector3(-300, 0, -200);
+		#region Fields & Properties
+		protected static Vector3 DEF_POSITION = new Vector3(-300, 0, -200);
         protected static Vector3 DEF_STAR_POSITION = Vector3.Zero;
 
+
+		private BasicEffect basicEffect;
+		private Effect simpleEffect;
+		private bool renderOrbitalLine = true;
+        /// <summary>
+        /// 現在使っていない
+        /// </summary>
+		private BillboardStrip orbitalLine;
+        /// <summary>
+        /// Lineで軌道を描画
+        /// </summary>
+        private CircleRenderer orbitRenderer;
+		private float p_radius = 200;
+		private float a_radius = 220;//205;
+		private float c_radius = 200.5f;
+
+		protected Texture2D baseTexture, gTexture, bTexture;
+		protected Texture2D baseNormalTexture;
+		protected bool rotate;
+		protected float rotationSpeed = MathHelper.ToRadians(1);
+		protected bool revolution;
+		protected float revolutionSpeed = MathHelper.ToRadians(1);
 		protected Model sphere;
+		protected GraphicsDevice graphicsDevice;
+		protected PlanetRenderType renderType;
 
 		public int Seed { get; private set; }
 		public PlanetType Type { get; protected set; }
@@ -37,8 +62,12 @@ namespace _3DRTSGame
 		public Texture2D Mercator { get; protected set; }
 		public Texture2D Palette { get; protected set; }
 		public Texture2D normalmap { get; protected set; }
+		public Texture2D BlendMap { get; protected set; }
+		public Effect atmosphere { get; protected set; }
 		public Effect terrain { get; protected set; }
 		public Effect draw { get; protected set; }
+		public Vector3 StarPosition { get; protected set; }
+		public float revolutionAngle { get; set; }
 		/// <summary>
 		/// このプロジェクトでは使う予定は無いが、チュートリアルで使うかもしれないので一応。
 		/// </summary>
@@ -51,35 +80,10 @@ namespace _3DRTSGame
 		public int TextureWidth = 512;
 		public int TextureHeight = 512;
 		public int SubType { get; protected set; }
-
-
-		protected GraphicsDevice graphicsDevice;
-		public Effect atmosphere { get; protected set; }
-		float p_radius = 200;
-		float a_radius = 220;//205;
-		float c_radius = 200.5f;
 		public float roll;
 		public float pitch;
+		#endregion
 
-		protected PlanetRenderType renderType;
-		public Texture2D BlendMap { get; protected set; }
-		protected Texture2D baseTexture, gTexture, bTexture;
-		protected Texture2D baseNormalTexture;
-		protected bool rotate;
-		protected float rotationSpeed = MathHelper.ToRadians(1);
-		protected bool revolution;
-		protected float revolutionSpeed = MathHelper.ToRadians(1);
-		
-		public Vector3 StarPosition { get; protected set; }
-		public float revolutionAngle { get; set; }
-		private BasicEffect basicEffect;
-		private Effect simpleEffect;
-
-		private bool renderOrbitalLine = true;
-		private BillboardStrip orbitalLine;
-
-
-		
 		protected virtual void LoadContent(ContentManager content)
 		{
 			base.Load("Models\\sphere2");
@@ -397,8 +401,9 @@ namespace _3DRTSGame
 				foreach (ModelMeshPart part in mesh.MeshParts) {
 					Effect toSet = effect;
 					// Copy the effect if necessary
-					if (CopyEffect)
-						toSet = effect.Clone();
+                    if (CopyEffect) {
+                        toSet = effect.Clone();
+                    }
 					MeshTag tag = ((MeshTag)part.Tag);
 
 					if (DrawingDepthNormalPass) {
@@ -487,7 +492,7 @@ namespace _3DRTSGame
 
 						mesh.Draw();
 					}
-				}/**/
+				}
 			}
 
 			// atmosphere scattering setteings
@@ -509,7 +514,10 @@ namespace _3DRTSGame
 				}
 
 				if (renderOrbitalLine) {
-					orbitalLine.Draw(View, Projection, level.camera.Up, level.camera.Right, level.camera.Position);
+					//orbitalLine.Draw(View, Projection, level.camera.Up, level.camera.Right, level.camera.Position);
+                    //circleRenderer.Draw(Level.graphicsDevice, View, Projection, Matrix.CreateTranslation(currentDestination), Player.UI_CIRCLE_COLOR, Player.UI_CIRCLE_RADIUS);
+                    orbitRenderer.Draw(graphicsDevice, View, Projection, Matrix.CreateTranslation(StarPosition),
+                        Color.DodgerBlue * 0.5f, (Position - StarPosition).Length());
 				}
 			}
 			
@@ -517,7 +525,6 @@ namespace _3DRTSGame
 			//graphics.RenderState.CullMode = CullMode.None;
 			graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 			graphicsDevice.DepthStencilState = DepthStencilState.Default;
-
 		}
 		public override  void Update(GameTime gameTime)
 		{
@@ -542,7 +549,9 @@ namespace _3DRTSGame
 				Vector3.Transform(Model.Meshes[0].BoundingSphere.Center, _world)
 				, Model.Meshes[0].BoundingSphere.Radius * _world.Forward.Length());
 
-			if (orbitalLine != null) orbitalLine.Update(gameTime);
+			if (renderOrbitalLine) {
+                //orbitalLine.Update(gameTime);
+            }
 		}
 		#region Constructors
 		public Planet(GraphicsDevice graphics, ContentManager content)
@@ -571,7 +580,9 @@ namespace _3DRTSGame
 
 			IsActive = true;
 			Scale = a_radius;
-			renderOrbitalLine = false;
+
+			renderOrbitalLine = true;
+            orbitRenderer = new CircleRenderer(graphicsDevice, Color.Blue, (this.Position - starPosition).Length());
 		}
 		#endregion
 	}

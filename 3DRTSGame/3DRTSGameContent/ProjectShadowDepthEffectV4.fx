@@ -159,7 +159,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 
 	// Rim lighting
-	float4 rim;
+	float4 rim = float4(0,0,0,0);
 	if (DoRimLighting) {
 		float3 normal = normalize(input.Normal);
 		float3 viewDir = normalize(CameraPosition - input.WorldPosition);

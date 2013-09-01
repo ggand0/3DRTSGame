@@ -13,18 +13,22 @@ namespace _3DRTSGame
 	/// </summary>
 	public class PlanetarySystem : Drawable
 	{
+		private CircleRenderer orbitRenderer;
+
 		public Sun[] Stars { get; private set; }
-		public Planet[] TargetPlanets { get; private set; }
-        public Planet[] BackGroundPlanets { get; private set; }
-        public Drawable[] BackGroundObjects { get; private set; }
+		public List<DamageablePlanet> TargetPlanets { get; private set; }
+        public List<Planet> BackGroundPlanets { get; private set; }
+        public List<Drawable> BackGroundObjects { get; private set; }
 
 
+		public void RemoveObjects()
+		{
+
+		}
 		public void Load(Vector3[] sunPositions, Vector3[] planetPositions)
 		{
             throw new NotImplementedException();
 		}
-
-
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
@@ -32,35 +36,43 @@ namespace _3DRTSGame
 			foreach (Sun s in Stars) {
 				s.Update(gameTime);
 			}
-			foreach (Planet p in TargetPlanets) {
+			/*foreach (Planet p in TargetPlanets) {
 				p.Update(gameTime);
 			}
             foreach (Planet p in BackGroundPlanets) {
                 p.Update(gameTime);
-            }
+            }*/
             foreach (Drawable p in BackGroundObjects) {
                 p.Update(gameTime);
             }
 		}
-		public override void Draw(GameTime gameTime)
-		{
-			base.Draw(gameTime);
 
-			foreach (Sun s in Stars) {
-				s.Draw(gameTime);
-			}
-			foreach (Planet p in TargetPlanets) {
-				p.Draw(gameTime);
-			}
+
+        public void Draw(GameTime gameTime, Camera camera)
+        {
+            base.Draw(camera);
+
+            foreach (Sun s in Stars) {
+                s.Draw(false, camera.View, camera.Projection);
+            }
+            /*foreach (Planet p in TargetPlanets) {
+                p.Draw(camera.View, camera.Projection, camera.Position);
+            }
             foreach (Planet p in BackGroundPlanets) {
-                p.Draw(gameTime);
-            }
+                p.Draw(camera.View, camera.Projection, camera.Position);
+            }*/
             foreach (Drawable p in BackGroundObjects) {
+                //p.Draw(camera.View, camera.Projection, camera.Position);
                 p.Draw(gameTime);
             }
-		}
+        }
 
-        private void Initialize()
+
+		#region Constructors
+        /// <summary>
+        /// Levelの該当リストへそれぞれ追加する。ライティング処理を反映させるために必要。
+        /// </summary>
+		private void AddObjectsToLevelList()
         {
             foreach (DamageablePlanet p in TargetPlanets) {
                 level.Planets.Add(p);
@@ -74,25 +86,38 @@ namespace _3DRTSGame
             foreach (Drawable p in BackGroundObjects) {
                 // AsteroidBeltなどは、UpdateとDrawさえすればよいので、Levelのリストに追加する必要はない
                 //level.Models.Add(p);
-            }
+            }/**/
         }
+		private void Initialize()
+		{
+			/*TargetPlanets = new List<DamageablePlanet>();
+			BackGroundPlanets = new List<Planet>();
+			BackGroundObjects = new List<Drawable>();*/
+            AddObjectsToLevelList();
+            // PLanet.Drawで描画させるべき
+			//orbitRenderer = new CircleRenderer(Level.graphicsDevice, Color.White, 50);
+		}
 		public PlanetarySystem()
 			:this(new Vector3[] { Vector3.Zero }, new Vector3[] { new Vector3(0, 100, 100) })
 		{
 		}
 		public PlanetarySystem(Vector3[] starPositions, Vector3[] planetPositions)
 		{
+			Initialize();
 			Load(starPositions, planetPositions);
 		}
         public PlanetarySystem(Sun[] stars, DamageablePlanet[] targetPlnaets, Planet[] backGroundPlnaets, Drawable[] backGroundObjects)
         {
+
             this.Stars = stars;
-            this.TargetPlanets = targetPlnaets;
-            this.BackGroundPlanets = backGroundPlnaets;
-            this.BackGroundObjects = backGroundObjects;
+            this.TargetPlanets = targetPlnaets.ToList<DamageablePlanet>();
+            this.BackGroundPlanets = backGroundPlnaets.ToList<Planet>();
+            this.BackGroundObjects = backGroundObjects.ToList<Drawable>();
 
             // Levelのリストに追加する処理もここで行う
-            Initialize();
-        }
+            //AddObjectsToLevelList();
+			Initialize();
+		}
+		#endregion
 	}
 }

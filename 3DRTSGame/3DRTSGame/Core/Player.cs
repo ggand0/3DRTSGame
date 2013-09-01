@@ -7,24 +7,29 @@ using Microsoft.Xna.Framework.Input;
 
 namespace _3DRTSGame
 {
+    /// <summary>
+    /// 主にCreditとユニット操作・操作に関連するUIの描画を担当するクラス
+    /// </summary>
 	public class Player
 	{
+        private static readonly int DEF_MONEY = 1000;
+        public static readonly Color UI_CIRCLE_COLOR = Color.LightGreen;
+        public static readonly float UI_CIRCLE_RADIUS = 50;
+
 		private enum MoveOrderState
 		{
 			NotOrdering,
 			SettingPosition,
 			SettingHeight,
-			Done
 		}
 		private MoveOrderState currentMoveOrderState = MoveOrderState.NotOrdering;
 		private Vector3 currentDestination;
 		private Vector3 currentVector;
+        private float initialHeight, currentHeight;
 
-		private static readonly int DEF_MONEY = 1000;
-		public static readonly Color UI_CIRCLE_COLOR = Color.LightGreen;
-		public static readonly float UI_CIRCLE_RADIUS = 50;
+		
 
-		public int Cregit { get; set; }
+		public int Cregit { get; private set; }
 		public List<Object> Units { get; private set; }
 
 		private Level level;
@@ -40,15 +45,14 @@ namespace _3DRTSGame
 		/// <param name="ray"></param>
 		/// <param name="plane"></param>
 		/// <returns></returns>
-		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)//Nullable<Vector3>
+		private Vector3 GetRayPlaneIntersectionPoint(Ray ray, Plane plane)
 		{
 			float? distance = ray.Intersects(plane);
-			//return distance.HasValue ? ray.Position + ray.Direction * distance.Value : null;
 			return distance.HasValue ? ray.Position + ray.Direction * distance.Value : Vector3.Zero;
 		}
 		private Ray GetPickRay()
 		{
-			Vector2 mousePos = MouseInput.GetMousePosition();
+			Vector2 mousePos = MouseInput.GetCurrentMousePosition();
 
 			// rayとplaneのintersection pointを計算する
 			Vector3 nearsource = new Vector3((float)mousePos.X, (float)mousePos.Y, 0f);
@@ -63,6 +67,37 @@ namespace _3DRTSGame
 			Ray pickRay = new Ray(nearPoint, direction);
 			return pickRay;
 		}
+        /// <summary>
+        /// ユニットのいる点が乗っている、カメラの平面と平行な平面とpickRayとの交点を求めて返す。
+        /// </summary>
+        /// <returns>pickRayと求める平面との交点</returns>
+        private Vector3 GetSelectPositionIntersectionPoint()
+        {
+            //Vector3 planePos = new Vector3(currentSelection.Position.X, level.camera.Position.Y, currentSelection.Position.Z);
+            Vector3 planePos = new Vector3((currentSelection.Position + currentVector).X, level.camera.Position.Y, (currentSelection.Position + currentVector).Z);
+            Vector3 planePos0 = new Vector3(currentSelection.Position.X, 0, currentSelection.Position.Z);
+
+            Vector3 planeNormal = planePos - level.camera.Position;                                                             // 同じ高さでのカメラから求める平面方向を向く法線になるはず
+            Vector3 planeUnitNormal = Vector3.Normalize(planeNormal);
+            float distance = Math.Abs(Vector3.Dot((Vector3.Zero - planePos0), planeNormal)) / (float)planeNormal.Length();      // 原点から平面までのdistanceが必要
+            //float distance = Vector3.Dot((level.camera.Position - planePos), planeNormal);
+
+            //Plane planeVertical = new Plane(planeNormal, planePos.Length());
+            //Plane planeVertical = new Plane(planeNormal, -planePos.X);
+            Plane planeVertical = new Plane(planeNormal, -distance);
+
+            return GetRayPlaneIntersectionPoint(GetPickRay(), planeVertical);
+        }
+        /// <summary>
+        /// マウスのY座標の差分から、高さを調整する
+        /// </summary>
+        /// <returns></returns>
+        private float GetMovedHeight()
+        {
+            //return -(MouseInput.GetCurrentMousePosition().Y - MouseInput.GetPrevMousePosition().Y);
+            return (MouseInput.GetCurrentMousePosition().Y - MouseInput.GetPrevMousePosition().Y) > 0 ? -10 : 10;
+        }
+
 
 		/// <summary>
 		/// いずれデリゲートに。
@@ -104,6 +139,7 @@ namespace _3DRTSGame
 		}
 		private void HandleInput()
 		{
+            // 高度設定モードの切り替え処理
 			if (KeyInput.IsOnKeyDown(Keys.LeftShift)) {
 				/*if (currentMoveOrderState == MoveOrderState.SettingPosition) {
 					currentMoveOrderState = MoveOrderState.SettingHeight;
@@ -117,15 +153,21 @@ namespace _3DRTSGame
 					}
 
 					currentMoveOrderState = MoveOrderState.SettingHeight;
+                    // [重要]Shift押下フレームでのpickRayとユニットのいる（垂直な）平面との交点の高さを求めておく
+                    initialHeight = GetSelectPositionIntersectionPoint().Y;
 				}
 			} else if (KeyInput.IsOnKeyUp(Keys.LeftShift)) {
 				if (currentMoveOrderState == MoveOrderState.SettingHeight) {
 					currentMoveOrderState = MoveOrderState.SettingPosition;
 				}
 			}
+
+            // 何かユニットが選択されていた場合、移動指示モードへ切り替える
 			if (currentSelection != null && MouseInput.IsOnButtonDownR()) {
 				currentMoveOrderState = MoveOrderState.SettingPosition;
 			}
+
+            // 高度設定モードならそのモードの終了、それ以外はユニット操作モード終了
 			if (KeyInput.IsOnKeyDown(Keys.Escape)) {
 				if (currentMoveOrderState == MoveOrderState.SettingHeight) {
 					currentMoveOrderState = MoveOrderState.SettingPosition;
@@ -134,46 +176,48 @@ namespace _3DRTSGame
 				}
 			}
 
+            // UI描画位置の計算:SettingHeight時も計算するようにした
+            if (currentMoveOrderState == MoveOrderState.SettingPosition || currentMoveOrderState == MoveOrderState.SettingHeight) {
+                // ユニットのいる高さのXZ平面との交点を求める
 
-			if (currentMoveOrderState == MoveOrderState.SettingPosition) {
-				//Plane planeXZ = new Plane(Vector3.Up, 0);
-				Plane planeXZ = new Plane(Vector3.Up, -currentSelection.Position.Y);
-				currentDestination = GetRayPlaneIntersectionPoint(GetPickRay(), planeXZ);
-			} else if (currentMoveOrderState == MoveOrderState.SettingHeight) {
-				// 高ささえ求められれば良いから向きはどうでもいいか
-				Vector3 planePos = new Vector3(currentSelection.Position.X, level.camera.Position.Y, currentSelection.Position.Z);
-				Vector3 planePos0 = new Vector3(currentSelection.Position.X, 0, currentSelection.Position.Z);
+                Plane planeXZ = new Plane(Vector3.Up, -currentSelection.Position.Y);
+                currentDestination = GetRayPlaneIntersectionPoint(GetPickRay(), planeXZ);
+            }
+            if (currentMoveOrderState == MoveOrderState.SettingHeight) {
+                // ユニットのいる位置の、カメラのクリップ面と平行な面との交点を求める
+				float height = GetSelectPositionIntersectionPoint().Y;// 交点の高さが求める高さ
+                //currentDestination = currentSelection.Position + currentVector + new Vector3(0, height, 0);
+                // Shift押した時点でいきなり高さがあるのは嫌なので、押した時点での高度との差分に設定することによって改善
+                currentDestination = currentSelection.Position + currentVector + new Vector3(0, (height - initialHeight), 0);
 
-				//Vector3 planeNormal = Vector3.UnitX;
-				Vector3 planeNormal = Vector3.Normalize(planePos - level.camera.Position);// 同じ高さでのカメラ方向を向く法線になるはず
-				float distance = Vector3.Dot((Vector3.Zero - planePos0), planeNormal);
+                // マウスのY座標の差分によって、選択しているユニットの高度を調整する
+                //currentHeight += GetMovedHeight();
+                //currentDestination = currentSelection.Position + currentVector + new Vector3(0, currentHeight, 0);
+            } else {
+                currentHeight = 0;
+            }
 
-				//Plane planeVertical = new Plane(planeNormal, planePos.Length());
-				//Plane planeVertical = new Plane(planeNormal, -planePos.X);
-				Plane planeVertical = new Plane(planeNormal, -distance);
 
-				float height = GetRayPlaneIntersectionPoint(GetPickRay(), planeVertical).Y;// 交差点の高さが求める高さである
-				currentDestination = currentSelection.Position + currentVector + new Vector3(0, height, 0);
-			}
-
+            // 左クリック時の入力処理
 			if (MouseInput.IsOnButtonDownL()) {
-				// 移動指示
-				if (currentSelection != null && currentMoveOrderState == MoveOrderState.SettingPosition) {
+                // 移動指示及び選択したユニットの高度設定
+                if (currentSelection != null && currentMoveOrderState == MoveOrderState.SettingPosition) {
 					currentMoveOrderState = MoveOrderState.NotOrdering;
 					currentSelection.StartMove(currentDestination);
-				}
-				// 選択したユニットの高度設定
-				else if (currentSelection != null && currentMoveOrderState == MoveOrderState.SettingHeight) {
+				} else if (currentSelection != null && currentMoveOrderState == MoveOrderState.SettingHeight) {
 					currentSelection.StartMove(currentDestination);
 					//adjustingUnitHeight = false;
 					currentMoveOrderState = MoveOrderState.NotOrdering;
 				}
 
-				if (UnitPanel.IsMouseInside()) {// ボタン選択
-					if (unitPanel.CurrentSelectedIcon != "" && currentSelection != null) {// 何か操作アイコンが選択されていたら
+
+
+                if (UnitPanel.IsMouseInside()) {// ボタン選択
+                    // 何か操作アイコンが選択されていたらそのボタンに該当する処理
+					if (unitPanel.CurrentSelectedIcon != "" && currentSelection != null) {
 						ControlUnit(unitPanel.CurrentSelectedIcon);
 					}
-				} else {// ユニット選択
+				} else {// ユニットが選択されているかどうかチェック
 					Ray pickRay = GetPickRay();
 					bool selectSomething = false;
 
@@ -186,7 +230,8 @@ namespace _3DRTSGame
 						}
 					}
 
-					if (!selectSomething) {// 何もない場所でクリックしたときには全てリセットするようにする
+                    // 何もない場所でクリックしたときには全てリセットするようにする
+					if (!selectSomething || KeyInput.IsOnKeyDown(Keys.Escape)) {
 						foreach (Satellite s in level.Satellites) {
 							currentSelection = null;
 							s.IsSelected = false;
@@ -196,6 +241,10 @@ namespace _3DRTSGame
 
 			}
 		}
+        /// <summary>
+        /// 敵を撃破した場合にCreditを追加する
+        /// </summary>
+        /// <param name="target"></param>
 		public void AddMoney(Object target)
 		{
 			if (target is Asteroid) {
@@ -204,6 +253,10 @@ namespace _3DRTSGame
 				Cregit += 20;
 			}
 		}
+        /// <summary>
+        /// ユニットを購入した場合にCreditを消費する
+        /// </summary>
+        /// <param name="unit"></param>
 		public void UseMoney(Object unit)
 		{
 			if (unit is ArmedSatellite) {
@@ -211,12 +264,14 @@ namespace _3DRTSGame
 			} else {
 			}
 		}
+
 		public void Update()
 		{
 			HandleInput();
 		}
-
-		
+        /// <summary>
+        /// 主に、ユニットに移動指示を出すときのUIを描画する
+        /// </summary>
 		public void Draw()
 		{
 			if (currentSelection != null) {
@@ -238,6 +293,11 @@ namespace _3DRTSGame
 
 						DebugOverlay.Line(currentSelection.Position, currentSelection.Position + currentVector, UI_CIRCLE_COLOR);
 						DebugOverlay.Line(currentSelection.Position + currentVector, currentDestination, UI_CIRCLE_COLOR);
+                        /*circleRenderer.Draw(Level.graphicsDevice, level.camera.View, level.camera.Projection,
+							Matrix.CreateTranslation(currentSelection.Position), UI_CIRCLE_COLOR, (currentDestination - currentSelection.Position).Length());
+						circleRenderer.Draw(Level.graphicsDevice, level.camera.View, level.camera.Projection,
+							Matrix.CreateTranslation(currentDestination), UI_CIRCLE_COLOR, UI_CIRCLE_RADIUS);
+                        DebugOverlay.Line(new Vector3(currentDestination.X, 0, currentDestination.Z), currentDestination, UI_CIRCLE_COLOR);*/
 						break;
 				}
 			}
@@ -247,6 +307,7 @@ namespace _3DRTSGame
 			}*/
 		}
 
+        // Constructor
 		public Player(Level level)
 		{
 			this.level = level;

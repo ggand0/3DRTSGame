@@ -11,6 +11,7 @@ namespace _3DRTSGame
 	public class Object : Drawable, IRenderable, ICloneable
 	{
 		#region Fields and Properties
+		public static readonly int DEF_ATTACK_VALUE = 1;
 		public static Effect shadowEffect;
 
 		//public Effect maskEffect;
@@ -469,6 +470,8 @@ namespace _3DRTSGame
         #endregion
 
         #region Constructors
+        // アセット名を引数で指定するかどうかで２系統用意している
+
         public Object()
 			: this(Vector3.Zero)
 		{
@@ -491,7 +494,9 @@ namespace _3DRTSGame
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
 
-			if (setEffect && !(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+            if (setEffect && !(this is Sun) && !(this is Planet) && !(this is ArmedSatellite)) {
+                SetModelEffect(shadowEffect, true);
+            }
 			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
 		}
 
@@ -519,14 +524,18 @@ namespace _3DRTSGame
 			_boundingSphereRenderer.OnCreateDevice();
 			MaxHitPoint = 1;
 
-			if (setEffect && !(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, true);
+            // 物体系のオブジェクトのModelに対してエフェクトの設定を行う
+            if (setEffect && !(this is Sun) && !(this is Planet) && !(this is ArmedSatellite)) {
+                SetModelEffect(shadowEffect, true);
+            }
 			//if (!(this is Sun) && !(this is Planet)) SetModelEffect(shadowEffect, false);
 		}
 		static Object()
 		{
 			shadowEffect = content.Load<Effect>("ProjectShadowDepthEffectV4");
 			SetEffectParameter(shadowEffect, "DoShadowMapping", false);
-			SetEffectParameter(shadowEffect, "DoRimLighting", true);
+			//SetEffectParameter(shadowEffect, "DoRimLighting", true);
+            SetEffectParameter(shadowEffect, "DoRimLighting", false);
 		}
 		#endregion
 	}
