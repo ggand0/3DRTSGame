@@ -50,7 +50,7 @@ namespace _3DRTSGame
 		private WaveState state;
 		private int count, start;
 
-        private Dictionary<string, Object> enemiesOrg = new Dictionary<string, Object>();
+        private Dictionary<string, Drawable> enemiesOrg = new Dictionary<string, Drawable>();
 
 
         #region Methods
@@ -187,7 +187,18 @@ namespace _3DRTSGame
                 level.Models.Add(f);
                 level.Enemies.Add(f);
 				level.Fighters.Add(f);
-            }
+			} else if (enemyData.EnemyType == typeof(Fighters)) {
+				Fighters f = (Fighters)enemiesOrg["Fighters"].Clone();
+				Vector3 pos = new Vector3(Utility.NextDouble(random, -radius, radius),//{X:2187.957 Y:-947.6964 Z:-1675.152}
+					Utility.NextDouble(random, -radius, radius), Utility.NextDouble(random, -radius, radius));
+				//+		Position	{X:-500.8944 Y:184.9642 Z:593.8776}	Microsoft.Xna.Framework.Vector3
+
+				f.Initialize(pos, level.TargetPlanets[0].Position);
+
+				level.Updaters.Add(f);
+				//+		Position	{X:1482.471 Y:737.4756 Z:1828.867}	Microsoft.Xna.Framework.Vector3
+				//この時点でlevel.models[2]とmodels[7]のposが完全に一致してしまっている
+			}
 		}
 		public void Update(GameTime gameTime)
 		{
@@ -233,7 +244,7 @@ namespace _3DRTSGame
 					}
 				}
 			} else if (state == WaveState.Interval) {
-                if (count - start > 10 * INTERVAL_SEC && level.Enemies.Count == 0 || count - start > 30 * INTERVAL_SEC) {// 敵全滅かつ10秒経過、もしくは（バグなども顧慮して）ある程度時間がたったら次のwaveへ
+                if (count - start > 10 * INTERVAL_SEC && level.Enemies.Count == 0/* || count - start > 30 * INTERVAL_SEC*/) {// 敵全滅かつ10秒経過、もしくは（バグなども顧慮して）ある程度時間がたったら次のwaveへ
 					WaveCount++;
 
 					if (WaveCount == waves.Count) {// wavesのカウントに達していたらクリア
@@ -261,10 +272,12 @@ namespace _3DRTSGame
         private void Initialize()
 		{
 			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), 0.5f), new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 2, 3, 3000, 30));
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), "", 1f, MAX_ASTEROID_ROUTE_NUM) }, 0, 1, 4, 3000, 60));
 			/*waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), "0", 1/3f), new EnemyInfo(typeof(Asteroid), "1", 1/3f)
                 , new EnemyInfo(typeof(Asteroid), "2", 1/3f) }, 0, 1, 4, 3000, 60));*/
-			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Fighter), 1f) }, 0, 10, 1, 3000, 30));
+
+			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), "", 1f, MAX_ASTEROID_ROUTE_NUM) }, 0, 1, 4, 3000, 60));
+			//waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Fighter), 1f) }, 0, 10, 1, 3000, 30));
+			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Fighters), 1f) }, 0, 10, 1, 3000, 30));
 			waves.Add(new EnemyWave(new EnemyInfo[] { new EnemyInfo(typeof(Asteroid), "", 0.5f, MAX_ASTEROID_ROUTE_NUM),
 				new EnemyInfo(typeof(Fighter), 0.5f) }, 0, 5, 4, 3000, 30));
 			state = WaveState.Start;
@@ -272,6 +285,7 @@ namespace _3DRTSGame
             // asteroid:4引数コンストラクタ以外を使うとeffectが初期化されずにnullのままになるので注意
 			enemiesOrg.Add("Asteroid", new Asteroid(Vector3.Zero, Vector3.Zero, 0.05f, 10, "Models\\Asteroid"));
             enemiesOrg.Add("Fighter", new Fighter(Vector3.Zero, Vector3.Zero, 20f, "Models\\fighter0"));
+			enemiesOrg.Add("Fighters", new Fighters(Vector3.Zero, Vector3.Zero, 5, ShipFormation.Random));
 
 			float unitRadian = MathHelper.ToRadians(360 / (float)MAX_ASTEROID_ROUTE_NUM);
 			for (int i = 0; i < MAX_ASTEROID_ROUTE_NUM; i++) {
@@ -287,8 +301,6 @@ namespace _3DRTSGame
 		{
 			this.level = level;
 			Initialize();
-
-			//spiralRenderer = new SpiralRenderer(Level.graphicsDevice, Color.Orange, 0, 1440, level.TargetPlanets[0].Position);
 		}
 	}
 }

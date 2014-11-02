@@ -121,6 +121,7 @@
     <Compile Include="Entity\Drawable.cs" />
     <Compile Include="Entity\EntityBullet.cs" />
     <Compile Include="Entity\Fighter.cs" />
+    <Compile Include="Entity\Fighters.cs" />
     <Compile Include="Entity\Frigate.cs" />
     <Compile Include="Entity\IBullet.cs" />
     <Compile Include="Entity\LaserBillboardBullet.cs" />

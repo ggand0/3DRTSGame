@@ -260,8 +260,9 @@ namespace _3DRTSGame
 		public void UseMoney(Object unit)
 		{
 			if (unit is ArmedSatellite) {
-				Cregit -= 500;
-			} else {
+				Cregit -= 200;
+			} else if (unit is SpaceStation) {
+                Cregit -= 500;
 			}
 		}
 

@@ -7,54 +7,34 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace _3DRTSGame
 {
-	public class PauseScene : MenuScene
+	public class PauseScene : MaskMenuScene
 	{
-		Camera camera;
+		protected Camera camera;
 
-		public PauseScene(Level privousScene)
-			: base(privousScene)
+		public PauseScene(Level privousScene, string title, params Menu[] menu)
+			: base(privousScene, title, menu)
 		{
-			sceneTitle = "Pause";
-			drawBackGround = false;
-			menuString = new string[] {
-				"Resume",
-                //"Reset the level"
-			};
-			buttonNum = menuString.Length;
-			button = new Button[buttonNum];
-			for (int i = 0; i < buttonNum; i++) {
-				button[i].color = Color.Blue;
-				button[i].name = menuString[i];
-			}
-			//SoundControl.Pause();
 			this.camera = privousScene.camera;
-
 			Load();
 		}
-
-		protected override void HandleInput()
+		public override void Load()
 		{
-            //foreach (Button b in button) {
-                if (JoyStick.IsOnKeyDown(3) || JoyStick.IsOnKeyDown(8)) {
-                    isEndScene = true;
-                    //if (!game.isMuted) cancel.Play(SoundControl.volumeAll, 0f, 0f);
-                }
-            
+			base.Load();
+			mask = content.Load<Texture2D>("Textures\\whiteBoard");
+		}
+
+		protected void HandleInput()
+		{
+            if (JoyStick.IsOnKeyDown(3)) {
+                isEndScene = true;
+                //if (!game.isMuted) cancel.Play(SoundControl.volumeAll, 0f, 0f);
+            }
 		}
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
+			HandleInput();
 			camera.Update(gameTime);
-		}
-
-		public override void Draw(GameTime gameTime)
-		{
-			higherScene.Draw(gameTime);
-
-			spriteBatch.Begin();
-			spriteBatch.Draw(mask, new Rectangle(0, 0, (int)Game1.Width, (int)Game1.Height), new Color(0, 0, 0, 100));
-			spriteBatch.End();
-			base.Draw(gameTime);
 		}
 	}
 }

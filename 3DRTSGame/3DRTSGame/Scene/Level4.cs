@@ -19,6 +19,7 @@ namespace _3DRTSGame
 
 	public class Level4 : Level
 	{
+		#region Fields and Properties
 		public static readonly Vector3 MAIN_PLANET_LOCATION = new Vector3(-100, 100, -100);
 
 		private enum LevelState
@@ -38,25 +39,21 @@ namespace _3DRTSGame
 		public ArmedSatellite Satellite { get; private set; }
         public Sun sun { get; private set; }
 
-		//private PrelightingRenderer renderer;
         public PrelightingRenderer renderer { get; private set; }
 		private GridRenderer grid;
-		private EnergyRingEffect discoidEffect;
-		private ExplosionEffect explosionTest, smallExplosion, bigExplosion, midExplosion;
+		private ExplosionEffect smallExplosion;
 		private Planet planet;
 		private Star star;
 		private Sun sunCircle;
-		private Effect shadowEffect;
         private Matrix RotationMatrix = Matrix.Identity;
 		private EnemyManager enemyManager;
 		private UIManager uiManager;
 		private ProductionManager productionManager;
-		private ExplosionEffect effectTmp;
 		private AsteroidBelt asteroidBelt;
         private int count;
+		#endregion
 
-
-        private void LoadSettings()
+		private void LoadSettings()
         {
             FileStream fs = new FileStream("Save\\graphics.txt", FileMode.Open);
             StreamReader sr = new StreamReader(fs, Encoding.GetEncoding(932));
@@ -102,6 +99,9 @@ namespace _3DRTSGame
             grid.GridSize = 64; ;//32;
             // Set the grid to draw on the x/z plane around the origin
             grid.WorldMatrix = Matrix.Identity;
+			debug = new Debug();
+			Debug.level = this;
+			
 
 
             // CPUのコア数を取得
@@ -181,11 +181,13 @@ namespace _3DRTSGame
 			//Models.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Enemies.Add(Models[Models.Count - 1]);
 			Fighters = new List<Fighter>();
-			Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
+			
 			//Fighters.Add(new Fighter(new Vector3(100, 1000, 100), waterPlanet.Position, 20f, "Models\\fighter0"));
 			//Fighters.Add(new Fighter(new Vector3(-100, -1000, -100), waterPlanet.Position, 20f, "Models\\fighter0"));// 同軸上だと正しく移動しないので注意
 			//Fighters.Add(new Fighter(new Vector3(-2000, 50, -1000), waterPlanet.Position, 20f, "Models\\fighter0"));
-            Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
+
+			Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
+            //Fighters.Add(new Fighter(new Vector3(2000, 50, 1000), waterPlanet.Position, 20f, "Models\\fighter0"));
 			foreach (Fighter f in Fighters) {
 				Enemies.Add(f);
 			}
@@ -323,6 +325,54 @@ namespace _3DRTSGame
 		{
 			return !TargetPlanets.Any((x) => x.IsAlive);
 		}
+
+		protected virtual void RemoveDeadObjects()
+		{
+			if (Asteroids.Count > 0) {
+				for (int j = 0; j < Asteroids.Count; j++) {
+					if (!Asteroids[j].IsAlive) {
+						Asteroids.RemoveAt(j);
+					}
+				}
+			}
+			if (Bullets.Count > 0) {
+				for (int j = Bullets.Count - 1; j >= 0; j--) {
+					if (!Bullets[j].IsActive) {
+						Bullets.RemoveAt(j);
+					}
+				}
+			}
+			for (int j = Enemies.Count - 1; j >= 0; j--) {
+				if (!Enemies[j].IsAlive) {
+					Enemies.RemoveAt(j);
+				}
+			}
+			for (int j = Fighters.Count - 1; j >= 0; j--) {
+				if (!Fighters[j].IsAlive) {
+					Fighters.RemoveAt(j);
+				}
+			}
+			for (int j = Satellites.Count - 1; j >= 0; j--) {
+				if (!Satellites[j].IsAlive) {
+					Satellites.RemoveAt(j);
+				}
+			}
+			for (int j = Models.Count - 1; j >= 0; j--) {
+				if (!Models[j].IsAlive) {
+					if (Models[j] is Asteroid) {
+						/*// 逆でも良いと思うけど、先に個別リストで消してから最後にModelsでプールに戻した後Removeしている。
+						// オブジェクトプールに戻してから削除(戻す際には蘇生させてから)
+						Models[j].IsActive = true;
+						Models[j].IsAlive = true;
+						Models[j].HitPoint = Models[j].MaxHitPoint;
+						ObjectPool.AsteroidPool.Enqueue(Models[j] as Asteroid);*/
+						(Models[j] as Asteroid).MoveBackToObjectPool();
+					}
+
+					Models.RemoveAt(j);
+				}
+			}
+		}
 		protected override void Collide()
 		{
 			base.Collide();
@@ -441,51 +491,7 @@ namespace _3DRTSGame
 			}
 
 
-			#region Remove dead objects
-			if (Asteroids.Count > 0) {
-				for (int j = 0; j < Asteroids.Count; j++) {
-					if (!Asteroids[j].IsAlive) {
-						Asteroids.RemoveAt(j);
-					}
-				}
-			}
-			if (Bullets.Count > 0) {
-                for (int j = Bullets.Count - 1; j >= 0; j--) {
-					if (!Bullets[j].IsActive) {
-						Bullets.RemoveAt(j);
-					}
-				}
-			}
-			for (int j = Enemies.Count-1; j >= 0; j--) {
-				if (!Enemies[j].IsAlive) {
-					Enemies.RemoveAt(j);
-				}
-			}
-			for (int j = Fighters.Count - 1; j >= 0; j--) {
-				if (!Fighters[j].IsAlive) {
-					Fighters.RemoveAt(j);
-				}
-			}
-			for (int j = Satellites.Count - 1; j >= 0; j--) {
-				if (!Satellites[j].IsAlive) {
-					Satellites.RemoveAt(j);
-				}
-			}
-			for (int j = Models.Count-1; j >=0; j--) {
-				if (!Models[j].IsAlive) {
-					if (Models[j] is Asteroid) {
-						// 逆でも良いと思うけど、先に個別リストで消してから最後にModelsでプールに戻した後Removeしている。
-						// オブジェクトプールに戻してから削除(戻す際には蘇生させてから)
-						Models[j].IsActive = true;
-						Models[j].IsAlive = true;
-						Models[j].HitPoint = Models[j].MaxHitPoint;
-						ObjectPool.AsteroidPool.Enqueue(Models[j] as Asteroid);
-					}
-
-					Models.RemoveAt(j);
-				}
-			}
-			#endregion
+			RemoveDeadObjects();
 		}
 		public override void Update(GameTime gameTime)
 		{
@@ -496,7 +502,7 @@ namespace _3DRTSGame
 				if (loaded) currentState = LevelState.Ready;
 			} else {
 				player.Update();
-				enemyManager.Update(gameTime);
+				//enemyManager.Update(gameTime);
 				productionManager.Update(gameTime);
 
 				base.Update(gameTime);
@@ -512,18 +518,12 @@ namespace _3DRTSGame
 				//sunCircle.Position = renderer.Lights[0].Position;
 				//sunCircle.Update(gameTime);
 				PlanetarySystem.Update(gameTime);
-
-				//asteroidBelt.Update(gameTime);
 				foreach (Object o in Models) {
 					if (o.IsAlive) o.Update(gameTime);
 				}
 				foreach (Bullet b in Bullets) {
 					if (b.IsAlive) b.Update(gameTime);
 				}
-                /*if (planet.IsAlive) {
-                    planet.Update(gameTime);
-                }*/
-
 				Collide();
 
 				effectManager.Update(gameTime);
@@ -531,11 +531,7 @@ namespace _3DRTSGame
 			}
 		}
 
-		private void DrawScene(GameTime gameTime)
-		{
-
-		}
-		
+		public static List<Vector3> debugPoints = new List<Vector3>();
 		public override void Draw(GameTime gameTime)
 		{
 			if (currentState == LevelState.Loading) {
@@ -607,7 +603,6 @@ namespace _3DRTSGame
 					if (b.IsActive) b.Draw(camera);
 				}
 
-
 				// Draw debug overlays
 				renderer.Draw(gameTime);
 				if (displayGrid) {
@@ -619,7 +614,12 @@ namespace _3DRTSGame
 				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitX * 1000, 1, Color.Red);
 				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitY * 1000, 1, Color.Green);
 				DebugOverlay.Arrow(Vector3.Zero, Vector3.UnitZ * 1000, 1, Color.Blue);
+				foreach (Vector3 v in debugPoints) {
+					DebugOverlay.Sphere(v, 10, Color.White);
+				}
+
 				DebugOverlay.Singleton.Draw(camera.Projection, camera.View);
+				debug.Draw(gameTime);
 				
 
 				// Draw effects
@@ -627,7 +627,6 @@ namespace _3DRTSGame
 				foreach (EnergyShieldEffect ese in transparentEffects) {
 					ese.Draw(gameTime, camera.View, camera.Projection, camera.Position, camera.Direction, camera.Up, camera.Right);
 				}
-
 
 				// Draw UIs
 				productionManager.Draw(gameTime);

@@ -34,6 +34,10 @@ namespace _3DRTSGame
 
 
 		// Members for RTS game (mainly used in Level3, 4)
+		/// <summary>
+		/// Fighterの編隊オブジェクトを実現するためにUpdateするだけのリストを用意した
+		/// </summary>
+		public List<Drawable> Updaters { get; protected set; }
 		public List<Bullet> Bullets { get; protected set; }
 		public List<Object> Enemies { get; protected set; }
 		public List<Satellite> Satellites { get; protected set; }
@@ -64,6 +68,7 @@ namespace _3DRTSGame
 		}
 		protected virtual void Initialize()
 		{
+			Updaters = new List<Drawable>();
 			Models = new List<Object>();
 			effectManager = new EffectManager();
             Models = new List<Object>();
@@ -105,7 +110,13 @@ namespace _3DRTSGame
 			if (JoyStick.IsOnKeyDown(9)) {
 				//isEndScene = true;
 				//game.MoveNextLevel = true;
-				PushScene(new PauseScene(this));
+
+				//PushScene(new PauseScene(this));
+				PushScene(new PauseScene(this,
+					"Pause",
+					MaskMenuScene.Menu.BACK_TO_GAME,
+					MaskMenuScene.Menu.START_NEW_GAME,
+					MaskMenuScene.Menu.EXIT));
 			}
 		}
 		protected virtual bool IsClear()
@@ -118,6 +129,7 @@ namespace _3DRTSGame
 		}
 		public virtual void Reset()
 		{
+			Updaters.Clear();
 		}
 		public override void Load()
 		{
@@ -125,7 +137,8 @@ namespace _3DRTSGame
 		}
 		public override void Update(GameTime gameTime)
 		{
-			HandleInput();
+			HandleInput();//+		Position	{X:302.6973 Y:25.28266 Z:204.4659}	Microsoft.Xna.Framework.Vector3
+
 
 			if (IsClear()) {
 				PushScene(new MaskMenuScene(this,
@@ -137,6 +150,12 @@ namespace _3DRTSGame
 					"Game Over",
 					MaskMenuScene.Menu.START_NEW_GAME,
 					MaskMenuScene.Menu.EXIT));
+			}
+
+
+			// Update variables
+			foreach (Drawable d in Updaters) {
+				d.Update(gameTime);
 			}
 		}
 		public override void Draw(GameTime gameTime)

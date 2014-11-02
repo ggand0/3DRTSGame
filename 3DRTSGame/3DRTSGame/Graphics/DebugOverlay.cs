@@ -222,7 +222,7 @@ namespace _3DRTSGame
 						pass.Apply();
 
 						mGraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
-							PrimitiveType.PointList,
+							PrimitiveType.//PrimitiveType.PointList,
 							p.mVertices.ToArray(),
 							0,
 							p.mVertices.Count

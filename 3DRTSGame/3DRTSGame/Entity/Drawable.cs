@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace _3DRTSGame
 {
-	public class Drawable
+	public class Drawable : ICloneable
 	{
 		public static Game1 game;
 		public static Level level;
@@ -27,6 +27,10 @@ namespace _3DRTSGame
 		}
 		public virtual void Draw(GameTime gameTime)
 		{
+		}
+		public virtual object Clone()
+		{
+			return (Drawable)MemberwiseClone();
 		}
 		/*public virtual void Draw(Matrix View, Matrix Projection, Vector3 CameraPosition)
 		{

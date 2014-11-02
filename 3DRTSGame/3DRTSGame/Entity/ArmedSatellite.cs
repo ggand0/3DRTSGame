@@ -18,7 +18,7 @@ namespace _3DRTSGame
 	}
 	public class ArmedSatellite : Satellite
 	{
-		#region Fields&Properties
+		#region Fields & Properties
 		private static Effect satelliteShadowEffect;
 		private static readonly float MISSILE_SPEED = 30.0f;
 		private static readonly float LASER_BOLT_SPEED = 60.0f;
@@ -40,8 +40,8 @@ namespace _3DRTSGame
 
 		public SatelliteWeapon Weapon { get; protected set; }
 		public bool ShieldEnabled { get; protected set; }
-		Object tmp1;
-		Missile missileOrg;
+		private Object tmp1;
+		private Missile missileOrg;
 		#endregion
 
 		private Vector3 SearchTarget(int tactics)
@@ -262,6 +262,10 @@ namespace _3DRTSGame
 			//shieldEffect = new EnergyShieldEffect(content, game.GraphicsDevice, Position, new Vector2(150), 100);//300,250
 			//level.transparentEffects.Add(shieldEffect);
 			Weapon = weaponType;
+
+			if (weaponType == SatelliteWeapon.Missile) {
+				SensorSphere = new BoundingSphere(Position, 3000);//1000 150
+			}
 		}
 		public void Initialize(Model model, Vector3 position, Vector3 center)
 		{

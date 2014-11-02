@@ -11,32 +11,28 @@ namespace _3DRTSGame
 {
     public class MilitaryShip : Object
     {
+		protected static readonly float VIEW_SPHERE_RADIUS = 500;// 2000,100
         protected static readonly int shootRate = 10;//120
 
 		public FighterState State { get; protected set; }
 		public Vector3 Target { get; set; }
-		public Vector3 StartPosition { get; private set; }
+		public Vector3 StartPosition { get; protected set; }
 
 		protected Vector3 currentWayPoint;
-		protected int currentWayPointIndex;
-		private Vector3[] wayPoints0, yawDebug, pitchDebug, rollDebug;
-		
-
+		public int currentWayPointIndex;
+		private Vector3[] yawDebug, pitchDebug, rollDebug;
 		private List<BoundingSphere> obstacles;
 		private BoundingSphere viewSphere;
 		private BillboardStrip engineTrailEffect;
 		private List<Vector3> positions;
-
 		private SoundEffect shootSound;
-		private List<SoundEffectInstance> currentSounds = new List<SoundEffectInstance>();
+		private List<SoundEffectInstance> currentSounds;
         protected int count, stripCount;
-        
-
         protected Vector3 upPosition;
+		protected Vector3[] wayPoints0;
 
 
 		#region private mehods
-		
 		private void UpdateLocus()
 		{
 			if (IsActive) {
@@ -55,18 +51,19 @@ namespace _3DRTSGame
 				}
 			}
 		}
+
 		/// <summary>
 		/// WayPoint loop movement
 		/// </summary>
 		/// <param name="wayPoints"></param>
-		private void DetectCurrentWaypoint(Vector3[] wayPoints)
+		protected virtual void DetectCurrentWaypoint(Vector3[] wayPoints, bool shoot)
 		{
 			float margin = 1.0f;
 			if ((currentWayPoint - Position).Length() < Velocity.Length() + margin) {
 				currentWayPointIndex++;
 				if (currentWayPointIndex >= wayPoints.Length) currentWayPointIndex = 0;
 
-				if (currentWayPointIndex == 1 || currentWayPointIndex == 3) Shoot(2);
+				if (shoot && currentWayPointIndex == 1 || currentWayPointIndex == 3) Shoot(2);
 
 				currentWayPoint = wayPoints[currentWayPointIndex];
 			}
@@ -96,7 +93,6 @@ namespace _3DRTSGame
                 currentSounds.Add(ls);
             }
 		}
-		
         /// <summary>
         /// 直線状に往復しつつ攻撃する戦術
         /// </summary>
@@ -123,7 +119,7 @@ namespace _3DRTSGame
         /// </summary>
 		protected void WayPointMove()
 		{
-			DetectCurrentWaypoint(wayPoints0);
+			DetectCurrentWaypoint(wayPoints0, true);
 
 			// 速度の決定
 			float speed = 1;//5
@@ -138,7 +134,6 @@ namespace _3DRTSGame
 			Direction = Vector3.Normalize(Velocity);
 		}
 		
-		
 		private void CheckObstacles()
 		{
 			obstacles.Clear();
@@ -146,6 +141,7 @@ namespace _3DRTSGame
 			foreach (Object o in level.Models) {
 				if (o.Position != Position// とりあえず位置だけで自分じゃないかを判断する
 					&& viewSphere.Intersects(o.transformedBoundingSphere)
+					&& !(o is MilitaryShip)
 					&& o.transformedBoundingSphere.Radius < 1000) {// Goundがリストに入るとまずいのでこれで除外
 					obstacles.Add(o.transformedBoundingSphere);
 				}
@@ -162,51 +158,56 @@ namespace _3DRTSGame
 			float l2 = dirProjected.Length();
 			return target.Radius > b.Length() && l1 > l2;
 		}
-		private bool IsLeft(Vector3 vector, Vector3 targetPoint)
+		private bool IsInLeftOfTarget(Vector3 vector, Vector3 targetPoint)
 		{
 			return Math.Sin(vector.X * (targetPoint.Y - 0) - vector.Y * (targetPoint.X - 0)) > 0;
 		}
 		private float CalcAvoidSpeed(float distance, float radius)
 		{
 			//float A = 0, B = 13000, n = 1, m = 2.5f, d = distance / 25f;
-			float A = 0, B = 10 * radius, n = 1, m = 3.0f, d = distance / 25f;
+			float A = 0, B = 10 * radius, n = 1, m = 2.0f, d = distance / 25f;// m=3.5f
 
 			return -A / (float)Math.Pow(d, n) + B / (float)Math.Pow(d, m);
 		}
-		private void AddAvoidanceVelocity(Vector3 projectedDirection, Vector3 projectedDirection2, BoundingSphere bs)
+		private float CalcAvoidSpeedForPotentialFunc(float distance, float radius)
 		{
-			// 距離の近さに応じて速さを調整するべきだろう
-			float distance = (bs.Center - Position).Length();
-			//float avoidSpeed = 1f;
-			//float avoidSpeed = 2.5f / (distance / 100f);
-			//float avoidSpeed = 2.5f / (distance / 25f);
-			//float avoidSpeed = 1000000 / (distance * distance);
+			float weight = 1f;//2.5f;
+			float A = 0, B = weight * radius, n = 1, m = 2.0f, d = distance / 25f;//25f
+			return -A / (float)Math.Pow(d, n) + B / (float)Math.Pow(d, m);
+		}
+		private Vector3 GetAvoidanceVelocityFromPotential(BoundingSphere bs)
+		{
+			Vector3 avoidVelocity = Vector3.Zero;
+			float distance = (bs.Center - Position).Length();		// 距離の近さに応じて速さを調整するべきだろう
+			float avoidSpeed = CalcAvoidSpeedForPotentialFunc(distance, bs.Radius);	// 将来的にポテンシャル関数を使った速度に換装予定
 
-			// 回避速度にはポテンシャル関数を使うのはどうか？
+			//avoidVelocity = _world.Right;
+			avoidVelocity = Vector3.Normalize(Position - bs.Center);
+			return avoidVelocity * avoidSpeed;
+		}
+		private Vector3 GetAvoidanceVelocityFromCross(Vector3 projectedDirection, Vector3 projectedDirection2, BoundingSphere bs)
+		{
+			Vector3 avoidVelocity = Vector3.Zero;
+			float distance = (bs.Center - Position).Length();		// 距離の近さに応じて速さを調整するべきだろう
 			float avoidSpeed = CalcAvoidSpeed(distance, bs.Radius);
 
-			Vector3 avoidVelocity = Vector3.Zero;
 
 			// DirectionとUpからなる平面上での、Directionにおける障害物中心点の左右判定（左右どちらに避けるか）
 			Vector3 planeToCenter = bs.Center - Position;
 			float distancePlaneToCenter = Vector3.Dot(planeToCenter, Up);
 			Vector3 projectedCenter = bs.Center - distancePlaneToCenter * Up;
-			bool isLeft = IsLeft(projectedDirection, projectedCenter);
-
+			bool isLeft = IsInLeftOfTarget(projectedDirection, projectedCenter);
 			avoidVelocity += isLeft ? _world.Right : _world.Left;// RightもLeftも0のケースが...
-
 
 			// DirectionとRightからなる平面上での左右判定（上下どちらに避けるか）
 			//Vector3 planeToCenter2 = bs.Center - Position;
 			float distancePlaneToCenter2 = Vector3.Dot(planeToCenter, Right);
 			Vector3 projectedCenter2 = bs.Center - distancePlaneToCenter * Right;
-			bool isLeft2 = IsLeft(projectedDirection2, projectedCenter2);
-
+			bool isLeft2 = IsInLeftOfTarget(projectedDirection2, projectedCenter2);
 			avoidVelocity += isLeft2 ? _world.Up : _world.Down;
 			
-
-			Velocity += avoidVelocity * avoidSpeed;
 			//Velocity += Vector3.UnitX * avoidSpeed;
+			return avoidVelocity * avoidSpeed;
 		}
 		private void AvoidCollision()
 		{
@@ -214,13 +215,15 @@ namespace _3DRTSGame
 			Vector3 projectedDirection2 = Direction - Vector3.Dot(Direction, Right) * Right;
 
 			foreach (BoundingSphere bs in obstacles) {
-				if (IsGoingToCollide(bs)) {
-					AddAvoidanceVelocity(projectedDirection, projectedDirection2, bs);
-				}
+				/*if (IsGoingToCollide(bs)) {				
+					Velocity += GetAvoidanceVelocityFromCross(projectedDirection, projectedDirection2, bs);
+				}*/
+				Velocity += GetAvoidanceVelocityFromPotential(bs);
 			}
 		}
 		#endregion
 
+		// override methods
 		protected override void UpdateWorldMatrix()
 		{
 			Direction.Normalize();
@@ -229,6 +232,7 @@ namespace _3DRTSGame
 			Up.Normalize();
 			Right = Vector3.Cross(Direction, Up);
 			Right.Normalize();
+			Vector3 test = Vector3.Cross(Direction, Right);
 
 			// UpとDirectionが同軸上に存在してしまった場合は例外的に個別に決める
 			if (Right == Vector3.Zero) {
@@ -278,6 +282,8 @@ namespace _3DRTSGame
         protected virtual void Move()
         {
         }
+
+		#region public methods
 		public override object Clone()
         {
             MilitaryShip cloned = (MilitaryShip)MemberwiseClone();
@@ -312,9 +318,11 @@ namespace _3DRTSGame
 		{
 			if (IsActive) {
 				CheckObstacles();
-				AvoidCollision();
+				//Velocity = Vector3.Zero;
+				
 				//WayPointMove();
                 Move();
+				AvoidCollision();
 
                 // 再生終了したSEインスタンスを削除
 				for (int i = currentSounds.Count - 1; i >= 0; i--) {
@@ -363,21 +371,23 @@ namespace _3DRTSGame
                 Die();
             }
         }
+		#endregion
 
-        // Constructor
+		// Constructor
 		private void Initialize()
 		{
 			// Initialize default up position. this value is used for calculating Up vector later.
 			upPosition = Position + Vector3.UnitY;
 
-			viewSphere = new BoundingSphere(Position, 500);// 2000,100
+			viewSphere = new BoundingSphere(Position, VIEW_SPHERE_RADIUS);
 			obstacles = new List<BoundingSphere>();
 
 			// Initialize waypoints
+			float dis = 500;
 			wayPoints0 = new Vector3[] {
-				Target + Vector3.Normalize(StartPosition - Target) * 500,
+				Target + Vector3.Normalize(StartPosition - Target) * dis,
 				Target + Vector3.UnitY * 400,
-				Target - Vector3.Normalize(StartPosition - Target) * 500,
+				Target - Vector3.Normalize(StartPosition - Target) * dis,
 				Target - Vector3.UnitY * 400,
 			};
 			yawDebug = new Vector3[] {
@@ -400,6 +410,7 @@ namespace _3DRTSGame
 			engineTrailEffect = new BillboardStrip(Level.graphicsDevice, content, content.Load<Texture2D>("Textures\\Lines\\Line2T1"),//"Textures\\Lines\\Line2T1"
 				new Vector2(10, 100), positions);
 			//shootSound = content.Load<SoundEffect>("SoundEffects\\laser1");//License\\LAAT1
+			currentSounds = new List<SoundEffectInstance>();
 			shootSound = content.Load<SoundEffect>("SoundEffects\\License\\LAAT1");
 
 			Initialize();

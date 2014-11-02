@@ -138,6 +138,11 @@ namespace _3DRTSGame
 				Die();
 			}
 		}
+		public void MoveBackToObjectPool()
+		{
+			HitPoint = MaxHitPoint;
+			ObjectPool.AsteroidPool.Enqueue(this);
+		}
 		
 		public override void Update(GameTime gameTime)
 		{
@@ -208,9 +213,11 @@ namespace _3DRTSGame
 			this.Speed = speed;
 			this.Destination = destination;
 			this.Scale = scale;
-
 			this.movePattern = movePattern;
 			this.moveRouteIndex = moveRouteIndex;
+
+			IsAlive = IsActive = true;
+
 			revolutionAngle = CalcInitialAngle(movePattern);
 		}
 

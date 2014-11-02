@@ -78,25 +78,33 @@ namespace _3DRTSGame
 		/// </summary>
 		private void DrawString(SpriteBatch spritebatch)
 		{
-			/*debugInfos.Clear();
-			debugInfos.Add("Player Pos : " + level.player.Position.ToString());
+			debugInfos.Clear();
+			//debugInfos.Add("Player Pos : " + level.player.ToString());
 			debugInfos.Add("Camera Pos : " + level.camera.Position.ToString());
-			debugInfos.Add("Camera Dir : " + level.camera.ChaseDirection.ToString());
+			debugInfos.Add("Camera Dir : " + level.camera.Direction.ToString());
 			debugInfos.Add(JoyStick.Vector.ToString());
 			debugInfos.Add(JoyStick.vectorOther.ToString());
-			debugInfos.Add(level.player.b.ToString());
-			debugInfos.Add(level.player.CurrentMovingState.ToString());
+			if (level.Fighters.Count > 0) {
+				debugInfos.Add(level.Fighters[0].State.ToString());
+				debugInfos.Add(level.Fighters[0].currentWayPointIndex.ToString());// 後でprivateに戻すように
+				debugInfos.Add(level.Fighters[0].Up.ToString());
+			}
+			//debugInfos.Add(level.player.b.ToString());
+			//debugInfos.Add(level.player.CurrentMovingState.ToString());
 			int count = 0;
+			Vector2 basePos = new Vector2(0, 60);
 			foreach (String s in debugInfos) {
-				spritebatch.DrawString(font, s, new Vector2(0, count * fontSize), Color.Wheat);
+				spritebatch.DrawString(font, s, basePos + new Vector2(0, count * fontSize), Color.Wheat);
 				count++;
-			}*/
+			}/**/
 		}
 
 		public Debug()
 		{
 			basicEffect.VertexColorEnabled = true;
 			vertexBuffer.SetData(vertices);
+
+			Load();
 		}
 	}
 }

@@ -241,7 +241,8 @@ namespace _3DRTSGame
 				graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 			}*/
 
-			if (JoyStick.IsOnKeyDown(8)) {
+			//if (JoyStick.IsOnKeyDown(8)) {
+			if (KeyInput.IsOnKeyDown(Microsoft.Xna.Framework.Input.Keys.PrintScreen)) {
 				using (Stream stream = File.OpenWrite("lightmap.png")) {
 					lightTarg.SaveAsPng(stream, lightTarg.Width, lightTarg.Height);
 					stream.Position = 0;
